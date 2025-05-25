@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { MONGO_CONNECTION } from '@constants/db';
+import { GameEngineModule } from '@game-engine/game-engine.module';
+import { AppController } from '@/app.controller';
+import { AppService } from '@/app.service';
 
 @Module({
   controllers: [AppController],
-  imports: [],
+  imports: [
+    // eslint-disable-next-line
+    MongooseModule.forRoot(MONGO_CONNECTION), // force formatting
+    GameEngineModule,
+  ],
   providers: [AppService],
 })
 export class AppModule {}
