@@ -6,6 +6,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { GameSessionStatus } from '@/constants';
 import { GameSession } from '@game-engine/schemas/game-session.schema';
 import { GameSessionService } from '@game-engine/session/game-session.service';
+import { createMockModel } from '@/utils/test-helpers';
 
 const mockPlayerOneID = randomUUID();
 const mockPlayerTwoID = randomUUID();
@@ -30,14 +31,7 @@ describe('GameSessionService', () => {
         GameSessionService,
         {
           provide: GAME_SESSION_MODEL_TOKEN,
-          useValue: {
-            new: jest.fn().mockResolvedValue(mockGameSession),
-            constructor: jest.fn().mockResolvedValue(mockGameSession),
-            find: jest.fn(),
-            create: jest.fn(),
-            save: jest.fn(),
-            exec: jest.fn(),
-          },
+          useValue: createMockModel(mockGameSession),
         },
       ],
     }).compile();
