@@ -9,7 +9,6 @@ import { AppService } from '@/app.service';
 @Module({
   controllers: [AppController],
   imports: [
-    // eslint-disable-next-line
     MongooseModule.forRoot(MONGO_CONNECTION), // force formatting
     GameEngineModule,
   ],
