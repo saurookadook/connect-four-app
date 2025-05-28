@@ -27,8 +27,8 @@ export class GameSessionService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    const createdGameSession = this.gameSessionModel.create(gameSession);
-    return createdGameSession;
+    const createdGameSession = new this.gameSessionModel(gameSession);
+    return createdGameSession.save();
   }
 
   async updateOne(
