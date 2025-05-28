@@ -9,8 +9,9 @@ export default {
     '@game-engine/(.*)': '<rootDir>/game-engine/$1',
   },
   // preset: "ts-jest",
+  // preset: '@shelf/jest-mongodb',
   rootDir: 'src',
-  // setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
+  setupFilesAfterEnv: ['../jest-setup.ts'],
   testEnvironment: 'node',
   // testPathIgnorePatterns: [
   //     ".+\.d.ts",
