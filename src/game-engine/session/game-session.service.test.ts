@@ -1,44 +1,92 @@
 import { randomUUID } from 'node:crypto';
+// import { inspect } from 'node:util';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
-// import { Model } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { Connection, Model } from 'mongoose';
 
-import { GameSessionStatus } from '@/constants';
-import { GameSession } from '@game-engine/schemas/game-session.schema';
+import {
+  MONGO_CONNECTION_TEST_TOKEN,
+  GAME_SESSION_MODEL_TOKEN,
+  GameSessionStatus,
+} from '@/constants';
+import {
+  GameSession,
+  GameSessionSchema,
+} from '@game-engine/schemas/game-session.schema';
 import { GameSessionService } from '@game-engine/session/game-session.service';
-import { createMockModel } from '@/utils/test-helpers';
+// import { createMockModel } from '@/utils/test-helpers';
 
 const mockPlayerOneID = randomUUID();
 const mockPlayerTwoID = randomUUID();
+const mockNow = new Date();
 const mockGameSession = {
   playerOneID: mockPlayerOneID,
   playerTwoID: mockPlayerTwoID,
   moves: [],
   status: GameSessionStatus.ACTIVE,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: mockNow,
+  updatedAt: mockNow,
 };
 
-const GAME_SESSION_MODEL_TOKEN = getModelToken(GameSession.name);
-
 describe('GameSessionService', () => {
+  let module: TestingModule;
+  let testDatabaseModule: typeof mongoose;
   let service: GameSessionService;
-  // let model: Model<GameSession>;
+  let gameSessionModel: Model<GameSession>;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+  beforeAll(async () => {
+    console.log(
+      '    beforeAll - GameSessionService    '
+        .padStart(100, '=')
+        .padEnd(180, '='),
+    );
+    console.log({
+      mongod: global.mongod,
+      mongoConnection: global.mongoConnection,
+    });
+    // inspect(global.mongod, { colors: true, depth: 2 });
+    // inspect(global.mongoConnection, { colors: true, depth: 2 });
+    console.log(''.padStart(180, '='));
+    gameSessionModel = (global.mongoConnection as Connection).model(
+      GameSession.name,
+      GameSessionSchema,
+    );
+
+    jest.useFakeTimers({
+      now: mockNow.getTime(),
+    });
+    module = await Test.createTestingModule({
       providers: [
-        GameSessionService,
+        GameSessionService, // force formatting
         {
           provide: GAME_SESSION_MODEL_TOKEN,
-          useValue: createMockModel(mockGameSession),
+          useValue: gameSessionModel,
         },
+        // testDatabaseProvider,
+        // {
+        //   provide: GAME_SESSION_MODEL_TOKEN,
+        //   useFactory: (connection: Connection) => {
+        //     mongoConn = connection;
+        //     return connection.model(GameSession.name, GameSessionSchema);
+        //   },
+        //   inject: [MONGO_CONNECTION_TEST_TOKEN],
+        // },
       ],
     }).compile();
 
     service = module.get(GameSessionService);
-    // model = module.get<Model<GameSession>>(GAME_SESSION_MODEL_TOKEN);
   });
+
+  afterEach(async () => {
+    const { collections } = global.mongoConnection as Connection;
+    for (const key in collections) {
+      await collections[key].deleteMany({});
+    }
+  });
+
+  // afterAll(async () => {
+  //   await (global.mongoConnection as Connection).dropDatabase();
+  // });
 
   it('should insert a new game session document', async () => {
     const newGameSession = await service.createOne({
@@ -46,6 +94,10 @@ describe('GameSessionService', () => {
       playerTwoID: mockPlayerTwoID,
     });
 
-    expect(newGameSession).toEqual(mockGameSession);
+    expect(newGameSession.__v).not.toBeNull();
+    expect(newGameSession._id).not.toBeNull();
+    for (const [key, value] of Object.entries(mockGameSession)) {
+      expect(newGameSession[key]).toEqual(value);
+    }
   });
 });
