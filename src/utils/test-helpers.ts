@@ -1,5 +1,5 @@
 export const createMockModel = <T>(model: T) => ({
-  new: jest.fn().mockResolvedValue(model),
+  // new: jest.fn().mockResolvedValue(model),
   constructor: jest.fn().mockResolvedValue(model),
   find: jest.fn(),
   create: jest.fn(),

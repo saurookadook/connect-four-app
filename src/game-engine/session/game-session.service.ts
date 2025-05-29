@@ -1,7 +1,8 @@
 import { UUID } from 'node:crypto';
+import { inspect } from 'node:util';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectModel, InjectConnection } from '@nestjs/mongoose';
+import { Connection, Model } from 'mongoose';
 
 import {
   CreateGameSessionDTO,
@@ -18,6 +19,7 @@ export class GameSessionService {
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async findById(id: UUID): Promise<NullableGameSessionDocument> {
@@ -26,9 +28,45 @@ export class GameSessionService {
 
   async createOne(
     gameSession: CreateGameSessionDTO,
+  ): Promise<GameSessionDocument[]> {
+    console.log(
+      inspect({ gameSession }, { colors: true, depth: 4, showHidden: true }),
+    );
+    return await this.gameSessionModel.insertMany([gameSession]);
+  }
+
+  async _createOne(
+    gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    const createdGameSession = new this.gameSessionModel(gameSession);
-    return createdGameSession.save();
+    const session = await this.connection.startSession();
+    let createdGameSession: GameSessionDocument;
+
+    try {
+      console.log(
+        inspect(
+          { gameSessionModel: this.gameSessionModel },
+          { colors: true, depth: 4, showHidden: true },
+        ),
+      );
+      createdGameSession = await this.gameSessionModel.create(gameSession);
+      console.log(
+        inspect(
+          { createdGameSession },
+          { colors: true, depth: 4, showHidden: true },
+        ),
+      );
+      await createdGameSession.save();
+
+      await session.commitTransaction();
+    } catch (error) {
+      console.error('ERROR in GameSessionService.createOne:', error);
+      await session.abortTransaction();
+    } finally {
+      await session.endSession();
+    }
+
+    // @ts-expect-error: TODO
+    return createdGameSession;
   }
 
   async updateOne(
