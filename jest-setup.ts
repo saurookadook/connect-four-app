@@ -11,30 +11,30 @@ let mongoConnection: Connection;
 // let connection: MongoClient;
 // let db: Db;
 
-beforeAll(async () => {
-  mongod = await MongoMemoryServer.create({
-    instance: {
-      dbName: 'test-connect-four',
-    },
-  });
-  mongoConnection = (await connect(mongod.getUri())).connection;
+// beforeAll(async () => {
+//   mongod = await MongoMemoryServer.create({
+//     instance: {
+//       dbName: 'test-connect-four',
+//     },
+//   });
+//   mongoConnection = (await connect(mongod.getUri())).connection;
 
-  global.mongod = mongod;
-  global.mongoConnection = mongoConnection;
+//   global.mongod = mongod;
+//   global.mongoConnection = mongoConnection;
 
-  // connection = await MongoClient.connect(global.__MONGO_URI__, {
-  //   // useNewUrlParser: true,
-  //   // useUnifiedTopology: true,
-  // });
-  // db = connection.db();
-});
-
-// beforeEach(async () => {
-//   await db.collection(GAME_SESSION_MODEL_TOKEN).deleteMany({});
+//   // connection = await MongoClient.connect(global.__MONGO_URI__, {
+//   //   // useNewUrlParser: true,
+//   //   // useUnifiedTopology: true,
+//   // });
+//   // db = connection.db();
 // });
 
-afterAll(async () => {
-  await (global.mongoConnection as Connection).dropDatabase();
-  await (global.mongoConnection as Connection).close();
-  await (global.mongod as MongoMemoryServer).stop();
-});
+// // beforeEach(async () => {
+// //   await db.collection(GAME_SESSION_MODEL_TOKEN).deleteMany({});
+// // });
+
+// afterAll(async () => {
+//   await (global.mongoConnection as Connection).dropDatabase();
+//   await (global.mongoConnection as Connection).close();
+//   await (global.mongod as MongoMemoryServer).stop();
+// });
