@@ -1,8 +1,10 @@
 import { UUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { inspect } from 'node:util';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { GAME_SESSION_MODEL } from '@/constants';
 import {
   CreateGameSessionDTO,
   UpdateGameSessionDTO,
@@ -16,7 +18,8 @@ import {
 @Injectable()
 export class GameSessionService {
   constructor(
-    @InjectModel(GameSession.name)
+    // @InjectModel(GameSession.name)
+    @Inject(GAME_SESSION_MODEL)
     private readonly gameSessionModel: Model<GameSessionDocument>,
   ) {}
 
@@ -27,8 +30,18 @@ export class GameSessionService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    const createdGameSession = new this.gameSessionModel(gameSession);
-    return createdGameSession.save();
+    const createdGameSession = await this.gameSessionModel.create(gameSession);
+    console.log(
+      '    createdGameSession    '.padStart(100, '=').padEnd(180, '='),
+    );
+    console.log(
+      inspect(
+        { createdGameSession },
+        { colors: true, depth: 2, showHidden: true },
+      ),
+    );
+    console.log(''.padStart(180, '='));
+    return await createdGameSession.save();
   }
 
   async updateOne(
