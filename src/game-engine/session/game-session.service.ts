@@ -1,7 +1,8 @@
 import { UUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
+  DataSource,
   Document,
   InsertOneResult,
   MongoRepository,
@@ -24,6 +25,8 @@ export class GameSessionService {
   constructor(
     @InjectRepository(GameSession)
     private readonly gameSessionRepo: MongoRepository<GameSession>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async findById(id: UUID): Promise<NullableGameSession> {
@@ -33,20 +36,64 @@ export class GameSessionService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<InsertOneResult<GameSession>> {
+    return await this.gameSessionRepo.insertOne(gameSession);
+  }
+
+  // TODO: this jsut fails in a different way :']
+  async _createOne(
+    gameSession: CreateGameSessionDTO,
+  ): Promise<InsertOneResult<GameSession> | null> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     console.log(
       '    GameSessionService.createOne    '
         .padStart(100, '=')
         .padEnd(180, '='),
+      '\n',
       inspect(
-        { this: this, gameSessionRepo: this.gameSessionRepo },
+        {
+          queryRunner,
+          mongoRepo: queryRunner.manager.getMongoRepository(GameSession),
+          this: this,
+          gameSessionRepo: this.gameSessionRepo,
+        },
         { colors: true, depth: 2, showHidden: true },
       ),
+      '\n',
       ''.padEnd(180, '='),
     );
 
-    const createdGameSession =
-      await this.gameSessionRepo.insertOne(gameSession);
-    return createdGameSession;
+    let createdGameSession: InsertOneResult<GameSession> | null = null;
+
+    try {
+      console.log(
+        '    GameSessionService.createOne - before insertOne    '
+          .padStart(140, '-')
+          .padEnd(180, '-'),
+      );
+      createdGameSession =
+        // await this.gameSessionRepo.insertOne(gameSession);
+        await queryRunner.manager
+          .getMongoRepository(GameSession)
+          .insertOne(gameSession);
+      console.log(
+        '    GameSessionService.createOne - before commitTransaction    '
+          .padStart(140, '-')
+          .padEnd(180, '-'),
+      );
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      console.error(
+        '[GameSessionService.createOne] Encountered ERROR inserting document',
+        error,
+      );
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+
+    return createdGameSession ?? null;
   }
 
   async updateOne(

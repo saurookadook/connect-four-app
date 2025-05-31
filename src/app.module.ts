@@ -22,6 +22,8 @@ import { AppService } from '@/app.service';
         database: configService.get('database.dbName'),
         host: configService.get('database.host'),
         port: configService.get('database.port'),
+        // entities: ['./**/*.entity.ts'],
+        autoLoadEntities: true,
         synchronize: true,
       }),
       inject: [ConfigService],

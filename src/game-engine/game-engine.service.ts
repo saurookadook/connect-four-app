@@ -4,12 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { GameSessionDTO } from '@game-engine/dtos/game-session.dto';
+import { GameSession } from '@game-engine/session/game-session.entity';
 import {
-  GameSession,
+  // GameSession,
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@game-engine/schemas/game-session.schema';
 import { GameSessionService } from '@game-engine/session/game-session.service';
+import { InsertOneResult } from 'typeorm';
 
 @Injectable()
 export class GameEngineService {
@@ -21,23 +23,37 @@ export class GameEngineService {
   }: {
     playerOneID: GameSessionDTO['playerOneID'];
     playerTwoID: GameSessionDTO['playerTwoID'];
-  }): Promise<GameSessionDocument> {
+  }): Promise<InsertOneResult<GameSession>> {
     return await this.gameSessionService.createOne({
       playerOneID,
       playerTwoID,
     });
   }
 
-  async handlePlayerMove({
-    gameSessionId,
-    moveData,
-  }: {
-    gameSessionId: UUID;
-    moveData: {
-      coordinates: [number, number];
-      playerId: UUID;
-    };
-  }): Promise<GameSessionDocument> {
-    const gameSession = await this.gameSessionService.findById(gameSessionId);
-  }
+  // TODO: initial implementation
+  // async _startGame({
+  //   playerOneID,
+  //   playerTwoID,
+  // }: {
+  //   playerOneID: GameSessionDTO['playerOneID'];
+  //   playerTwoID: GameSessionDTO['playerTwoID'];
+  // }): Promise<GameSessionDocument> {
+  //   return await this.gameSessionService.createOne({
+  //     playerOneID,
+  //     playerTwoID,
+  //   });
+  // }
+
+  // async handlePlayerMove({
+  //   gameSessionId,
+  //   moveData,
+  // }: {
+  //   gameSessionId: UUID;
+  //   moveData: {
+  //     coordinates: [number, number];
+  //     playerId: UUID;
+  //   };
+  // }): Promise<GameSessionDocument> {
+  //   const gameSession = await this.gameSessionService.findById(gameSessionId);
+  // }
 }

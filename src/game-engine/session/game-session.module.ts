@@ -9,6 +9,7 @@ import { GameSessionService } from '@game-engine/session/game-session.service';
 
 @Module({
   controllers: [],
+  exports: [GameSessionService],
   imports: [TypeOrmModule.forFeature([GameSession])],
   providers: [GameSessionService],
 })
