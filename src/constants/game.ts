@@ -11,6 +11,6 @@ export type MoveCoordinatesTuple = [number, number];
 
 export type PlayerMove = {
   coordinates: MoveCoordinatesTuple;
-  playerId: UUID;
+  playerID: UUID;
   timestamp: Date;
 };
