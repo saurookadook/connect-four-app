@@ -30,20 +30,6 @@ export class GameEngineService {
     });
   }
 
-  // TODO: initial implementation
-  // async _startGame({
-  //   playerOneID,
-  //   playerTwoID,
-  // }: {
-  //   playerOneID: GameSessionDTO['playerOneID'];
-  //   playerTwoID: GameSessionDTO['playerTwoID'];
-  // }): Promise<GameSessionDocument> {
-  //   return await this.gameSessionService.createOne({
-  //     playerOneID,
-  //     playerTwoID,
-  //   });
-  // }
-
   // async handlePlayerMove({
   //   gameSessionId,
   //   moveData,

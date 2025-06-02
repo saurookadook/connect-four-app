@@ -33,6 +33,12 @@ export class GameSessionService {
     return await this.gameSessionRepo.findOneBy({ id });
   }
 
+  async findAllForPlayer(playerID: UUID): Promise<GameSession[]> {
+    return await this.gameSessionRepo.find({
+      $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
+    });
+  }
+
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<InsertOneResult<GameSession>> {
