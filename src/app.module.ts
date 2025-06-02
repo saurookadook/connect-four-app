@@ -17,15 +17,25 @@ import { AppService } from '@/app.service';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mongodb',
-        database: configService.get('database.dbName'),
-        host: configService.get('database.host'),
-        port: configService.get('database.port'),
-        // entities: ['./**/*.entity.ts'],
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        console.log({
+          name: 'AppModule.useFactory',
+          database: configService.get('database.dbName'),
+          host: configService.get('database.host'),
+          port: configService.get('database.port'),
+        });
+
+        return {
+          type: 'mongodb',
+          database: configService.get('database.dbName'),
+          host: configService.get('database.host'),
+          port: configService.get('database.port'),
+          entities: [__dirname + '/**/*.entity.ts'],
+          autoLoadEntities: true,
+          synchronize: true,
+          logging: process.env.NODE_ENV !== 'production',
+        };
+      },
       inject: [ConfigService],
     }),
     GameEngineModule,

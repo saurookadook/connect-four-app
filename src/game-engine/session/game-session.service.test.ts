@@ -48,8 +48,7 @@ const mockGameSession = {
           database: configService.get('database.dbName'),
           host: configService.get('database.host'),
           port: configService.get('database.port'),
-          // entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          entities: [GameSession],
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: true,
           logging: true,
         };
@@ -115,11 +114,12 @@ describe('GameSessionService', () => {
       // ],
     }).compile();
 
+    app = module.createNestApplication();
     // app = await NestFactory.create(GameSessionTestModule);
-    // await app.init();
+    await app.init();
 
-    // service = app.get(GameSessionService);
-    service = await module.resolve(GameSessionService);
+    service = app.get(GameSessionService);
+    // service = await module.resolve(GameSessionService);
     console.log(
       '    [beforeAll] GameSessionService TEST    '
         .padStart(100, '=')
@@ -127,8 +127,8 @@ describe('GameSessionService', () => {
       '\n',
       inspect(
         {
-          // app,
-          module,
+          app,
+          // module,
           service,
         },
         { colors: true, depth: 2, showHidden: true },
@@ -139,8 +139,8 @@ describe('GameSessionService', () => {
   });
 
   afterAll(async () => {
-    // await app.close();
-    await module.close();
+    await app.close();
+    // await module.close();
     jest.useRealTimers();
   });
 
