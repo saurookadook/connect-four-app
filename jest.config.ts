@@ -2,6 +2,8 @@ export default {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   // coveragePathIgnorePatterns: ['/dist/', '/node_modules/', '**/*.d.ts'],
+  detectOpenHandles: true,
+  forceExit: true,
   moduleFileExtensions: ['js', 'json', 'ts'],
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/$1',

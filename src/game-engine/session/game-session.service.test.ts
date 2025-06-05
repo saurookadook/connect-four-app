@@ -1,18 +1,17 @@
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
-import { INestApplication, Module } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
-import { MongoRepository } from 'typeorm';
+import { Test } from '@nestjs/testing';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ObjectId } from 'mongodb';
+import { DataSource } from 'typeorm';
 
 import baseConfig from '@/config/base.config';
 import { GameSessionStatus } from '@/constants';
 import { GameSession } from '@game-engine/session/game-session.entity';
 import { GameSessionModule } from '@game-engine/session/game-session.module';
 import { GameSessionService } from '@game-engine/session/game-session.service';
-import { createMockModel } from '@/utils/test-helpers';
 
 const mockPlayerOneID = randomUUID();
 const mockPlayerTwoID = randomUUID();
@@ -22,58 +21,21 @@ const mockGameSession = {
   playerTwoID: mockPlayerTwoID,
   moves: [],
   status: GameSessionStatus.ACTIVE,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt: mockNow,
+  updatedAt: mockNow,
 };
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-      isGlobal: true,
-      load: [baseConfig],
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => {
-        console.log({
-          name: 'GameSessionService.useFactory',
-          database: configService.get('database.dbName'),
-          host: configService.get('database.host'),
-          port: configService.get('database.port'),
-        });
-
-        return {
-          type: 'mongodb',
-          database: configService.get('database.dbName'),
-          host: configService.get('database.host'),
-          port: configService.get('database.port'),
-          entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: true,
-          logging: true,
-        };
-      },
-      inject: [ConfigService],
-    }),
-    TypeOrmModule.forFeature([GameSession]),
-    GameSessionModule,
-  ],
-  // providers: [
-  //   GameSessionService, // force formatting
-  // ],
-})
-export class GameSessionTestModule {}
 
 describe('GameSessionService', () => {
   let app: INestApplication;
-  let module: TestingModule;
+  let dataSource: DataSource;
   let service: GameSessionService;
 
   beforeAll(async () => {
     jest.useFakeTimers({
+      doNotFake: ['nextTick', 'setImmediate'],
       now: mockNow,
     });
-    module = await Test.createTestingModule({
+    const module = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
           envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
@@ -95,8 +57,7 @@ describe('GameSessionService', () => {
               database: configService.get('database.dbName'),
               host: configService.get('database.host'),
               port: configService.get('database.port'),
-              // entities: [__dirname + '/**/*.entity{.ts,.js}'],
-              entities: [GameSession],
+              entities: [__dirname + '/**/*.entity{.ts,.js}'],
               synchronize: true,
             };
           },
@@ -105,42 +66,19 @@ describe('GameSessionService', () => {
         TypeOrmModule.forFeature([GameSession]),
         GameSessionModule,
       ],
-      // providers: [
-      //   GameSessionService,
-      //   {
-      //     provide: getRepositoryToken(GameSession),
-      //     useClass: MongoRepository,
-      //   },
-      // ],
     }).compile();
 
     app = module.createNestApplication();
-    // app = await NestFactory.create(GameSessionTestModule);
-    await app.init();
+    await app.listen(3333);
 
-    service = app.get(GameSessionService);
-    // service = await module.resolve(GameSessionService);
-    console.log(
-      '    [beforeAll] GameSessionService TEST    '
-        .padStart(100, '=')
-        .padEnd(180, '='),
-      '\n',
-      inspect(
-        {
-          app,
-          // module,
-          service,
-        },
-        { colors: true, depth: 2, showHidden: true },
-      ),
-      '\n',
-      ''.padEnd(180, '='),
-    );
+    dataSource = await app.resolve(DataSource);
+    service = await app.resolve(GameSessionService);
   });
 
   afterAll(async () => {
+    await dataSource.dropDatabase();
+    await dataSource.destroy();
     await app.close();
-    // await module.close();
     jest.useRealTimers();
   });
 
@@ -148,27 +86,22 @@ describe('GameSessionService', () => {
     expect(service).toBeDefined();
   });
 
-  // TODO: WHY WON'T THIS SERVICE INSERT ANYTHING!?
   it('should insert a new game session document', async () => {
-    const newGameSession = await service.createOne({
+    const insertResult = await service.createOne({
       playerOneID: mockPlayerOneID,
       playerTwoID: mockPlayerTwoID,
     });
-    // console.log(
-    //   '    GameSessionService TEST    '.padStart(100, '=').padEnd(180, '='),
-    //   '\n',
-    //   inspect(
-    //     {
-    //       mockGameSession,
-    //       newGameSession,
-    //       service,
-    //     },
-    //     { colors: true, depth: 2, showHidden: true },
-    //   ),
-    //   '\n',
-    //   ''.padEnd(180, '='),
-    // );
 
-    expect(newGameSession).toEqual(mockGameSession);
+    console.log({
+      insertedIdType: typeof insertResult.insertedId,
+      insertedIdInstanceOf: insertResult.insertedId instanceof ObjectId,
+    });
+
+    expect(insertResult).toEqual(
+      expect.objectContaining({
+        acknowledged: true,
+        insertedId: expect.any(ObjectId),
+      }),
+    );
   });
 });
