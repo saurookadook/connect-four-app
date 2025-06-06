@@ -29,7 +29,13 @@ export class GameSessionService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findById(id: UUID): Promise<NullableGameSession> {
+  async createOne(
+    gameSession: CreateGameSessionDTO,
+  ): Promise<InsertOneResult<GameSession>> {
+    return await this.gameSessionRepo.insertOne(gameSession);
+  }
+
+  async findOneById(id: ObjectId): Promise<NullableGameSession> {
     return await this.gameSessionRepo.findOneBy({ id });
   }
 
@@ -39,13 +45,7 @@ export class GameSessionService {
     });
   }
 
-  async createOne(
-    gameSession: CreateGameSessionDTO,
-  ): Promise<InsertOneResult<GameSession>> {
-    return await this.gameSessionRepo.insertOne(gameSession);
-  }
-
-  // TODO: this jsut fails in a different way :']
+  // TODO: possibly an example using transactions?
   async _createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<InsertOneResult<GameSession> | null> {
