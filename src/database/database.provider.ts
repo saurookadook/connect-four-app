@@ -1,14 +1,19 @@
-import * as mongoose from 'mongoose';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 
-import { MONGO_DB_CONNECTION } from '@/constants/db';
+import baseConfig, { buildConnectionURI } from '@/config';
 
-export const databaseProvider = {
-  provide: MONGO_DB_CONNECTION,
-  useFactory: async (configService: ConfigService) => {
-    const connectionURL = `mongodb://${configService.get('database.host')}:${configService.get('database.port')}/${configService.get('database.dbName')}`;
-    const connection = await mongoose.connect(connectionURL);
-    return connection;
-  },
-  inject: [ConfigService],
-};
+export const databaseProviders = [
+  ConfigModule.forRoot({
+    envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+    isGlobal: true,
+    load: [baseConfig],
+  }),
+  MongooseModule.forRootAsync({
+    imports: [ConfigModule],
+    useFactory: (configService: ConfigService) => ({
+      uri: buildConnectionURI(configService),
+    }),
+    inject: [ConfigService],
+  }), // force formatting
+];
