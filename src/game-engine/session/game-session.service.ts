@@ -1,7 +1,7 @@
 import { UUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import {
   CreateGameSessionDTO,
@@ -20,8 +20,16 @@ export class GameSessionService {
     private readonly gameSessionModel: Model<GameSessionDocument>,
   ) {}
 
-  async findById(id: UUID): Promise<NullableGameSessionDocument> {
+  async findOneById(id: Types.ObjectId): Promise<NullableGameSessionDocument> {
     return await this.gameSessionModel.findById(id).exec();
+  }
+
+  async findAllForPlayer(playerID: UUID): Promise<GameSessionDocument[]> {
+    return this.gameSessionModel
+      .find({
+        $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
+      })
+      .exec();
   }
 
   async createOne(
