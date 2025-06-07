@@ -1,17 +1,15 @@
 import { randomUUID } from 'node:crypto';
-import { INestApplication } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
 import { Connection, Model } from 'mongoose';
 
-import baseConfig from '@/config';
+import baseConfig, { buildConnectionURI } from '@/config';
 import { GAME_SESSION_MODEL_TOKEN, GameSessionStatus } from '@/constants';
 import {
   GameSession,
   GameSessionDocument,
-  GameSessionSchema,
 } from '@game-engine/schemas/game-session.schema';
 import { GameSessionModule } from '@game-engine/session/game-session.module';
 import { GameSessionService } from '@game-engine/session/game-session.service';
@@ -28,10 +26,8 @@ const mockGameSession = {
   createdAt: mockNow,
   updatedAt: mockNow,
 };
-const dateFields = new Set(['createdAt', 'updatedAt']);
 
 describe('GameSessionService', () => {
-  let app: INestApplication;
   let mongoConnection: Connection;
   let service: GameSessionService;
   let model: Model<GameSession>;
@@ -44,7 +40,7 @@ describe('GameSessionService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
-          envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+          envFilePath: '.env.test',
           isGlobal: true,
           load: [baseConfig],
         }),
@@ -52,24 +48,18 @@ describe('GameSessionService', () => {
           imports: [ConfigModule],
           useFactory: (configService: ConfigService) => {
             return {
-              uri: `mongodb://${configService.get('database.host')}:${configService.get('database.port')}/${configService.get('database.dbName')}`,
+              uri: buildConnectionURI(configService),
             };
           },
           inject: [ConfigService],
         }),
-        MongooseModule.forFeature([
-          { name: GameSession.name, schema: GameSessionSchema },
-        ]),
         GameSessionModule,
       ],
     }).compile();
 
-    app = module.createNestApplication();
-    await app.init();
-
-    mongoConnection = await app.resolve(getConnectionToken());
-    service = await app.resolve(GameSessionService);
-    model = await app.resolve(GAME_SESSION_MODEL_TOKEN);
+    mongoConnection = await module.resolve(getConnectionToken());
+    service = await module.resolve(GameSessionService);
+    model = await module.resolve(GAME_SESSION_MODEL_TOKEN);
   });
 
   beforeEach(() => {
@@ -83,8 +73,8 @@ describe('GameSessionService', () => {
   });
 
   afterAll(async () => {
+    await model.deleteMany({}).exec();
     await mongoConnection.close();
-    await app.close();
     jest.useRealTimers();
   });
 
@@ -139,6 +129,11 @@ describe('GameSessionService', () => {
     });
   });
 });
+
+// --------------------------------------------------------------------------------
+// Helper Functions (TODO: maybe move to test helpers file?)
+// --------------------------------------------------------------------------------
+const dateFields = new Set(['createdAt', 'updatedAt']);
 
 function expectGameSessionToMatch(
   gameSessionDocument: GameSessionDocument,
