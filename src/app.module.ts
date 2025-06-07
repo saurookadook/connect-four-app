@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 
-import { MONGO_CONNECTION } from '@constants/db';
+import { DatabaseModule } from '@/database/database.module';
 import { GameEngineModule } from '@game-engine/game-engine.module';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
@@ -9,8 +8,8 @@ import { AppService } from '@/app.service';
 @Module({
   controllers: [AppController],
   imports: [
-    MongooseModule.forRoot(MONGO_CONNECTION), // force formatting
-    GameEngineModule,
+    DatabaseModule,
+    GameEngineModule, // force formatting
   ],
   providers: [AppService],
 })
