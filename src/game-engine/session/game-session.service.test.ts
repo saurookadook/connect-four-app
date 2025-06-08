@@ -89,20 +89,22 @@ describe('GameSessionService', () => {
     });
   });
 
-  it("'findById' - should a game session document by ", async () => {
+  it("'findById' - should find a game session document by ID", async () => {
     const newGameSession = await service.createOne({
       playerOneID: mockFirstPlayerID,
       playerTwoID: mockSecondPlayerID,
     });
 
-    const foundGameSession = await service.findOneById(newGameSession._id);
+    const foundGameSession = await service.findOneById(
+      newGameSession._id.toString(),
+    );
 
     expectGameSessionToMatch(foundGameSession as GameSessionDocument, {
       ...mockGameSession,
     });
   });
 
-  it("'findAllForPlayer' - should insert a new game session document", async () => {
+  it("'findAllForPlayer' - should find all game session documents for a player by their ID", async () => {
     const gameSessionOne = await service.createOne({
       playerOneID: mockFirstPlayerID,
       playerTwoID: mockSecondPlayerID,
@@ -126,6 +128,50 @@ describe('GameSessionService', () => {
       _id: gameSessionTwo._id,
       playerOneID: mockThirdPlayerID,
       playerTwoID: mockFirstPlayerID,
+    });
+  });
+
+  it("'updateOne' - should update a game session document", async () => {
+    const newGameSession = await service.createOne({
+      playerOneID: mockFirstPlayerID,
+      playerTwoID: mockSecondPlayerID,
+    });
+
+    expectGameSessionToMatch(newGameSession, {
+      ...mockGameSession,
+    });
+
+    const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
+    const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
+
+    const updatedMoves = [
+      {
+        columnIndex: 3,
+        playerID: mockFirstPlayerID,
+        timestamp: new Date(),
+      },
+      {
+        columnIndex: 2,
+        playerID: mockSecondPlayerID,
+        timestamp: nowPlus30Seconds,
+      },
+      {
+        columnIndex: 3,
+        playerID: mockFirstPlayerID,
+        timestamp: nowPlus1Minute,
+      },
+    ];
+
+    const updatedGameSession = await service.updateOne(
+      newGameSession._id.toString(),
+      {
+        moves: [...newGameSession.moves, ...updatedMoves],
+      },
+    );
+
+    expectGameSessionToMatch(updatedGameSession as GameSessionDocument, {
+      ...mockGameSession,
+      moves: [...mockGameSession.moves, ...updatedMoves],
     });
   });
 });

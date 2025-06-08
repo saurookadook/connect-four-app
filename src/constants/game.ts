@@ -7,10 +7,9 @@ export enum GameSessionStatus {
 }
 
 export type PlayersTuple = [UUID, UUID];
-export type MoveCoordinatesTuple = [number, number];
 
 export type PlayerMove = {
-  coordinates: MoveCoordinatesTuple;
-  playerId: UUID;
+  columnIndex: number;
+  playerID: UUID;
   timestamp: Date;
 };
