@@ -1,13 +1,11 @@
 import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
-import { PlayerMove } from '@constants/game';
+import { PlayerMove } from '@/constants/game';
+import { BaseDTO } from '@/dtos/base.dto';
 
 @Exclude()
-export class GameSessionDTO {
-  @Expose({ name: '_id' })
-  id: string;
-
+export class GameSessionDTO extends BaseDTO {
   @Expose()
   playerOneID: UUID;
 
@@ -19,12 +17,6 @@ export class GameSessionDTO {
 
   @Expose()
   status: string;
-
-  @Expose()
-  createdAt: Date;
-
-  @Expose()
-  updatedAt: Date;
 
   // constructor(partial: Partial<GameSessionDTO>) {
   //   Object.assign(this, partial);
