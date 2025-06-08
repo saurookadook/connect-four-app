@@ -19,7 +19,7 @@ describe('LogicSession', () => {
         playerTwoID: mockPlayerTwoID,
       });
       const {
-        board: { state: boardState },
+        board: { gameBoardState },
         playerOneID,
         playerTwoID,
       } = session;
@@ -27,12 +27,12 @@ describe('LogicSession', () => {
       expect(playerOneID).toBe(mockPlayerOneID);
       expect(playerTwoID).toBe(mockPlayerTwoID);
 
-      expect(boardState).toHaveLength(BOARD_COLS);
-      expect(boardState[0]).toHaveLength(BOARD_ROWS);
+      expect(gameBoardState).toHaveLength(BOARD_COLS);
+      expect(gameBoardState[0]).toHaveLength(BOARD_ROWS);
 
       for (let i = 0; i < BOARD_COLS; i++) {
         for (let j = 0; j < BOARD_ROWS; j++) {
-          expect(boardState[i][j]).toEqual({
+          expect(gameBoardState[i][j]).toEqual({
             state: null,
             column: i,
             row: j,
@@ -58,23 +58,23 @@ describe('LogicSession', () => {
       const columnThree = 2;
 
       const {
-        board: { state: boardState },
+        board: { gameBoardState },
       } = session;
 
       session.updateBoard({ column: columnOne, playerID: mockPlayerOneID });
-      expect(boardState[columnOne].at(-1)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnOne].at(-1)!.state).toBe(PlayerColor.RED);
       session.updateBoard({ column: columnOne, playerID: mockPlayerTwoID });
-      expect(boardState[columnOne].at(-2)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnOne].at(-2)!.state).toBe(PlayerColor.BLACK);
 
       session.updateBoard({ column: columnTwo, playerID: mockPlayerOneID });
-      expect(boardState[columnTwo].at(-1)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnTwo].at(-1)!.state).toBe(PlayerColor.RED);
       session.updateBoard({ column: columnThree, playerID: mockPlayerTwoID });
-      expect(boardState[columnThree].at(-1)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnThree].at(-1)!.state).toBe(PlayerColor.BLACK);
 
       session.updateBoard({ column: columnTwo, playerID: mockPlayerOneID });
-      expect(boardState[columnTwo].at(-2)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnTwo].at(-2)!.state).toBe(PlayerColor.RED);
       session.updateBoard({ column: columnTwo, playerID: mockPlayerTwoID });
-      expect(boardState[columnTwo].at(-3)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnTwo].at(-3)!.state).toBe(PlayerColor.BLACK);
     });
 
     test('should throw error for invalid column', () => {
