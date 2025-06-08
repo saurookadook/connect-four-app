@@ -20,6 +20,13 @@ export class GameSessionService {
     private readonly gameSessionModel: Model<GameSessionDocument>,
   ) {}
 
+  async createOne(
+    gameSession: CreateGameSessionDTO,
+  ): Promise<GameSessionDocument> {
+    const createdGameSession = new this.gameSessionModel(gameSession);
+    return createdGameSession.save();
+  }
+
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
     return await this.gameSessionModel.findById(id).exec();
   }
@@ -32,13 +39,6 @@ export class GameSessionService {
       .exec();
   }
 
-  async createOne(
-    gameSession: CreateGameSessionDTO,
-  ): Promise<GameSessionDocument> {
-    const createdGameSession = new this.gameSessionModel(gameSession);
-    return createdGameSession.save();
-  }
-
   async updateOne(
     id: string,
     gameSession: UpdateGameSessionDTO,
@@ -48,7 +48,7 @@ export class GameSessionService {
       .exec();
   }
 
-  async deleteTodo(id: string): Promise<NullableGameSessionDocument> {
+  async deleteOneById(id: string): Promise<NullableGameSessionDocument> {
     return this.gameSessionModel.findByIdAndDelete(id).exec();
   }
 }

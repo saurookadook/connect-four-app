@@ -1,18 +1,17 @@
 import { randomUUID } from 'node:crypto';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
+import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 
-import baseConfig, { buildConnectionURI } from '@/config';
 import { GAME_SESSION_MODEL_TOKEN, GameSessionStatus } from '@/constants';
+import { databaseProviders } from '@/database/database.providers';
 import {
   GameSession,
   GameSessionDocument,
 } from '@game-engine/schemas/game-session.schema';
 import { GameSessionModule } from '@game-engine/session/game-session.module';
 import { GameSessionService } from '@game-engine/session/game-session.service';
+import { expectHydratedDocumentToMatch } from '@/utils/testing';
 
 const mockFirstPlayerID = randomUUID();
 const mockSecondPlayerID = randomUUID();
@@ -39,20 +38,7 @@ describe('GameSessionService', () => {
     });
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          envFilePath: '.env.test',
-          isGlobal: true,
-          load: [baseConfig],
-        }),
-        MongooseModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: (configService: ConfigService) => {
-            return {
-              uri: buildConnectionURI(configService),
-            };
-          },
-          inject: [ConfigService],
-        }),
+        ...databaseProviders, // force formatting
         GameSessionModule,
       ],
     }).compile();
@@ -68,7 +54,7 @@ describe('GameSessionService', () => {
   });
 
   afterEach(async () => {
-    await model.deleteMany({});
+    await model.deleteMany({}).exec();
     jest.clearAllTimers();
   });
 
@@ -85,7 +71,7 @@ describe('GameSessionService', () => {
         playerTwoID: mockSecondPlayerID,
       });
 
-      expectGameSessionToMatch(newGameSession, {
+      expectHydratedDocumentToMatch<GameSession>(newGameSession, {
         ...mockGameSession,
       });
     });
@@ -101,14 +87,17 @@ describe('GameSessionService', () => {
       });
     });
 
-    it("'findById' - should find a game session document by ID", async () => {
+    it('should find a game session document by ID', async () => {
       const foundGameSession = await service.findOneById(
         initialGameSession._id.toString(),
       );
 
-      expectGameSessionToMatch(foundGameSession as GameSessionDocument, {
-        ...mockGameSession,
-      });
+      expectHydratedDocumentToMatch<GameSession>(
+        foundGameSession as GameSessionDocument,
+        {
+          ...mockGameSession,
+        },
+      );
     });
   });
 
@@ -129,11 +118,11 @@ describe('GameSessionService', () => {
       expect(foundGameSessions).toHaveLength(2);
 
       const [foundGameSessionOne, foundGameSessionTwo] = foundGameSessions;
-      expectGameSessionToMatch(foundGameSessionOne, {
+      expectHydratedDocumentToMatch<GameSession>(foundGameSessionOne, {
         ...mockGameSession,
         _id: gameSessionOne._id,
       });
-      expectGameSessionToMatch(foundGameSessionTwo, {
+      expectHydratedDocumentToMatch<GameSession>(foundGameSessionTwo, {
         ...mockGameSession,
         _id: gameSessionTwo._id,
         playerOneID: mockThirdPlayerID,
@@ -153,7 +142,7 @@ describe('GameSessionService', () => {
     });
 
     it('should update a game session document', async () => {
-      expectGameSessionToMatch(initialGameSession, {
+      expectHydratedDocumentToMatch<GameSession>(initialGameSession, {
         ...mockGameSession,
       });
 
@@ -185,14 +174,17 @@ describe('GameSessionService', () => {
         },
       );
 
-      expectGameSessionToMatch(updatedGameSession as GameSessionDocument, {
-        ...mockGameSession,
-        moves: [...mockGameSession.moves, ...updatedMoves],
-      });
+      expectHydratedDocumentToMatch<GameSession>(
+        updatedGameSession as GameSessionDocument,
+        {
+          ...mockGameSession,
+          moves: [...mockGameSession.moves, ...updatedMoves],
+        },
+      );
     });
   });
 
-  describe('deleteOne', () => {
+  describe('deleteOneById', () => {
     let initialGameSession: GameSessionDocument;
 
     beforeEach(async () => {
@@ -202,30 +194,23 @@ describe('GameSessionService', () => {
       });
     });
 
-    it('should delete a game session document', () => {
-      expectGameSessionToMatch(initialGameSession, {
+    it('should delete a game session document', async () => {
+      expectHydratedDocumentToMatch<GameSession>(initialGameSession, {
         ...mockGameSession,
       });
+
+      const initialID = initialGameSession._id.toString();
+      const deletedGameSession = await service.deleteOneById(initialID);
+
+      expectHydratedDocumentToMatch<GameSession>(
+        deletedGameSession as GameSessionDocument,
+        {
+          ...mockGameSession,
+        },
+      );
+
+      const emptyResult = await service.findOneById(initialID);
+      expect(emptyResult).toBeNull();
     });
   });
 });
-
-// --------------------------------------------------------------------------------
-// Helper Functions (TODO: maybe move to test helpers file?)
-// --------------------------------------------------------------------------------
-const dateFields = new Set(['createdAt', 'updatedAt']);
-
-function expectGameSessionToMatch(
-  gameSessionDocument: GameSessionDocument,
-  expected: Partial<GameSession> & { _id?: ObjectId },
-): void {
-  expect(gameSessionDocument).not.toBeNull();
-  expect(gameSessionDocument._id).toEqual(expect.any(ObjectId));
-  for (const [key, value] of Object.entries(expected)) {
-    if (dateFields.has(key)) {
-      expect(gameSessionDocument[key]).toEqual(expect.any(Date));
-    } else {
-      expect(gameSessionDocument[key]).toEqual(value);
-    }
-  }
-}
