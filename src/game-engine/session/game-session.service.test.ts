@@ -192,7 +192,7 @@ describe('GameSessionService', () => {
     });
   });
 
-  describe('deleteOne', () => {
+  describe('deleteOneById', () => {
     let initialGameSession: GameSessionDocument;
 
     beforeEach(async () => {
@@ -202,10 +202,20 @@ describe('GameSessionService', () => {
       });
     });
 
-    it('should delete a game session document', () => {
+    it('should delete a game session document', async () => {
       expectGameSessionToMatch(initialGameSession, {
         ...mockGameSession,
       });
+
+      const initialID = initialGameSession._id.toString();
+      const deletedGameSession = await service.deleteOneById(initialID);
+
+      expectGameSessionToMatch(deletedGameSession as GameSessionDocument, {
+        ...mockGameSession,
+      });
+
+      const emptyResult = await service.findOneById(initialID);
+      expect(emptyResult).toBeNull();
     });
   });
 });
