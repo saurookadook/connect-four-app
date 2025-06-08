@@ -11,3 +11,15 @@ export class BaseDTO {
   @Expose()
   updatedAt: Date;
 }
+
+@Exclude()
+export class PartialBaseDTO {
+  @Expose({ name: '_id' })
+  id?: string;
+
+  @Expose()
+  createdAt?: Date;
+
+  @Expose()
+  updatedAt?: Date;
+}

@@ -2,7 +2,7 @@ import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
 import { PlayerMove } from '@/constants/game';
-import { BaseDTO } from '@/dtos/base.dto';
+import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
 
 @Exclude()
 export class GameSessionDTO extends BaseDTO {
@@ -33,7 +33,7 @@ export class CreateGameSessionDTO {
 }
 
 @Exclude()
-export class UpdateGameSessionDTO {
+export class UpdateGameSessionDTO extends PartialBaseDTO {
   @Expose()
   playerOneID?: GameSessionDTO['playerOneID'];
 
