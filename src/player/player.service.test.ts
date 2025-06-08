@@ -1,11 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import { MongooseModule, getConnectionToken } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
+import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 
-import baseConfig, { buildConnectionURI } from '@/config';
 import { PLAYER_MODEL_TOKEN } from '@/constants/db';
 import { databaseProviders } from '@/database/database.providers';
 import { Player, PlayerDocument } from '@/player/schemas/player.schema';
