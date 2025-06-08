@@ -14,14 +14,16 @@ describe('Board', () => {
 
       const targetColIndex = 4;
 
-      expect(testLogicBoard.state[targetColIndex].at(-1)?.state).toBeNull();
+      expect(
+        testLogicBoard.gameBoardState[targetColIndex].at(-1)?.state,
+      ).toBeNull();
 
       testLogicBoard.updateBoardState({
         columnIndex: targetColIndex,
         playerColor: PlayerColor.RED,
       });
 
-      expect(testLogicBoard.state[targetColIndex].at(-1)?.state).toBe(
+      expect(testLogicBoard.gameBoardState[targetColIndex].at(-1)?.state).toBe(
         PlayerColor.RED,
       );
     });
