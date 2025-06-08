@@ -78,100 +78,134 @@ describe('GameSessionService', () => {
     jest.useRealTimers();
   });
 
-  it("'createOne' - should insert a new game session document", async () => {
-    const newGameSession = await service.createOne({
-      playerOneID: mockFirstPlayerID,
-      playerTwoID: mockSecondPlayerID,
-    });
+  describe("'createOne' method", () => {
+    it('should insert a new game session document', async () => {
+      const newGameSession = await service.createOne({
+        playerOneID: mockFirstPlayerID,
+        playerTwoID: mockSecondPlayerID,
+      });
 
-    expectGameSessionToMatch(newGameSession, {
-      ...mockGameSession,
-    });
-  });
-
-  it("'findById' - should find a game session document by ID", async () => {
-    const newGameSession = await service.createOne({
-      playerOneID: mockFirstPlayerID,
-      playerTwoID: mockSecondPlayerID,
-    });
-
-    const foundGameSession = await service.findOneById(
-      newGameSession._id.toString(),
-    );
-
-    expectGameSessionToMatch(foundGameSession as GameSessionDocument, {
-      ...mockGameSession,
+      expectGameSessionToMatch(newGameSession, {
+        ...mockGameSession,
+      });
     });
   });
 
-  it("'findAllForPlayer' - should find all game session documents for a player by their ID", async () => {
-    const gameSessionOne = await service.createOne({
-      playerOneID: mockFirstPlayerID,
-      playerTwoID: mockSecondPlayerID,
-    });
-    const gameSessionTwo = await service.createOne({
-      playerOneID: mockThirdPlayerID,
-      playerTwoID: mockFirstPlayerID,
+  describe("'findOneById' method", () => {
+    let initialGameSession: GameSessionDocument;
+
+    beforeEach(async () => {
+      initialGameSession = await service.createOne({
+        playerOneID: mockFirstPlayerID,
+        playerTwoID: mockSecondPlayerID,
+      });
     });
 
-    const foundGameSessions = await service.findAllForPlayer(mockFirstPlayerID);
+    it("'findById' - should find a game session document by ID", async () => {
+      const foundGameSession = await service.findOneById(
+        initialGameSession._id.toString(),
+      );
 
-    expect(foundGameSessions).toHaveLength(2);
-
-    const [foundGameSessionOne, foundGameSessionTwo] = foundGameSessions;
-    expectGameSessionToMatch(foundGameSessionOne, {
-      ...mockGameSession,
-      _id: gameSessionOne._id,
-    });
-    expectGameSessionToMatch(foundGameSessionTwo, {
-      ...mockGameSession,
-      _id: gameSessionTwo._id,
-      playerOneID: mockThirdPlayerID,
-      playerTwoID: mockFirstPlayerID,
+      expectGameSessionToMatch(foundGameSession as GameSessionDocument, {
+        ...mockGameSession,
+      });
     });
   });
 
-  it("'updateOne' - should update a game session document", async () => {
-    const newGameSession = await service.createOne({
-      playerOneID: mockFirstPlayerID,
-      playerTwoID: mockSecondPlayerID,
+  describe("'findAllForPlayer' method", () => {
+    it('should find all game session documents for a player by their ID', async () => {
+      const gameSessionOne = await service.createOne({
+        playerOneID: mockFirstPlayerID,
+        playerTwoID: mockSecondPlayerID,
+      });
+      const gameSessionTwo = await service.createOne({
+        playerOneID: mockThirdPlayerID,
+        playerTwoID: mockFirstPlayerID,
+      });
+
+      const foundGameSessions =
+        await service.findAllForPlayer(mockFirstPlayerID);
+
+      expect(foundGameSessions).toHaveLength(2);
+
+      const [foundGameSessionOne, foundGameSessionTwo] = foundGameSessions;
+      expectGameSessionToMatch(foundGameSessionOne, {
+        ...mockGameSession,
+        _id: gameSessionOne._id,
+      });
+      expectGameSessionToMatch(foundGameSessionTwo, {
+        ...mockGameSession,
+        _id: gameSessionTwo._id,
+        playerOneID: mockThirdPlayerID,
+        playerTwoID: mockFirstPlayerID,
+      });
+    });
+  });
+
+  describe("'updateOne' method", () => {
+    let initialGameSession: GameSessionDocument;
+
+    beforeEach(async () => {
+      initialGameSession = await service.createOne({
+        playerOneID: mockFirstPlayerID,
+        playerTwoID: mockSecondPlayerID,
+      });
     });
 
-    expectGameSessionToMatch(newGameSession, {
-      ...mockGameSession,
+    it('should update a game session document', async () => {
+      expectGameSessionToMatch(initialGameSession, {
+        ...mockGameSession,
+      });
+
+      const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
+      const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
+
+      const updatedMoves = [
+        {
+          columnIndex: 3,
+          playerID: mockFirstPlayerID,
+          timestamp: new Date(),
+        },
+        {
+          columnIndex: 2,
+          playerID: mockSecondPlayerID,
+          timestamp: nowPlus30Seconds,
+        },
+        {
+          columnIndex: 3,
+          playerID: mockFirstPlayerID,
+          timestamp: nowPlus1Minute,
+        },
+      ];
+
+      const updatedGameSession = await service.updateOne(
+        initialGameSession._id.toString(),
+        {
+          moves: [...initialGameSession.moves, ...updatedMoves],
+        },
+      );
+
+      expectGameSessionToMatch(updatedGameSession as GameSessionDocument, {
+        ...mockGameSession,
+        moves: [...mockGameSession.moves, ...updatedMoves],
+      });
+    });
+  });
+
+  describe('deleteOne', () => {
+    let initialGameSession: GameSessionDocument;
+
+    beforeEach(async () => {
+      initialGameSession = await service.createOne({
+        playerOneID: mockFirstPlayerID,
+        playerTwoID: mockSecondPlayerID,
+      });
     });
 
-    const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
-    const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
-
-    const updatedMoves = [
-      {
-        columnIndex: 3,
-        playerID: mockFirstPlayerID,
-        timestamp: new Date(),
-      },
-      {
-        columnIndex: 2,
-        playerID: mockSecondPlayerID,
-        timestamp: nowPlus30Seconds,
-      },
-      {
-        columnIndex: 3,
-        playerID: mockFirstPlayerID,
-        timestamp: nowPlus1Minute,
-      },
-    ];
-
-    const updatedGameSession = await service.updateOne(
-      newGameSession._id.toString(),
-      {
-        moves: [...newGameSession.moves, ...updatedMoves],
-      },
-    );
-
-    expectGameSessionToMatch(updatedGameSession as GameSessionDocument, {
-      ...mockGameSession,
-      moves: [...mockGameSession.moves, ...updatedMoves],
+    it('should delete a game session document', () => {
+      expectGameSessionToMatch(initialGameSession, {
+        ...mockGameSession,
+      });
     });
   });
 });
