@@ -16,43 +16,27 @@ export class PlayerService {
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
   ) {}
 
-  async createOne(player: CreatePlayerDTO) {
-    // placeholder to make tests fail
+  async createOne(player: CreatePlayerDTO): Promise<PlayerDocument> {
+    const createdPlayer = new this.playerModel(player);
+    return createdPlayer.save();
   }
 
-  async findOneById(id: string) {
-    // placeholder to make tests fail
+  async findOneById(id: string): Promise<NullablePlayerDocument> {
+    return await this.playerModel.findById(id).exec();
   }
 
   async findOneByPlayerID(playerID: UUID) {
-    // placeholder to make tests fail
+    return await this.playerModel.findOne({ playerID: playerID }).exec();
   }
 
-  async updateOne(id: string, player: UpdatePlayerDTO) {
-    // placeholder to make tests fail
+  async updateOne(
+    id: string,
+    player: UpdatePlayerDTO,
+  ): Promise<NullablePlayerDocument> {
+    return this.playerModel.findByIdAndUpdate(id, player, { new: true }).exec();
   }
 
-  async deleteOneById(id: string) {
-    // placeholder to make tests fail
+  async deleteOneById(id: string): Promise<NullablePlayerDocument> {
+    return this.playerModel.findByIdAndDelete(id).exec();
   }
-
-  // async createOne(player: CreatePlayerDTO): Promise<PlayerDocument> {
-  //   const createdPlayer = new this.playerModel(player);
-  //   return createdPlayer.save();
-  // }
-
-  // async findOneById(id: string): Promise<NullablePlayerDocument> {
-  //   return await this.playerModel.findById(id).exec();
-  // }
-
-  // async updateOne(
-  //   id: string,
-  //   player: UpdatePlayerDTO,
-  // ): Promise<NullablePlayerDocument> {
-  //   return this.playerModel.findByIdAndUpdate(id, player, { new: true }).exec();
-  // }
-
-  // async deleteOnebyId(id: string): Promise<NullablePlayerDocument> {
-  //   return this.playerModel.findByIdAndDelete(id).exec();
-  // }
 }

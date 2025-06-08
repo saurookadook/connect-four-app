@@ -58,8 +58,7 @@ describe('PlayerService', () => {
         playerID: mockPlayerID,
       });
 
-      // @ts-expect-error: Just to make the test fail :)
-      expectHydratedDocumentToMatch<Player>(newPlayer as PlayerDocument, {
+      expectHydratedDocumentToMatch<Player>(newPlayer, {
         ...mockPlayer,
       });
     });
@@ -69,7 +68,6 @@ describe('PlayerService', () => {
     let initialPlayer: PlayerDocument;
 
     beforeEach(async () => {
-      // @ts-expect-error: Just to make the test fail :)
       initialPlayer = await service.createOne({
         playerID: mockPlayerID,
       });
@@ -80,7 +78,6 @@ describe('PlayerService', () => {
         initialPlayer._id.toString(),
       );
 
-      // @ts-expect-error: Just to make the test fail :)
       expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
         ...mockPlayer,
       });
@@ -91,7 +88,6 @@ describe('PlayerService', () => {
     let initialPlayer: PlayerDocument;
 
     beforeEach(async () => {
-      // @ts-expect-error: Just to make the test fail :)
       initialPlayer = await service.createOne({
         playerID: mockPlayerID,
       });
@@ -102,7 +98,6 @@ describe('PlayerService', () => {
         initialPlayer.playerID,
       );
 
-      // @ts-expect-error: Just to make the test fail :)
       expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
         ...mockPlayer,
       });
@@ -113,25 +108,24 @@ describe('PlayerService', () => {
     let initialPlayer: PlayerDocument;
 
     beforeEach(async () => {
-      // @ts-expect-error: Just to make the test fail :)
       initialPlayer = await service.createOne({
         playerID: mockPlayerID,
       });
     });
 
     it('should update a player document', async () => {
-      const updatedPlayer = await service.updateOne(
-        initialPlayer._id.toString(),
-        {
-          playerID: randomUUID(),
-        },
-      );
-
-      // @ts-expect-error: Just to make the test fail :)
-      expectHydratedDocumentToMatch<Player>(updatedPlayer as PlayerDocument, {
-        ...mockPlayer,
+      const updatedFields = {
         username: 'RickSanchez',
         email: 'im-a-pickle@gmail.com',
+      };
+      const updatedPlayer = await service.updateOne(
+        initialPlayer._id.toString(),
+        updatedFields,
+      );
+
+      expectHydratedDocumentToMatch<Player>(updatedPlayer as PlayerDocument, {
+        ...mockPlayer,
+        ...updatedFields,
       });
     });
   });
@@ -140,7 +134,6 @@ describe('PlayerService', () => {
     let initialPlayer: PlayerDocument;
 
     beforeEach(async () => {
-      // @ts-expect-error: Just to make the test fail :)
       initialPlayer = await service.createOne({
         playerID: mockPlayerID,
       });
@@ -154,7 +147,6 @@ describe('PlayerService', () => {
       const initialID = initialPlayer._id.toString();
       const deletedPlayer = await service.deleteOneById(initialID);
 
-      // @ts-expect-error: Just to make the test fail :)
       expectHydratedDocumentToMatch(deletedPlayer as PlayerDocument, {
         ...mockPlayer,
       });
