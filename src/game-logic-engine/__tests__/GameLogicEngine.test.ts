@@ -44,11 +44,11 @@ describe('GameLogicEngine', () => {
     // TODO: fix method implementation
     test.skip("updates board state and active player for 'sessionRef'", () => {
       const {
-        board: { state: boardState },
+        board: { gameBoardState },
       } = logicSession;
       const targetColIndex = 3;
 
-      expect(boardState[targetColIndex].at(-1)?.state).toBeNull();
+      expect(gameBoardState[targetColIndex].at(-1)?.state).toBeNull();
       expect(logicSession.activePlayer).toBe(PlayerColor.RED);
 
       gameEngine.handleMove({
@@ -57,7 +57,9 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(boardState[targetColIndex].at(-1)?.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[targetColIndex].at(-1)?.state).toBe(
+        PlayerColor.RED,
+      );
       expect(logicSession.activePlayer).toBe(PlayerColor.BLACK);
 
       gameEngine.handleMove({
@@ -66,7 +68,9 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(boardState[targetColIndex].at(-1)?.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[targetColIndex].at(-1)?.state).toBe(
+        PlayerColor.BLACK,
+      );
       expect(logicSession.activePlayer).toBe(PlayerColor.RED);
     });
 
@@ -82,9 +86,9 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(logicSession.board.state[targetColIndex].at(-1)?.state).toBe(
-        PlayerColor.RED,
-      );
+      expect(
+        logicSession.board.gameBoardState[targetColIndex].at(-1)?.state,
+      ).toBe(PlayerColor.RED);
       expect(logicSession.activePlayer).toBe(PlayerColor.RED);
     });
   });

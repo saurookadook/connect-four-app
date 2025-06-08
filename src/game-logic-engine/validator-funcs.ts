@@ -25,16 +25,17 @@ export function checkTopDownVerticalWin(
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
+  loggingEnabled = false,
 ): boolean {
   let cell: Cell;
 
-  console.log(`checkTopDownVerticalWin for ${playerColor}`);
+  if (loggingEnabled) console.log(`checkTopDownVerticalWin for ${playerColor}`);
   for (let row = rowStart; row <= rowStart + 3; row++) {
-    console.log(`---- col: ${colStart} | row: ${row}`);
+    if (loggingEnabled) console.log(`---- col: ${colStart} | row: ${row}`);
     if (isBeyondBoardBounds(colStart, row)) return false;
 
     cell = boardState[colStart][row];
-    console.log(`---- cell: ${JSON.stringify(cell)}`);
+    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -48,17 +49,19 @@ export function checkTopDownLeftDiagonalWin(
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
+  loggingEnabled = false,
 ): boolean {
   let cell: Cell;
   let row = rowStart;
 
-  console.log(`checkTopDownLeftDiagonalWin for ${playerColor}`);
+  if (loggingEnabled)
+    console.log(`checkTopDownLeftDiagonalWin for ${playerColor}`);
   for (let col = colStart; col >= colStart - 3; col--) {
-    console.log(`---- col: ${col} | row: ${row}`);
+    if (loggingEnabled) console.log(`---- col: ${col} | row: ${row}`);
     if (isBeyondBoardBounds(col, row)) return false;
 
     cell = boardState[col][row];
-    console.log(`---- cell: ${JSON.stringify(cell)}`);
+    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -73,17 +76,19 @@ export function checkTopDownRightDiagonalWin(
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
+  loggingEnabled = false,
 ): boolean {
   let cell: Cell;
   let row = rowStart;
 
-  console.log(`checkTopDownRightDiagonalWin for ${playerColor}`);
+  if (loggingEnabled)
+    console.log(`checkTopDownRightDiagonalWin for ${playerColor}`);
   for (let col = colStart; col <= colStart + 3; col++) {
-    console.log(`---- col: ${col} | row: ${row}`);
+    if (loggingEnabled) console.log(`---- col: ${col} | row: ${row}`);
     if (isBeyondBoardBounds(col, row)) return false;
 
     cell = boardState[col][row];
-    console.log(`---- cell: ${JSON.stringify(cell)}`);
+    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -98,16 +103,18 @@ export function checkLeftToRightHorizontalWin(
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
+  loggingEnabled = false,
 ): boolean {
   let cell: Cell;
 
-  console.log(`checkLeftToRightHorizontalWin for ${playerColor}`);
+  if (loggingEnabled)
+    console.log(`checkLeftToRightHorizontalWin for ${playerColor}`);
   for (let col = colStart; col <= colStart + 3; col++) {
-    console.log(`---- col: ${col} | row: ${rowStart}`);
+    if (loggingEnabled) console.log(`---- col: ${col} | row: ${rowStart}`);
     if (isBeyondBoardBounds(col, rowStart)) return false;
 
     cell = boardState[col][rowStart];
-    console.log(`---- cell: ${JSON.stringify(cell)}`);
+    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -121,16 +128,18 @@ export function checkRightToLeftHorizontalWin(
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
+  loggingEnabled = false,
 ): boolean {
   let cell: Cell;
 
-  console.log(`checkRightToLeftHorizontalWin for ${playerColor}`);
+  if (loggingEnabled)
+    console.log(`checkRightToLeftHorizontalWin for ${playerColor}`);
   for (let col = colStart; col >= colStart - 3; col--) {
-    console.log(`---- col: ${col} | row: ${rowStart}`);
+    if (loggingEnabled) console.log(`---- col: ${col} | row: ${rowStart}`);
     if (isBeyondBoardBounds(col, rowStart)) return false;
 
     cell = boardState[col][rowStart];
-    console.log(`---- cell: ${JSON.stringify(cell)}`);
+    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
     if (cell.state !== playerColor) {
       return false;
     }
