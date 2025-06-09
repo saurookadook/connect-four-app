@@ -44,6 +44,11 @@ export function checkTopDownVerticalWin(
   return true;
 }
 
+/**
+ * TODO
+ * - rename to checkDescendingSlopeDiagonalWin
+ * - refactor to check in both directions from starting point
+ */
 export function checkTopDownLeftDiagonalWin(
   boardState: GameBoard,
   colStart: number,
@@ -71,6 +76,11 @@ export function checkTopDownLeftDiagonalWin(
   return true;
 }
 
+/**
+ * TODO
+ * - rename to checkAscendingSlopeDiagonalWin
+ * - refactor to check in both directions from starting point
+ */
 export function checkTopDownRightDiagonalWin(
   boardState: GameBoard,
   colStart: number,
@@ -98,6 +108,8 @@ export function checkTopDownRightDiagonalWin(
   return true;
 }
 
+// TODO: combine logic in checkLeftToRightHorizontalWin and checkRightToLeftHorizontalWin
+// into single function that checks for horizontal win
 export function checkLeftToRightHorizontalWin(
   boardState: GameBoard,
   colStart: number,
