@@ -387,7 +387,7 @@ export function populateBoardWithVerticalWin(
     [0, PlayerColor.BLACK],
     [3, PlayerColor.RED],
     [2, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
+    [3, PlayerColor.RED],
   ];
 
   populateBoardWithMoves({
