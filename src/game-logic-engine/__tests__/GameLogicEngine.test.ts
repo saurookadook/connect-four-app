@@ -2,7 +2,11 @@ import { UUID, randomUUID } from 'crypto';
 
 import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
 import { GameSessionStatus, PlayerColor } from '@/game-logic-engine/constants';
-import { winningConditionGeneratorFuncs } from '@/game-logic-engine/testing-utils/winConditionGenerators';
+import {
+  populateBoardWithOneMoveTilWin,
+  populateBoardWithDescendingSlopeDiagonalWinOne,
+  winningConditionGeneratorFuncs,
+} from '@/game-logic-engine/testing-utils/winConditionGenerators';
 
 describe('GameLogicEngine', () => {
   const mockPlayerOneID: UUID = randomUUID();
@@ -170,7 +174,7 @@ describe('GameLogicEngine', () => {
         playerOneID: mockPlayerOneID,
         playerTwoID: mockPlayerTwoID,
       });
-      populateBoardWithSimpleWin(logicSession);
+      populateBoardWithDescendingSlopeDiagonalWinOne(logicSession);
 
       gameEngine.endGame(logicSession);
 
@@ -179,101 +183,3 @@ describe('GameLogicEngine', () => {
     });
   });
 });
-
-// ---------------------------------------------------------------------------
-// Helper functions
-// ---------------------------------------------------------------------------
-function populateBoardWithOneMoveTilWin(logicSessionRef: LogicSession): void {
-  // RED at (3, 0)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 3,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 2,
-    playerColor: PlayerColor.BLACK,
-  });
-  // RED at (2, 1)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 2,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.BLACK,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.BLACK,
-  });
-  // RED at (1, 2)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.BLACK,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 3,
-    playerColor: PlayerColor.BLACK,
-  });
-}
-
-/**
- * @example
- * ```txt
- *   0   1   2   3   4   5   6
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │ 0
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │ 1
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │   │   │   │   │   │   │ 2
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ R │   │   │   │   │   │ 3
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ R │ B │   │   │   │ 4
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ B │ B │ R │   │   │   │ 5
- * └───┴───┴───┴───┴───┴───┴───┘
- * ```
- */
-function populateBoardWithSimpleWin(logicSessionRef: LogicSession): void {
-  populateBoardWithOneMoveTilWin(logicSessionRef);
-
-  // RED at (0, 3)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.RED,
-  });
-}
-
-/**
- * TEMPLATE
- * @example
- * ```txt
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │   │
- * └───┴───┴───┴───┴───┴───┴───┘
- * ```
- */
