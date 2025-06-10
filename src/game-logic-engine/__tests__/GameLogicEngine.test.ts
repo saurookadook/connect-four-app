@@ -12,16 +12,9 @@ describe('GameLogicEngine', () => {
   const mockPlayerOneID: UUID = randomUUID();
   const mockPlayerTwoID: UUID = randomUUID();
   let gameEngine: GameLogicEngine;
-  let logicSession: LogicSession;
 
   beforeEach(() => {
     gameEngine = new GameLogicEngine();
-  });
-
-  afterEach(() => {
-    if (logicSession != null) {
-      logicSession.board.reset();
-    }
   });
 
   describe('startGame', () => {
@@ -39,6 +32,8 @@ describe('GameLogicEngine', () => {
   });
 
   describe('handleMove', () => {
+    let logicSession: LogicSession;
+
     beforeEach(() => {
       logicSession = gameEngine.startGame({
         playerOneID: mockPlayerOneID,
@@ -46,8 +41,7 @@ describe('GameLogicEngine', () => {
       });
     });
 
-    // TODO: fix method implementation
-    test.skip("updates board state and active player for 'sessionRef'", () => {
+    test("updates board state and active player for 'sessionRef'", () => {
       const {
         board: { gameBoardState },
       } = logicSession;
@@ -73,14 +67,13 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(gameBoardState[targetColIndex].at(-1)?.state).toBe(
+      expect(gameBoardState[targetColIndex].at(-2)?.state).toBe(
         PlayerColor.BLACK,
       );
       expect(logicSession.activePlayer).toBe(PlayerColor.RED);
     });
 
-    // TODO: fix method implementation
-    test.skip("updates board state with winning move for 'sessionRef'", () => {
+    test("updates board state with winning move for 'sessionRef'", () => {
       populateBoardWithOneMoveTilWin(logicSession);
 
       const targetColIndex = 0;
@@ -92,7 +85,7 @@ describe('GameLogicEngine', () => {
       });
 
       expect(
-        logicSession.board.gameBoardState[targetColIndex].at(-1)?.state,
+        logicSession.board.gameBoardState[targetColIndex].at(-4)?.state,
       ).toBe(PlayerColor.RED);
       expect(logicSession.activePlayer).toBe(PlayerColor.RED);
     });
