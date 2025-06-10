@@ -13,6 +13,24 @@ export function isBeyondBoardBounds(
   return col < 0 || col >= BOARD_COLS || row < 0 || row >= BOARD_ROWS;
 }
 
+// TODO: better name...?
+function playerHasCell({
+  boardState, // force formatting
+  colIndex,
+  rowIndex,
+  playerColor,
+}: {
+  boardState: GameBoard;
+  colIndex: number;
+  rowIndex: number;
+  playerColor: PlayerColor;
+}): boolean {
+  return (
+    !isBeyondBoardBounds(colIndex, rowIndex) &&
+    boardState[colIndex][rowIndex].state === playerColor
+  );
+}
+
 export type ValidatorFunc = (
   boardState: GameBoard,
   colStart: number,
@@ -29,13 +47,13 @@ export function checkTopDownVerticalWin(
 ): boolean {
   let cell: Cell;
 
-  if (loggingEnabled) console.log(`checkTopDownVerticalWin for ${playerColor}`);
+  localLogger(`checkTopDownVerticalWin for ${playerColor}`, loggingEnabled);
   for (let row = rowStart; row <= rowStart + 3; row++) {
-    if (loggingEnabled) console.log(`---- col: ${colStart} | row: ${row}`);
+    localLogger(`---- col: ${colStart} | row: ${row}`, loggingEnabled);
     if (isBeyondBoardBounds(colStart, row)) return false;
 
     cell = boardState[colStart][row];
-    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
+    localLogger(`---- cell: ${JSON.stringify(cell)}`, loggingEnabled);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -44,68 +62,124 @@ export function checkTopDownVerticalWin(
   return true;
 }
 
-/**
- * TODO
- * - rename to checkDescendingSlopeDiagonalWin
- * - refactor to check in both directions from starting point
- */
-export function checkTopDownLeftDiagonalWin(
+export function checkDescendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
   loggingEnabled = false,
 ): boolean {
-  let cell: Cell;
-  let row = rowStart;
+  let descOpen = true;
+  let ascOpen = true;
+  let connectedCount = 0;
 
-  if (loggingEnabled)
-    console.log(`checkTopDownLeftDiagonalWin for ${playerColor}`);
-  for (let col = colStart; col >= colStart - 3; col--) {
-    if (loggingEnabled) console.log(`---- col: ${col} | row: ${row}`);
-    if (isBeyondBoardBounds(col, row)) return false;
-
-    cell = boardState[col][row];
-    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
-    if (cell.state !== playerColor) {
-      return false;
+  localLogger(
+    `checkDescendingSlopeDiagonalWin for ${playerColor}`,
+    loggingEnabled,
+  );
+  for (let offset = 0; offset < 4; offset++) {
+    localLogger(
+      `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
+      loggingEnabled,
+    );
+    if (
+      descOpen &&
+      playerHasCell({
+        boardState, // force formatting
+        colIndex: colStart - offset,
+        rowIndex: rowStart - offset,
+        playerColor,
+      })
+    ) {
+      connectedCount += 1;
+    } else {
+      descOpen = false;
     }
-    row++;
+
+    localLogger(
+      `---- Checking asc => col: ${colStart + offset} | row: ${rowStart + offset}`,
+      loggingEnabled,
+    );
+    if (
+      ascOpen &&
+      playerHasCell({
+        boardState, // force formatting
+        colIndex: colStart + offset,
+        rowIndex: rowStart + offset,
+        playerColor,
+      })
+    ) {
+      connectedCount += 1;
+    } else {
+      ascOpen = false;
+    }
+
+    if (connectedCount >= 4) {
+      return true;
+    }
   }
 
-  return true;
+  return connectedCount >= 4;
 }
 
-/**
- * TODO
- * - rename to checkAscendingSlopeDiagonalWin
- * - refactor to check in both directions from starting point
- */
-export function checkTopDownRightDiagonalWin(
+export function checkAscendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
   playerColor: PlayerColor,
   loggingEnabled = false,
 ): boolean {
-  let cell: Cell;
-  let row = rowStart;
+  let descOpen = true;
+  let ascOpen = true;
+  let connectedCount = 0;
 
-  if (loggingEnabled)
-    console.log(`checkTopDownRightDiagonalWin for ${playerColor}`);
-  for (let col = colStart; col <= colStart + 3; col++) {
-    if (loggingEnabled) console.log(`---- col: ${col} | row: ${row}`);
-    if (isBeyondBoardBounds(col, row)) return false;
-
-    cell = boardState[col][row];
-    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
-    if (cell.state !== playerColor) {
-      return false;
+  localLogger(
+    `checkAscendingSlopeDiagonalWin for ${playerColor}`,
+    loggingEnabled,
+  );
+  for (let offset = 0; offset < 4; offset++) {
+    localLogger(
+      `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
+      loggingEnabled,
+    );
+    if (
+      descOpen &&
+      playerHasCell({
+        boardState, // force formatting
+        colIndex: colStart - offset,
+        rowIndex: rowStart + offset,
+        playerColor,
+      })
+    ) {
+      connectedCount += 1;
+    } else {
+      descOpen = false;
     }
-    row++;
+
+    localLogger(
+      `---- Checking asc => col: ${colStart + offset} | row: ${rowStart + offset}`,
+      loggingEnabled,
+    );
+    if (
+      ascOpen &&
+      playerHasCell({
+        boardState, // force formatting
+        colIndex: colStart + offset,
+        rowIndex: rowStart - offset,
+        playerColor,
+      })
+    ) {
+      connectedCount += 1;
+    } else {
+      ascOpen = false;
+    }
+
+    if (connectedCount >= 4) {
+      return true;
+    }
   }
 
-  return true;
+  return connectedCount >= 4;
 }
 
 // TODO: combine logic in checkLeftToRightHorizontalWin and checkRightToLeftHorizontalWin
@@ -119,14 +193,16 @@ export function checkLeftToRightHorizontalWin(
 ): boolean {
   let cell: Cell;
 
-  if (loggingEnabled)
-    console.log(`checkLeftToRightHorizontalWin for ${playerColor}`);
+  localLogger(
+    `checkLeftToRightHorizontalWin for ${playerColor}`,
+    loggingEnabled,
+  );
   for (let col = colStart; col <= colStart + 3; col++) {
-    if (loggingEnabled) console.log(`---- col: ${col} | row: ${rowStart}`);
+    localLogger(`---- col: ${col} | row: ${rowStart}`, loggingEnabled);
     if (isBeyondBoardBounds(col, rowStart)) return false;
 
     cell = boardState[col][rowStart];
-    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
+    localLogger(`---- cell: ${JSON.stringify(cell)}`, loggingEnabled);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -144,14 +220,16 @@ export function checkRightToLeftHorizontalWin(
 ): boolean {
   let cell: Cell;
 
-  if (loggingEnabled)
-    console.log(`checkRightToLeftHorizontalWin for ${playerColor}`);
+  localLogger(
+    `checkRightToLeftHorizontalWin for ${playerColor}`,
+    loggingEnabled,
+  );
   for (let col = colStart; col >= colStart - 3; col--) {
-    if (loggingEnabled) console.log(`---- col: ${col} | row: ${rowStart}`);
+    localLogger(`---- col: ${col} | row: ${rowStart}`, loggingEnabled);
     if (isBeyondBoardBounds(col, rowStart)) return false;
 
     cell = boardState[col][rowStart];
-    if (loggingEnabled) console.log(`---- cell: ${JSON.stringify(cell)}`);
+    localLogger(`---- cell: ${JSON.stringify(cell)}`, loggingEnabled);
     if (cell.state !== playerColor) {
       return false;
     }
@@ -160,10 +238,16 @@ export function checkRightToLeftHorizontalWin(
   return true;
 }
 
+function localLogger(message: string, shouldLog = false) {
+  if (shouldLog) {
+    console.log(message);
+  }
+}
+
 const validatorFuncs: ValidatorFunc[] = [
   checkTopDownVerticalWin,
-  checkTopDownLeftDiagonalWin,
-  checkTopDownRightDiagonalWin,
+  checkDescendingSlopeDiagonalWin,
+  checkAscendingSlopeDiagonalWin,
   checkRightToLeftHorizontalWin,
   checkLeftToRightHorizontalWin,
 ];
