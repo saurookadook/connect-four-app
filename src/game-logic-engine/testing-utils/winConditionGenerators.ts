@@ -4,48 +4,106 @@ import { LogicSession } from '@/game-logic-engine';
 export function populateBoardWithOneMoveTilWin(
   logicSessionRef: LogicSession,
 ): void {
-  // RED at (3, 0)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 3,
-    playerColor: PlayerColor.RED,
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [1, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
   });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 2,
-    playerColor: PlayerColor.BLACK,
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │(R)│   │   │   │   │   │   │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ R │   │   │   │   │   │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ R │ R │ B │   │   │   │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ B │ B │ R │   │   │   │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithDescendingSlopeDiagonalWinOne(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [1, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
   });
-  // RED at (2, 1)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 2,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.BLACK,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.BLACK,
-  });
-  // RED at (1, 2)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 1,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.BLACK,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.RED,
-  });
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 3,
-    playerColor: PlayerColor.BLACK,
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │   │   │   │   │   │   │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │(R)│   │   │   │   │   │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ R │ R │ B │   │   │   │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ B │ B │ R │   │   │   │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithDescendingSlopeDiagonalWinTwo(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [1, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
   });
 }
 
@@ -62,21 +120,242 @@ export function populateBoardWithOneMoveTilWin(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │ R │ R │   │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ R │ B │   │   │   │ 4
+ * │ B │ R │(R)│ B │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │ B │ B │ B │ R │   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
-export function populateBoardWithDescendingSlopeDiagonalWin(
+export function populateBoardWithDescendingSlopeDiagonalWinThree(
   logicSessionRef: LogicSession,
 ): void {
-  populateBoardWithOneMoveTilWin(logicSessionRef);
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [1, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+  ];
 
-  // RED at (0, 3)
-  logicSessionRef.board.updateBoardState({
-    columnIndex: 0,
-    playerColor: PlayerColor.RED,
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │   │   │   │   │   │   │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ R │ B │   │   │   │   │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ R │ R │   │   │   │   │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ B │ B │(R)│   │   │   │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithDescendingSlopeDiagonalWinFour(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [0, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [1, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [0, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+    [2, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │(R)│ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │ R │ R │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ B │ R │ R │ B │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ R │ B │ B │ B │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithAscendingSlopeDiagonalWinOne(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [4, PlayerColor.RED],
+    [5, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │ R │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │(R)│ B │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ B │ R │ R │ R │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ R │ B │ B │ B │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithAscendingSlopeDiagonalWinTwo(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [4, PlayerColor.RED],
+    [5, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │ R │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │ R │ R │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ B │(R)│ R │ B │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ R │ B │ B │ B │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithAscendingSlopeDiagonalWinThree(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [3, PlayerColor.RED],
+    [5, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [3, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [4, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │ R │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │ R │ B │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ R │ R │ B │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │(R)│ B │ B │ R │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithAscendingSlopeDiagonalWinFour(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [6, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [4, PlayerColor.RED],
+    [5, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [5, PlayerColor.RED],
+    [6, PlayerColor.BLACK],
+    [6, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
   });
 }
 
@@ -88,7 +367,7 @@ export function populateBoardWithDescendingSlopeDiagonalWin(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ R │   │   │   │
+ * │   │   │   │(R)│   │   │   │
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │ R │   │   │   │
  * ├───┼───┼───┼───┼───┼───┼───┤
@@ -101,7 +380,7 @@ export function populateBoardWithDescendingSlopeDiagonalWin(
 export function populateBoardWithVerticalWin(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MovesTuple[] = [
+  const movesTuples: MoveTuple[] = [
     [3, PlayerColor.RED],
     [1, PlayerColor.BLACK],
     [3, PlayerColor.RED],
@@ -118,7 +397,172 @@ export function populateBoardWithVerticalWin(
 }
 
 /**
+ * @example
+ * ```txt
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │(R)│ R │ R │ R │ B │   │   │
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithHorizontalWinOne(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [1, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [0, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │(R)│ R │ R │ B │   │   │
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithHorizontalWinTwo(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [0, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ R │(R)│ R │ B │   │   │
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithHorizontalWinThree(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [0, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │ B │   │   │
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ R │ R │(R)│ B │   │   │
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithHorizontalWinFour(
+  logicSessionRef: LogicSession,
+): void {
+  const movesTuples: MoveTuple[] = [
+    [0, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [1, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [2, PlayerColor.RED],
+    [4, PlayerColor.BLACK],
+    [3, PlayerColor.RED],
+  ];
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: movesTuples,
+  });
+}
+
+export const winningConditionGeneratorFuncs = [
+  populateBoardWithDescendingSlopeDiagonalWinOne,
+  populateBoardWithDescendingSlopeDiagonalWinTwo,
+  populateBoardWithDescendingSlopeDiagonalWinThree,
+  populateBoardWithDescendingSlopeDiagonalWinFour,
+  populateBoardWithAscendingSlopeDiagonalWinOne,
+  populateBoardWithAscendingSlopeDiagonalWinTwo,
+  populateBoardWithAscendingSlopeDiagonalWinThree,
+  populateBoardWithAscendingSlopeDiagonalWinFour,
+  populateBoardWithVerticalWin,
+  populateBoardWithHorizontalWinOne,
+  populateBoardWithHorizontalWinTwo,
+  populateBoardWithHorizontalWinThree,
+  populateBoardWithHorizontalWinFour,
+];
+
+/**
  * TEMPLATE
+ * - winning move is surrounded by parens, such as (R) or (B)
  * @example
  * ```txt
  * ├───┼───┼───┼───┼───┼───┼───┤
@@ -138,14 +582,14 @@ export function populateBoardWithVerticalWin(
  */
 
 /** @description Tuple of `[columnIndex, PlayerColor]` */
-export type MovesTuple = [number, PlayerColor];
+export type MoveTuple = [number, PlayerColor];
 
 export function populateBoardWithMoves({
   logicSessionRef,
   moves,
 }: {
   logicSessionRef: LogicSession;
-  moves: MovesTuple[];
+  moves: MoveTuple[];
 }) {
   moves.forEach(([columnIndex, playerColor]) => {
     logicSessionRef.board.updateBoardState({

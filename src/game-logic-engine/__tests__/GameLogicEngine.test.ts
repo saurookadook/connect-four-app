@@ -2,6 +2,7 @@ import { UUID, randomUUID } from 'crypto';
 
 import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
 import { GameSessionStatus, PlayerColor } from '@/game-logic-engine/constants';
+import { winningConditionGeneratorFuncs } from '@/game-logic-engine/testing-utils/winConditionGenerators';
 
 describe('GameLogicEngine', () => {
   const mockPlayerOneID: UUID = randomUUID();
@@ -142,8 +143,19 @@ describe('GameLogicEngine', () => {
         });
       });
 
-      test('simple case', () => {
-        populateBoardWithSimpleWin(logicSession);
+      const winningCases = winningConditionGeneratorFuncs.reduce(
+        (acc, curr) => {
+          acc.push([curr.name, curr]);
+          return acc;
+        },
+        [] as [
+          string, // testName
+          (logicSessionRef: LogicSession) => void, // generatorFunc
+        ][],
+      );
+
+      test.each(winningCases)('%s', (_, generatorFunc) => {
+        generatorFunc(logicSession);
 
         expect(
           gameEngine.checkForWin(logicSession.board, logicSession.activePlayer),
