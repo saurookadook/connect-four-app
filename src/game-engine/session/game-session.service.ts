@@ -15,6 +15,7 @@ import {
 
 @Injectable()
 export class GameSessionService {
+  // TODO: probably inject player model too?
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
