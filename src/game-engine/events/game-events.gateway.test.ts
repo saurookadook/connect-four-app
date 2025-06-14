@@ -2,8 +2,9 @@ import { randomUUID } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { reduce } from 'rxjs/operators';
 
-import { PlayerMove } from '@/constants/game';
+import { databaseProviders } from '@/database/database.providers';
 import { GameEventsGateway } from '@/game-engine/events/game-events.gateway';
+import { GameEngineModule } from '@/game-engine/game-engine.module';
 
 describe('GameEventsGateway', () => {
   const mockPlayerOneID = randomUUID();
@@ -12,6 +13,10 @@ describe('GameEventsGateway', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        ...databaseProviders, // force formatting
+        GameEngineModule,
+      ],
       providers: [GameEventsGateway],
     }).compile();
 
@@ -27,13 +32,14 @@ describe('GameEventsGateway', () => {
         columnIndex: 1,
         playerID: mockPlayerOneID,
         timestamp: firstTimestamp,
-      } as PlayerMove);
+      });
 
       firstCall
         .pipe(reduce((acc, item) => [...acc, item], []))
         .subscribe((results) => {
           expect(results).toHaveLength(1);
           results.forEach((result, index) => {
+            expect(result.event).toBe('resolved-move');
             expect(result.data.columnIndex).toBe(1);
             expect(result.data.playerID).toBe(mockPlayerOneID);
             expect(result.data.timestamp).toBe(firstTimestamp);
@@ -44,13 +50,14 @@ describe('GameEventsGateway', () => {
         columnIndex: 2,
         playerID: mockPlayerTwoID,
         timestamp: secondTimestamp,
-      } as PlayerMove);
+      });
 
       secondCall
         .pipe(reduce((acc, item) => [...acc, item], []))
         .subscribe((results) => {
           expect(results).toHaveLength(1);
           results.forEach((result, index) => {
+            expect(result.event).toBe('resolved-move');
             expect(result.data.columnIndex).toBe(2);
             expect(result.data.playerID).toBe(mockPlayerTwoID);
             expect(result.data.timestamp).toBe(secondTimestamp);

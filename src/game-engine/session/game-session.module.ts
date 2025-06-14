@@ -15,5 +15,6 @@ import { GameSessionService } from '@game-engine/session/game-session.service';
     ]),
   ],
   providers: [GameSessionService],
+  exports: [GameSessionService],
 })
 export class GameSessionModule {}
