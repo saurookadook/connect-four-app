@@ -16,28 +16,41 @@ export class GameEngineService {
   constructor(private readonly gameSessionService: GameSessionService) {}
 
   async startGame({
+    gameSessionID,
     playerOneID,
     playerTwoID,
   }: {
+    gameSessionID?: GameSessionDTO['id']; // as mongodb.ObjectId
     playerOneID: GameSessionDTO['playerOneID'];
     playerTwoID: GameSessionDTO['playerTwoID'];
   }): Promise<GameSessionDocument> {
-    return await this.gameSessionService.createOne({
-      playerOneID,
-      playerTwoID,
-    });
+    let foundGame: NullableGameSessionDocument = null;
+
+    if (gameSessionID != null) {
+      foundGame = await this.gameSessionService.findOneById(
+        gameSessionID || '',
+      );
+    }
+
+    return (
+      foundGame ??
+      (await this.gameSessionService.createOne({
+        playerOneID,
+        playerTwoID,
+      }))
+    );
   }
 
-  async handlePlayerMove({
-    gameSessionId,
-    moveData,
-  }: {
-    gameSessionId: UUID;
-    moveData: {
-      coordinates: [number, number];
-      playerId: UUID;
-    };
-  }): Promise<GameSessionDocument> {
-    const gameSession = await this.gameSessionService.findById(gameSessionId);
-  }
+  // async handlePlayerMove({
+  //   gameSessionId,
+  //   moveData,
+  // }: {
+  //   gameSessionId: UUID;
+  //   moveData: {
+  //     coordinates: [number, number];
+  //     playerId: UUID;
+  //   };
+  // }): Promise<GameSessionDocument> {
+  //   const gameSession = await this.gameSessionService.findOneById(gameSessionId);
+  // }
 }
