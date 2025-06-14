@@ -11,5 +11,6 @@ export type PlayersTuple = [UUID, UUID];
 export type PlayerMove = {
   columnIndex: number;
   playerID: UUID;
+  /** @todo Need to change this to `number` */
   timestamp: Date;
 };

@@ -8,5 +8,6 @@ import { GameEngineService } from '@game-engine/game-engine.service';
   controllers: [GameEngineController],
   imports: [GameSessionModule],
   providers: [GameEngineService],
+  exports: [GameEngineService],
 })
 export class GameEngineModule {}
