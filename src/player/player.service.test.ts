@@ -14,6 +14,8 @@ const mockPlayerID = randomUUID();
 const mockNow = new Date();
 const mockPlayer = {
   playerID: mockPlayerID,
+  username: 'MortySmith',
+  password: 'wubbalubbadubdub',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
@@ -55,7 +57,9 @@ describe('PlayerService', () => {
   describe("'createOne' method", () => {
     it('should insert a new player document', async () => {
       const newPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
 
       expectHydratedDocumentToMatch<Player>(newPlayer, {
@@ -69,7 +73,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
@@ -89,7 +95,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
@@ -109,7 +117,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
@@ -135,7 +145,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
