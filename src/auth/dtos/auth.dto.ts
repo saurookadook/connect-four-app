@@ -5,7 +5,7 @@ export class RegisterDTO {
   @Expose()
   username: string;
 
-  @Expose()
+  @Expose({ name: 'password' })
   unhashedPassword: string;
 
   @Expose()
@@ -17,6 +17,6 @@ export class LoginDTO {
   @Expose()
   username: string;
 
-  @Expose()
+  @Expose({ name: 'password' })
   unhashedPassword: string;
 }

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 
 import { PlayerModule } from '@/player/player.module';
+import { AuthController } from './auth.controller';
 import { AuthenticationService } from './authentication.service';
 
 @Module({
-  controllers: [],
+  controllers: [AuthController],
   imports: [PlayerModule],
   providers: [AuthenticationService],
   exports: [AuthenticationService],
