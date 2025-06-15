@@ -9,18 +9,18 @@ import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
 const SALT_ROUNDS = 10;
 
-export type AuthenticationResponse = {
+export type AuthenticationResult = {
   message: string;
 };
 
-export type AuthenticationSuccessResponse = AuthenticationResponse & {
+export type AuthenticationSuccessResult = AuthenticationResult & {
   playerID: UUID;
   playerObjectID: string; // MongoDB ObjectId
   username: string;
 };
 
-export type AuthenticationErrorResponse = AuthenticationResponse & {
-  // TODO:
+export type AuthenticationErrorResult = AuthenticationResult & {
+  // TODO: other stuff?
   statusCode: number;
 };
 
@@ -28,7 +28,9 @@ export type AuthenticationErrorResponse = AuthenticationResponse & {
 export class AuthenticationService {
   constructor(private playerService: PlayerService) {}
 
-  async register(registrationData: RegisterDTO): Promise<PlayerDocument> {
+  async register(
+    registrationData: RegisterDTO,
+  ): Promise<AuthenticationSuccessResult> {
     // TODO: validate username and password?
     const passwordHash = await bcrypt.hash(
       registrationData.unhashedPassword,
@@ -42,18 +44,29 @@ export class AuthenticationService {
       email: registrationData.email,
     });
 
-    return newPlayer;
+    return {
+      message: 'Registration successful!',
+      playerID: newPlayer.playerID,
+      playerObjectID: newPlayer._id.toString(),
+      username: newPlayer.username,
+    };
   }
 
-  async login(credentials: LoginDTO): Promise<PlayerDocument | null> {
+  async login(loginData: LoginDTO): Promise<AuthenticationSuccessResult> {
     // const player = await this.playerService.findOneByUsername(
-    //   credentials.username,
+    //   loginData.username,
     // );
-    // if (player && player.password === credentials.password) {
+    // if (player && player.password === loginData.password) {
     //   return player;
     // }
 
-    return null;
+    return {
+      message: 'Login successful!',
+      // TEMP
+      playerID: uuidv4() as UUID,
+      playerObjectID: 'TODO',
+      username: 'TODO',
+    };
   }
 
   async logout(playerID: string): Promise<string> {

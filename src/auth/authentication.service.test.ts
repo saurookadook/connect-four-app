@@ -2,11 +2,11 @@ import { randomUUID, UUID } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
-import { Player, PlayerDocument } from '@/player/schemas/player.schema';
-import { expectHydratedDocumentToMatch } from '@/utils/testing';
+import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
 
@@ -55,18 +55,17 @@ describe('AuthenticationService', () => {
 
   describe("'register' method", () => {
     it('should register a new player and return the player document', async () => {
-      const registeredPlayer = await service.register(mockPlayerData);
+      const registeredPlayerResult = await service.register(mockPlayerData);
 
-      expectHydratedDocumentToMatch<Player>(
-        registeredPlayer, // force formatting
-        {
-          password: expect.not.stringMatching(mockPlayerData.unhashedPassword),
-          // TODO: should maybe just extend `expect`?
+      expect(registeredPlayerResult).toEqual(
+        expect.objectContaining({
+          message: 'Registration successful!',
           playerID: expect.stringMatching(
             /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
           ),
+          playerObjectID: expect.any(ObjectId),
           username: mockPlayerData.username,
-        },
+        }),
       );
     });
   });
@@ -75,21 +74,20 @@ describe('AuthenticationService', () => {
     it('should authenticate a player and return the player document', async () => {
       await service.register(mockPlayerData);
 
-      const loggedInPlayer = (await service.login({
+      const loggedInPlayerResult = await service.login({
         username: mockPlayerData.username,
         unhashedPassword: mockPlayerData.unhashedPassword,
-      })) as PlayerDocument;
+      });
 
-      expectHydratedDocumentToMatch<Player>(
-        loggedInPlayer, // force formatting
-        {
-          ...mockPlayerData,
-          password: expect.not.stringMatching(mockPlayerData.unhashedPassword),
-          // TODO: should maybe just extend `expect`?
+      expect(loggedInPlayerResult).toEqual(
+        expect.objectContaining({
+          message: 'Login successful!',
           playerID: expect.stringMatching(
             /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
           ),
-        },
+          playerObjectID: expect.any(ObjectId),
+          username: mockPlayerData.username,
+        }),
       );
     });
   });
