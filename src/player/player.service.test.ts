@@ -80,13 +80,16 @@ describe('PlayerService', () => {
     });
 
     it('should find a player document by ', async () => {
-      const foundPlayer = await service.findOneById(
+      const foundPlayer = (await service.findOneById(
         initialPlayer._id.toString(),
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
-        ...mockPlayer,
-      });
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
     });
   });
 
@@ -102,13 +105,41 @@ describe('PlayerService', () => {
     });
 
     it('should find a player document by playerID', async () => {
-      const foundPlayer = await service.findOneByPlayerID(
+      const foundPlayer = (await service.findOneByPlayerID(
         initialPlayer.playerID,
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
-        ...mockPlayer,
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
+    });
+  });
+
+  describe("'findOneByUsername' method", () => {
+    let initialPlayer: PlayerDocument;
+
+    beforeEach(async () => {
+      initialPlayer = await service.createOne({
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
+    });
+
+    it('should find a player document by username', async () => {
+      const foundPlayer = (await service.findOneByUsername(
+        initialPlayer.username,
+      )) as PlayerDocument;
+
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
     });
   });
 
@@ -128,15 +159,18 @@ describe('PlayerService', () => {
         username: 'RickSanchez',
         email: 'im-a-pickle@gmail.com',
       };
-      const updatedPlayer = await service.updateOne(
+      const updatedPlayer = (await service.updateOne(
         initialPlayer._id.toString(),
         updatedFields,
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(updatedPlayer as PlayerDocument, {
-        ...mockPlayer,
-        ...updatedFields,
-      });
+      expectHydratedDocumentToMatch<Player>(
+        updatedPlayer, // force formatting
+        {
+          ...mockPlayer,
+          ...updatedFields,
+        },
+      );
     });
   });
 
@@ -157,11 +191,16 @@ describe('PlayerService', () => {
       });
 
       const initialID = initialPlayer._id.toString();
-      const deletedPlayer = await service.deleteOneById(initialID);
+      const deletedPlayer = (await service.deleteOneById(
+        initialID,
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch(deletedPlayer as PlayerDocument, {
-        ...mockPlayer,
-      });
+      expectHydratedDocumentToMatch(
+        deletedPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
 
       const emptyResult = await service.findOneById(initialID);
       expect(emptyResult).toBeNull();

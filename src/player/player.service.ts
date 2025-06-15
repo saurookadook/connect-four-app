@@ -37,6 +37,12 @@ export class PlayerService {
       .exec();
   }
 
+  async findOneByUsername(username: string) {
+    return await this.playerModel
+      .findOne({ username: username }, { projection: { password: 0 } })
+      .exec();
+  }
+
   async updateOne(
     id: string,
     player: UpdatePlayerDTO,
