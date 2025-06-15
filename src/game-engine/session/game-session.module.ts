@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import {
-  GameSession,
-  GameSessionSchema,
-} from '@game-engine/schemas/game-session.schema';
-import { GameSessionService } from '@game-engine/session/game-session.service';
+import { GameSession, GameSessionSchema } from '../schemas/game-session.schema';
+import { GameSessionService } from './game-session.service';
 
 @Module({
   controllers: [],

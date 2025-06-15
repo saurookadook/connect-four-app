@@ -1,12 +1,8 @@
 import { randomUUID } from 'crypto';
 import { inspect } from 'util';
 
-import { LogicSession } from '@/game-logic-engine';
-import {
-  BOARD_COLS,
-  BOARD_ROWS,
-  PlayerColor,
-} from '@/game-logic-engine/constants';
+import { BOARD_COLS, BOARD_ROWS, PlayerColor } from '../constants';
+import { LogicSession } from '..';
 
 describe('LogicSession', () => {
   const mockPlayerOneID = randomUUID();

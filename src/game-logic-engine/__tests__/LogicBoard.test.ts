@@ -1,9 +1,5 @@
-import { LogicBoard } from '@/game-logic-engine';
-import {
-  BOARD_COLS,
-  BOARD_ROWS,
-  PlayerColor,
-} from '@/game-logic-engine/constants';
+import { BOARD_COLS, BOARD_ROWS, PlayerColor } from '../constants';
+import { LogicBoard } from '..';
 
 describe('Board', () => {
   let testLogicBoard: LogicBoard;

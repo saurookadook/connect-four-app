@@ -9,10 +9,13 @@ export class PlayerDTO extends BaseDTO {
   playerID: UUID;
 
   @Expose()
-  username?: string;
+  username: string;
 
   @Expose()
   email?: string;
+
+  @Expose()
+  password: string;
 }
 
 @Exclude()

@@ -3,12 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { CreatePlayerDTO, UpdatePlayerDTO } from '@/player/dtos/player.dto';
+import { CreatePlayerDTO, UpdatePlayerDTO } from './dtos/player.dto';
 import {
   NullablePlayerDocument,
   Player,
   PlayerDocument,
-} from '@/player/schemas/player.schema';
+} from './schemas/player.schema';
 
 @Injectable()
 export class PlayerService {
@@ -21,6 +21,9 @@ export class PlayerService {
     return createdPlayer.save();
   }
 
+  /**
+   * @param id Represents `ObjectId` in MongoDB
+   */
   async findOneById(id: string): Promise<NullablePlayerDocument> {
     return await this.playerModel.findById(id).exec();
   }

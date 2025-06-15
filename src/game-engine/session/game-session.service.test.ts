@@ -5,13 +5,13 @@ import { Connection, Model } from 'mongoose';
 
 import { GAME_SESSION_MODEL_TOKEN, GameSessionStatus } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
+import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import {
   GameSession,
   GameSessionDocument,
-} from '@game-engine/schemas/game-session.schema';
-import { GameSessionModule } from '@game-engine/session/game-session.module';
-import { GameSessionService } from '@game-engine/session/game-session.service';
-import { expectHydratedDocumentToMatch } from '@/utils/testing';
+} from '../schemas/game-session.schema';
+import { GameSessionModule } from './game-session.module';
+import { GameSessionService } from './game-session.service';
 
 const mockFirstPlayerID = randomUUID();
 const mockSecondPlayerID = randomUUID();

@@ -3,13 +3,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { GameSessionDTO } from '@game-engine/dtos/game-session.dto';
+import { GameSessionDTO } from './dtos/game-session.dto';
 import {
   GameSession,
   GameSessionDocument,
   NullableGameSessionDocument,
-} from '@game-engine/schemas/game-session.schema';
-import { GameSessionService } from '@game-engine/session/game-session.service';
+} from './schemas/game-session.schema';
+import { GameSessionService } from './session/game-session.service';
 
 @Injectable()
 export class GameEngineService {

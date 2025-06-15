@@ -5,10 +5,10 @@ import { Connection, Model } from 'mongoose';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants/db';
 import { databaseProviders } from '@/database/database.providers';
-import { Player, PlayerDocument } from '@/player/schemas/player.schema';
-import { PlayerModule } from '@/player/player.module';
-import { PlayerService } from '@/player/player.service';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
+import { Player, PlayerDocument } from './schemas/player.schema';
+import { PlayerModule } from './player.module';
+import { PlayerService } from './player.service';
 
 const mockPlayerID = randomUUID();
 const mockNow = new Date();

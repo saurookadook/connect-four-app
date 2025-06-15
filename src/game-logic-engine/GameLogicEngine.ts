@@ -1,11 +1,9 @@
 import { UUID } from 'node:crypto';
 import { inspect } from 'node:util';
 
-import { LogicBoard, LogicSession } from '@/game-logic-engine';
-import { GameSessionStatus, PlayerColor } from '@/game-logic-engine/constants';
-import validatorFuncs, {
-  ValidatorFunc,
-} from '@/game-logic-engine/validator-funcs';
+import { GameSessionStatus, PlayerColor } from './constants';
+import validatorFuncs, { ValidatorFunc } from './validator-funcs';
+import { LogicBoard, LogicSession } from './';
 
 export class GameLogicEngine {
   #validatorFuncs: ValidatorFunc[];
