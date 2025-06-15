@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID, UUID } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
@@ -10,10 +10,13 @@ import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
 
+const mockNow = new Date();
 const mockPlayerData = {
   playerID: randomUUID(),
   username: 'testuser',
   unhashedPassword: 'securepassword',
+  createdAt: mockNow,
+  updatedAt: mockNow,
 };
 
 describe('AuthenticationService', () => {
@@ -22,6 +25,11 @@ describe('AuthenticationService', () => {
   let model: Model<Player>;
 
   beforeAll(async () => {
+    jest.useFakeTimers({
+      doNotFake: ['nextTick', 'setImmediate'],
+      now: mockNow,
+    });
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         ...databaseProviders, // force formatting
@@ -36,12 +44,13 @@ describe('AuthenticationService', () => {
 
   afterEach(async () => {
     await model.deleteMany({}).exec();
-    jest.resetAllMocks();
+    jest.clearAllTimers();
   });
 
   afterAll(async () => {
     await model.deleteMany({}).exec();
     await mongoConnection.close();
+    jest.useRealTimers();
   });
 
   describe("'register' method", () => {
@@ -51,7 +60,12 @@ describe('AuthenticationService', () => {
       expectHydratedDocumentToMatch<Player>(
         registeredPlayer, // force formatting
         {
-          ...mockPlayerData,
+          password: expect.not.stringMatching(mockPlayerData.unhashedPassword),
+          // TODO: should maybe just extend `expect`?
+          playerID: expect.stringMatching(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+          ),
+          username: mockPlayerData.username,
         },
       );
     });
@@ -70,6 +84,11 @@ describe('AuthenticationService', () => {
         loggedInPlayer, // force formatting
         {
           ...mockPlayerData,
+          password: expect.not.stringMatching(mockPlayerData.unhashedPassword),
+          // TODO: should maybe just extend `expect`?
+          playerID: expect.stringMatching(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+          ),
         },
       );
     });

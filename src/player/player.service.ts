@@ -17,19 +17,24 @@ export class PlayerService {
   ) {}
 
   async createOne(player: CreatePlayerDTO): Promise<PlayerDocument> {
-    const createdPlayer = new this.playerModel(player);
-    return createdPlayer.save();
+    const createdPlayer = await new this.playerModel(player).save();
+    // TODO: Exclude password from the returned document
+    return createdPlayer;
   }
 
   /**
    * @param id Represents `ObjectId` in MongoDB
    */
   async findOneById(id: string): Promise<NullablePlayerDocument> {
-    return await this.playerModel.findById(id).exec();
+    return await this.playerModel
+      .findById(id, { projection: { password: 0 } })
+      .exec();
   }
 
   async findOneByPlayerID(playerID: UUID) {
-    return await this.playerModel.findOne({ playerID: playerID }).exec();
+    return await this.playerModel
+      .findOne({ playerID: playerID }, { projection: { password: 0 } })
+      .exec();
   }
 
   async updateOne(
