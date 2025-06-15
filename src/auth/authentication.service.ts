@@ -14,6 +14,8 @@ export type AuthenticationResponse = {
 };
 
 export type AuthenticationSuccessResponse = AuthenticationResponse & {
+  playerID: UUID;
+  playerObjectID: string; // MongoDB ObjectId
   username: string;
 };
 
