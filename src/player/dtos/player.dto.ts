@@ -12,10 +12,10 @@ export class PlayerDTO extends BaseDTO {
   username: string;
 
   @Expose()
-  email?: string;
+  password: string;
 
   @Expose()
-  password: string;
+  email?: string;
 }
 
 @Exclude()
@@ -24,7 +24,10 @@ export class CreatePlayerDTO {
   playerID: PlayerDTO['playerID'];
 
   @Expose()
-  username?: PlayerDTO['username'];
+  username: PlayerDTO['username'];
+
+  @Expose()
+  password: string;
 
   @Expose()
   email?: PlayerDTO['email'];
@@ -37,6 +40,9 @@ export class UpdatePlayerDTO extends PartialBaseDTO {
 
   @Expose()
   username?: PlayerDTO['username'];
+
+  @Expose()
+  password?: PlayerDTO['password'];
 
   @Expose()
   email?: PlayerDTO['email'];
