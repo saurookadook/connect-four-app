@@ -9,6 +9,10 @@ export class GameSessionController {
 
   @Get('history/:playerID')
   async getGameSessionHistory(@Param('playerID') playerID: UUID) {
-    // return this.gameSessionService.findAllForPlayer(playerID);
+    const playerSessions =
+      await this.gameSessionService.findAllForPlayer(playerID);
+    return {
+      sessions: playerSessions,
+    };
   }
 }
