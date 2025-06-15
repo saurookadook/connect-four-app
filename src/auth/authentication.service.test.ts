@@ -5,7 +5,8 @@ import { Connection, Model } from 'mongoose';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
-import { Player } from '@/player/schemas/player.schema';
+import { Player, PlayerDocument } from '@/player/schemas/player.schema';
+import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
 
@@ -43,21 +44,16 @@ describe('AuthenticationService', () => {
     await mongoConnection.close();
   });
 
-  // Add your tests here
   describe("'register' method", () => {
     it('should register a new player and return the player document', async () => {
       const registeredPlayer = await service.register(mockPlayerData);
 
-      expect(registeredPlayer).toHaveProperty(
-        'playerID',
-        mockPlayerData.playerID,
+      expectHydratedDocumentToMatch<Player>(
+        registeredPlayer, // force formatting
+        {
+          ...mockPlayerData,
+        },
       );
-      expect(registeredPlayer).toHaveProperty(
-        'username',
-        mockPlayerData.username,
-      );
-      expect(registeredPlayer).toHaveProperty('createdAt');
-      expect(registeredPlayer).toHaveProperty('updatedAt');
     });
   });
 
@@ -65,18 +61,16 @@ describe('AuthenticationService', () => {
     it('should authenticate a player and return the player document', async () => {
       await service.register(mockPlayerData);
 
-      const loggedInPlayer = await service.login({
+      const loggedInPlayer = (await service.login({
         username: mockPlayerData.username,
         unhashedPassword: mockPlayerData.unhashedPassword,
-      });
+      })) as PlayerDocument;
 
-      expect(loggedInPlayer).toHaveProperty(
-        'playerID',
-        mockPlayerData.playerID,
-      );
-      expect(loggedInPlayer).toHaveProperty(
-        'username',
-        mockPlayerData.username,
+      expectHydratedDocumentToMatch<Player>(
+        loggedInPlayer, // force formatting
+        {
+          ...mockPlayerData,
+        },
       );
     });
   });

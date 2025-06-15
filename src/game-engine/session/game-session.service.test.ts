@@ -71,9 +71,12 @@ describe('GameSessionService', () => {
         playerTwoID: mockSecondPlayerID,
       });
 
-      expectHydratedDocumentToMatch<GameSession>(newGameSession, {
-        ...mockGameSession,
-      });
+      expectHydratedDocumentToMatch<GameSession>(
+        newGameSession, // force formatting
+        {
+          ...mockGameSession,
+        },
+      );
     });
   });
 
@@ -88,12 +91,12 @@ describe('GameSessionService', () => {
     });
 
     it('should find a game session document by ID', async () => {
-      const foundGameSession = await service.findOneById(
+      const foundGameSession = (await service.findOneById(
         initialGameSession._id.toString(),
-      );
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        foundGameSession as GameSessionDocument,
+        foundGameSession, // force formatting
         {
           ...mockGameSession,
         },
@@ -167,15 +170,15 @@ describe('GameSessionService', () => {
         },
       ];
 
-      const updatedGameSession = await service.updateOne(
+      const updatedGameSession = (await service.updateOne(
         initialGameSession._id.toString(),
         {
           moves: [...initialGameSession.moves, ...updatedMoves],
         },
-      );
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        updatedGameSession as GameSessionDocument,
+        updatedGameSession, // force formatting
         {
           ...mockGameSession,
           moves: [...mockGameSession.moves, ...updatedMoves],
@@ -200,10 +203,12 @@ describe('GameSessionService', () => {
       });
 
       const initialID = initialGameSession._id.toString();
-      const deletedGameSession = await service.deleteOneById(initialID);
+      const deletedGameSession = (await service.deleteOneById(
+        initialID,
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        deletedGameSession as GameSessionDocument,
+        deletedGameSession, // force formatting
         {
           ...mockGameSession,
         },
