@@ -1,25 +1,55 @@
+import { UUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
-import { CreatePlayerDTO } from '@/player/dtos/player.dto';
 import { PlayerDocument } from '@/player/schemas/player.schema';
 import { PlayerService } from '@/player/player.service';
-import { LoginDTO } from './dtos/auth.dto';
+import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
+
+const SALT_ROUNDS = 10;
+
+export type AuthResponse = {
+  message: string;
+};
+
+export type AuthSuccessResponse = AuthResponse & {
+  username: string;
+};
+
+export type AuthErrorResponse = AuthResponse & {
+  // TODO:
+  statusCode: number;
+};
 
 @Injectable()
 export class AuthService {
   constructor(private playerService: PlayerService) {}
 
-  async register(playerData: CreatePlayerDTO): Promise<PlayerDocument> {
-    return this.playerService.createOne(playerData);
+  async register(registrationData: RegisterDTO): Promise<PlayerDocument> {
+    // TODO: validate username and password?
+    const passwordHash = await bcrypt.hash(
+      registrationData.unhashedPassword,
+      SALT_ROUNDS,
+    );
+    const playerID = uuidv4() as UUID;
+    const newPlayer = await this.playerService.createOne({
+      username: registrationData.username,
+      password: passwordHash,
+      playerID,
+      email: registrationData.email,
+    });
+
+    return newPlayer;
   }
 
   async login(credentials: LoginDTO): Promise<PlayerDocument | null> {
-    const player = await this.playerService.findOneByUsername(
-      credentials.username,
-    );
-    if (player && player.password === credentials.password) {
-      return player;
-    }
+    // const player = await this.playerService.findOneByUsername(
+    //   credentials.username,
+    // );
+    // if (player && player.password === credentials.password) {
+    //   return player;
+    // }
 
     return null;
   }
