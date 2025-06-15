@@ -18,5 +18,5 @@ export class LoginDTO {
   username: string;
 
   @Expose()
-  password: string;
+  unhashedPassword: string;
 }

@@ -9,21 +9,21 @@ import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
 const SALT_ROUNDS = 10;
 
-export type AuthResponse = {
+export type AuthenticationResponse = {
   message: string;
 };
 
-export type AuthSuccessResponse = AuthResponse & {
+export type AuthenticationSuccessResponse = AuthenticationResponse & {
   username: string;
 };
 
-export type AuthErrorResponse = AuthResponse & {
+export type AuthenticationErrorResponse = AuthenticationResponse & {
   // TODO:
   statusCode: number;
 };
 
 @Injectable()
-export class AuthService {
+export class AuthenticationService {
   constructor(private playerService: PlayerService) {}
 
   async register(registrationData: RegisterDTO): Promise<PlayerDocument> {

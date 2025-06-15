@@ -7,17 +7,17 @@ import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
 import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
-import { AuthService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 
 const mockPlayerData = {
   playerID: randomUUID(),
   username: 'testuser',
-  password: 'securepassword',
+  unhashedPassword: 'securepassword',
 };
 
-describe('AuthService', () => {
+describe('AuthenticationService', () => {
   let mongoConnection: Connection;
-  let service: AuthService;
+  let service: AuthenticationService;
   let model: Model<Player>;
 
   beforeAll(async () => {
@@ -29,7 +29,7 @@ describe('AuthService', () => {
     }).compile();
 
     mongoConnection = await module.resolve(getConnectionToken());
-    service = await module.resolve(AuthService);
+    service = await module.resolve(AuthenticationService);
     model = await module.resolve(PLAYER_MODEL_TOKEN);
   });
 
@@ -67,7 +67,7 @@ describe('AuthService', () => {
 
       const loggedInPlayer = await service.login({
         username: mockPlayerData.username,
-        password: mockPlayerData.password,
+        unhashedPassword: mockPlayerData.unhashedPassword,
       });
 
       expect(loggedInPlayer).toHaveProperty(
