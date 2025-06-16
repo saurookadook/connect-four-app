@@ -1,6 +1,18 @@
 import { Exclude, Expose } from 'class-transformer';
 
 @Exclude()
+export class AuthenticationRequestDTO {
+  @Expose()
+  username: string;
+
+  @Expose()
+  password: string;
+
+  @Expose()
+  email?: string;
+}
+
+@Exclude()
 export class RegisterDTO {
   @Expose()
   username: string;

@@ -1,28 +1,32 @@
-import { Body, Controller, Get, Query, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
-import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
+import {
+  AuthenticationRequestDTO,
+  RegisterDTO,
+  LoginDTO,
+} from './dtos/auth.dto';
 import { AuthenticationService } from './authentication.service';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('register')
-  async register(@Body() registrationData: RegisterDTO) {
-    console.log({
-      registrationData,
-    });
+  async register(@Body() requestData: AuthenticationRequestDTO) {
+    const dataAsDTO = plainToInstance(RegisterDTO, requestData);
     return this.authenticationService.register({
-      username: registrationData.username,
-      unhashedPassword: registrationData.unhashedPassword,
+      username: dataAsDTO.username,
+      unhashedPassword: dataAsDTO.unhashedPassword,
     });
   }
 
   @Post('login')
-  async login(@Body() loginData: LoginDTO) {
+  async login(@Body() requestData: AuthenticationRequestDTO) {
+    const dataAsDTO = plainToInstance(LoginDTO, requestData);
     return this.authenticationService.login({
-      username: loginData.username,
-      unhashedPassword: loginData.unhashedPassword,
+      username: dataAsDTO.username,
+      unhashedPassword: dataAsDTO.unhashedPassword,
     });
   }
 }
