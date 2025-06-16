@@ -8,8 +8,6 @@ import { PlayerDocument } from '@/player/schemas/player.schema';
 import { PlayerService } from '@/player/player.service';
 import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
-const SALT_ROUNDS = 10;
-
 export type AuthenticationResult = {
   message: string;
 };
@@ -27,21 +25,23 @@ export type AuthenticationErrorResult = AuthenticationResult & {
 
 @Injectable()
 export class AuthenticationService {
+  static readonly SALT_ROUNDS = 10;
+
   constructor(private playerService: PlayerService) {}
 
   async register(
     registrationData: RegisterDTO,
   ): Promise<AuthenticationSuccessResult> {
     // TODO: validate username and password?
+    const salt = await bcrypt.genSalt(AuthenticationService.SALT_ROUNDS);
     const passwordHash = await bcrypt.hash(
       registrationData.unhashedPassword,
-      SALT_ROUNDS,
+      salt,
     );
-    const playerID = uuidv4() as UUID;
     const newPlayer = await this.playerService.createOne({
       username: registrationData.username,
       password: passwordHash,
-      playerID,
+      playerID: uuidv4() as UUID,
       email: registrationData.email,
     });
 
