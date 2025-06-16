@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -14,21 +13,18 @@ import { AuthenticationService } from './authentication.service';
 
 const mockNow = new Date();
 const mockFirstPlayer = {
-  playerID: randomUUID(),
   username: 'player_uno',
   unhashedPassword: 'superdupergoodpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
 const mockSecondPlayer = {
-  playerID: randomUUID(),
   username: 'player_dos',
   unhashedPassword: 'superdupergoodpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
 const mockThirdPlayer = {
-  playerID: randomUUID(),
   username: 'player_tres',
   unhashedPassword: 'superdupergoodpassword',
   createdAt: mockNow,
@@ -57,21 +53,6 @@ describe('AuthController', () => {
     await app.init();
   });
 
-  beforeEach(async () => {
-    await service.register({
-      username: mockFirstPlayer.username,
-      unhashedPassword: mockFirstPlayer.unhashedPassword,
-    });
-    // await service.register({
-    //   username: mockSecondPlayer.username,
-    //   unhashedPassword: mockSecondPlayer.unhashedPassword,
-    // });
-    // await service.register({
-    //   username: mockThirdPlayer.username,
-    //   unhashedPassword: mockThirdPlayer.unhashedPassword,
-    // });
-  });
-
   afterEach(async () => {
     await model.deleteMany({}).exec();
     jest.clearAllTimers();
@@ -84,8 +65,8 @@ describe('AuthController', () => {
   });
 
   describe('/auth/register (POST)', () => {
-    it('should register a new player', async () => {
-      await request(app.getHttpServer())
+    it('should register a new player', (done) => {
+      request(app.getHttpServer())
         .post('/auth/register')
         .send({
           username: mockFirstPlayer.username,
@@ -96,32 +77,41 @@ describe('AuthController', () => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
           expect(resultBody.message).toEqual('Registration successful!');
-          expect(resultBody.playerID).toEqual(mockFirstPlayer.playerID);
+          expect(resultBody.playerID).toBeUUID();
           expect(resultBody.playerObjectID).toEqual(expect.any(String));
           expect(resultBody.username).toEqual(mockFirstPlayer.username);
-          expect(result.status).toBe(200);
-        });
+          expect(result.status).toBe(201);
+        })
+        .end(done);
     });
   });
 
   describe('/auth/login (POST)', () => {
-    it('should log in an existing player', async () => {
-      await request(app.getHttpServer())
+    beforeEach(async () => {
+      await service.register({
+        username: mockSecondPlayer.username,
+        unhashedPassword: mockSecondPlayer.unhashedPassword,
+      });
+    });
+
+    it('should log in an existing player', (done) => {
+      request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          username: mockFirstPlayer.username,
-          password: mockFirstPlayer.unhashedPassword,
+          username: mockSecondPlayer.username,
+          password: mockSecondPlayer.unhashedPassword,
         })
         .set('Accept', 'application/json')
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
           expect(resultBody.message).toEqual('Login successful!');
-          expect(resultBody.playerID).toEqual(mockFirstPlayer.playerID);
+          expect(resultBody.playerID).toBeUUID();
           expect(resultBody.playerObjectID).toEqual(expect.any(String));
-          expect(resultBody.username).toEqual(mockFirstPlayer.username);
-          expect(result.status).toBe(200);
-        });
+          expect(resultBody.username).toEqual(mockSecondPlayer.username);
+          expect(result.status).toBe(201);
+        })
+        .end(done);
     });
   });
 });
