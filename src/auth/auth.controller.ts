@@ -15,18 +15,12 @@ export class AuthController {
   @Post('register')
   async register(@Body() requestData: AuthenticationRequestDTO) {
     const dataAsDTO = plainToInstance(RegisterDTO, requestData);
-    return this.authenticationService.register({
-      username: dataAsDTO.username,
-      unhashedPassword: dataAsDTO.unhashedPassword,
-    });
+    return this.authenticationService.register(dataAsDTO);
   }
 
   @Post('login')
   async login(@Body() requestData: AuthenticationRequestDTO) {
     const dataAsDTO = plainToInstance(LoginDTO, requestData);
-    return this.authenticationService.login({
-      username: dataAsDTO.username,
-      unhashedPassword: dataAsDTO.unhashedPassword,
-    });
+    return this.authenticationService.login(dataAsDTO);
   }
 }
