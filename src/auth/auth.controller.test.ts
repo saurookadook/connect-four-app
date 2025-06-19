@@ -35,11 +35,6 @@ describe('AuthController', () => {
     await app.init();
   });
 
-  afterEach(async () => {
-    await model.deleteMany({}).exec();
-    jest.clearAllTimers();
-  });
-
   afterAll(async () => {
     await model.deleteMany({}).exec();
     await mongoConnection.close();
@@ -47,6 +42,11 @@ describe('AuthController', () => {
   });
 
   describe('/auth/register (POST)', () => {
+    beforeEach(async () => {
+      await model.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
     it('should register a new player', (done) => {
       request(app.getHttpServer())
         .post('/auth/register')
@@ -70,6 +70,9 @@ describe('AuthController', () => {
 
   describe('/auth/login (POST)', () => {
     beforeEach(async () => {
+      await model.deleteMany({}).exec();
+      jest.clearAllTimers();
+
       await service.register({
         username: mockSecondPlayer.username,
         unhashedPassword: mockSecondPlayer.unhashedPassword,
