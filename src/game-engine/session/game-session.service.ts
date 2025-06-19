@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { PlayerService } from '@/player/player.service';
 import {
   CreateGameSessionDTO,
   UpdateGameSessionDTO,
@@ -15,17 +16,29 @@ import {
 
 @Injectable()
 export class GameSessionService {
-  // TODO: probably inject player model too?
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
+    private readonly playerService: PlayerService,
   ) {}
 
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    const createdGameSession = new this.gameSessionModel(gameSession);
-    return createdGameSession.save();
+    try {
+      await this._validatePlayers({
+        playerOneID: gameSession.playerOneID,
+        playerTwoID: gameSession.playerTwoID,
+      });
+      const createdGameSession = new this.gameSessionModel(gameSession);
+      return createdGameSession.save();
+    } catch (error) {
+      // console.error(error);
+      throw new Error(
+        '[GameSessionService.createOne] Encountered ERROR while creating game session: ',
+        error,
+      );
+    }
   }
 
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
@@ -51,5 +64,37 @@ export class GameSessionService {
 
   async deleteOneById(id: string): Promise<NullableGameSessionDocument> {
     return this.gameSessionModel.findByIdAndDelete(id).exec();
+  }
+
+  async _validatePlayers({
+    playerOneID,
+    playerTwoID,
+  }: {
+    playerOneID: UUID;
+    playerTwoID: UUID;
+  }): Promise<void> {
+    if (playerOneID === playerTwoID) {
+      throw new TypeError(
+        '[GameSessionService._validatePlayers] Player IDs must be different.',
+      );
+    }
+
+    const playerOneExists =
+      await this.playerService.findOneByPlayerID(playerOneID);
+
+    if (!playerOneExists) {
+      throw new Error(
+        `[GameSessionService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
+      );
+    }
+
+    const playerTwoExists =
+      await this.playerService.findOneByPlayerID(playerTwoID);
+
+    if (!playerTwoExists) {
+      throw new Error(
+        `[GameSessionService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
+      );
+    }
   }
 }
