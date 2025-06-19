@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { INestApplication } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -6,19 +5,26 @@ import { Connection, Model } from 'mongoose';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 
-import { GAME_SESSION_MODEL_TOKEN, GameSessionStatus } from '@/constants';
+import { mockNow } from '@/__mocks__/commonMocks';
+import { mockPlayers } from '@/__mocks__/playerMocks';
+import { PlayerModule } from '@/player/player.module';
+import { Player } from '@/player/schemas/player.schema';
+import {
+  GAME_SESSION_MODEL_TOKEN,
+  PLAYER_MODEL_TOKEN,
+  GameSessionStatus,
+} from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
-import { GameSession } from '@/game-engine/schemas/game-session.schema';
-import { GameSessionModule } from '@/game-engine/session/game-session.module';
-import { GameSessionService } from '@/game-engine/session/game-session.service';
-
-const mockFirstPlayerID = randomUUID();
-const mockSecondPlayerID = randomUUID();
-const mockThirdPlayerID = randomUUID();
+import { GameSession } from '../schemas/game-session.schema';
+import { GameSessionModule } from './game-session.module';
+import { GameSessionService } from './game-session.service';
 
 describe('GameSessionController', () => {
+  const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
+
   let app: INestApplication<App>;
   let mongoConnection: Connection;
+  let playerModel: Model<Player>;
   let service: GameSessionService;
   let model: Model<GameSession>;
 
@@ -27,29 +33,36 @@ describe('GameSessionController', () => {
       imports: [
         ...databaseProviders, // force formatting
         GameSessionModule,
+        PlayerModule,
       ],
     }).compile();
 
     app = module.createNestApplication();
     mongoConnection = await app.resolve(getConnectionToken());
 
+    playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
     service = await app.resolve(GameSessionService);
     model = await app.resolve(GAME_SESSION_MODEL_TOKEN);
     await app.init();
   });
 
   beforeEach(async () => {
+    await playerModel.insertMany([
+      mockFirstPlayer,
+      mockSecondPlayer,
+      mockThirdPlayer,
+    ]);
     await service.createOne({
-      playerOneID: mockFirstPlayerID,
-      playerTwoID: mockSecondPlayerID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
     await service.createOne({
-      playerOneID: mockSecondPlayerID,
-      playerTwoID: mockFirstPlayerID,
+      playerOneID: mockSecondPlayer.playerID,
+      playerTwoID: mockFirstPlayer.playerID,
     });
     await service.createOne({
-      playerOneID: mockThirdPlayerID,
-      playerTwoID: mockSecondPlayerID,
+      playerOneID: mockThirdPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
   });
 
@@ -67,7 +80,7 @@ describe('GameSessionController', () => {
   describe('/game-session/history (GET)', () => {
     it('should return game session history for a player', async () => {
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockFirstPlayerID}`)
+        .get(`/game-session/history/${mockFirstPlayer.playerID}`)
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
@@ -77,7 +90,7 @@ describe('GameSessionController', () => {
         });
 
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockSecondPlayerID}`)
+        .get(`/game-session/history/${mockSecondPlayer.playerID}`)
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
@@ -87,7 +100,7 @@ describe('GameSessionController', () => {
         });
 
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockThirdPlayerID}`)
+        .get(`/game-session/history/${mockThirdPlayer.playerID}`)
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
