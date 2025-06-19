@@ -3,12 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { CreatePlayerDTO, UpdatePlayerDTO } from '@/player/dtos/player.dto';
+import { CreatePlayerDTO, UpdatePlayerDTO } from './dtos/player.dto';
 import {
   NullablePlayerDocument,
   Player,
   PlayerDocument,
-} from '@/player/schemas/player.schema';
+} from './schemas/player.schema';
 
 @Injectable()
 export class PlayerService {
@@ -17,16 +17,30 @@ export class PlayerService {
   ) {}
 
   async createOne(player: CreatePlayerDTO): Promise<PlayerDocument> {
-    const createdPlayer = new this.playerModel(player);
-    return createdPlayer.save();
+    const createdPlayer = await new this.playerModel(player).save();
+    // TODO: Exclude password from the returned document
+    return createdPlayer;
   }
 
+  /**
+   * @param id Represents `ObjectId` in MongoDB
+   */
   async findOneById(id: string): Promise<NullablePlayerDocument> {
-    return await this.playerModel.findById(id).exec();
+    return await this.playerModel
+      .findById(id, { projection: { password: 0 } })
+      .exec();
   }
 
   async findOneByPlayerID(playerID: UUID) {
-    return await this.playerModel.findOne({ playerID: playerID }).exec();
+    return await this.playerModel
+      .findOne({ playerID: playerID }, { projection: { password: 0 } })
+      .exec();
+  }
+
+  async findOneByUsername(username: string) {
+    return await this.playerModel
+      .findOne({ username: username }, { projection: { password: 0 } })
+      .exec();
   }
 
   async updateOne(

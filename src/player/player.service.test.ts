@@ -5,15 +5,17 @@ import { Connection, Model } from 'mongoose';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants/db';
 import { databaseProviders } from '@/database/database.providers';
-import { Player, PlayerDocument } from '@/player/schemas/player.schema';
-import { PlayerModule } from '@/player/player.module';
-import { PlayerService } from '@/player/player.service';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
+import { Player, PlayerDocument } from './schemas/player.schema';
+import { PlayerModule } from './player.module';
+import { PlayerService } from './player.service';
 
 const mockPlayerID = randomUUID();
 const mockNow = new Date();
 const mockPlayer = {
   playerID: mockPlayerID,
+  username: 'MortySmith',
+  password: 'wubbalubbadubdub',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
@@ -55,7 +57,9 @@ describe('PlayerService', () => {
   describe("'createOne' method", () => {
     it('should insert a new player document', async () => {
       const newPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
 
       expectHydratedDocumentToMatch<Player>(newPlayer, {
@@ -69,18 +73,23 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
     it('should find a player document by ', async () => {
-      const foundPlayer = await service.findOneById(
+      const foundPlayer = (await service.findOneById(
         initialPlayer._id.toString(),
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
-        ...mockPlayer,
-      });
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
     });
   });
 
@@ -89,18 +98,48 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
     it('should find a player document by playerID', async () => {
-      const foundPlayer = await service.findOneByPlayerID(
+      const foundPlayer = (await service.findOneByPlayerID(
         initialPlayer.playerID,
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(foundPlayer as PlayerDocument, {
-        ...mockPlayer,
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
+    });
+  });
+
+  describe("'findOneByUsername' method", () => {
+    let initialPlayer: PlayerDocument;
+
+    beforeEach(async () => {
+      initialPlayer = await service.createOne({
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
+    });
+
+    it('should find a player document by username', async () => {
+      const foundPlayer = (await service.findOneByUsername(
+        initialPlayer.username,
+      )) as PlayerDocument;
+
+      expectHydratedDocumentToMatch<Player>(
+        foundPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
     });
   });
 
@@ -109,7 +148,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
@@ -118,15 +159,18 @@ describe('PlayerService', () => {
         username: 'RickSanchez',
         email: 'im-a-pickle@gmail.com',
       };
-      const updatedPlayer = await service.updateOne(
+      const updatedPlayer = (await service.updateOne(
         initialPlayer._id.toString(),
         updatedFields,
-      );
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch<Player>(updatedPlayer as PlayerDocument, {
-        ...mockPlayer,
-        ...updatedFields,
-      });
+      expectHydratedDocumentToMatch<Player>(
+        updatedPlayer, // force formatting
+        {
+          ...mockPlayer,
+          ...updatedFields,
+        },
+      );
     });
   });
 
@@ -135,7 +179,9 @@ describe('PlayerService', () => {
 
     beforeEach(async () => {
       initialPlayer = await service.createOne({
-        playerID: mockPlayerID,
+        playerID: mockPlayer.playerID,
+        username: mockPlayer.username,
+        password: mockPlayer.password,
       });
     });
 
@@ -145,11 +191,16 @@ describe('PlayerService', () => {
       });
 
       const initialID = initialPlayer._id.toString();
-      const deletedPlayer = await service.deleteOneById(initialID);
+      const deletedPlayer = (await service.deleteOneById(
+        initialID,
+      )) as PlayerDocument;
 
-      expectHydratedDocumentToMatch(deletedPlayer as PlayerDocument, {
-        ...mockPlayer,
-      });
+      expectHydratedDocumentToMatch(
+        deletedPlayer, // force formatting
+        {
+          ...mockPlayer,
+        },
+      );
 
       const emptyResult = await service.findOneById(initialID);
       expect(emptyResult).toBeNull();

@@ -11,9 +11,18 @@ export class Player {
   playerID: UUID;
 
   @Prop({
+    required: true,
+    type: String,
+    unique: true,
+  })
+  username: string;
+
+  // TODO: is there a setting to exclude this from `find` queries by default?
+  @Prop({
+    required: true,
     type: String,
   })
-  username?: string;
+  password: string;
 
   @Prop({
     type: String,

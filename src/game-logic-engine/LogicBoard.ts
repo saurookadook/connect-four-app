@@ -4,7 +4,7 @@ import {
   Cell,
   GameBoard,
   PlayerColor,
-} from '@/game-logic-engine/constants';
+} from './constants';
 
 export class LogicBoard {
   gameBoardState: GameBoard;
