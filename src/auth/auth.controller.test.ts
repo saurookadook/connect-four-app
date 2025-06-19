@@ -5,31 +5,13 @@ import { Connection, Model } from 'mongoose';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 
+import { mockNow } from '@/__mocks__/commonMocks';
+import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
 import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
-
-const mockNow = new Date();
-const mockFirstPlayer = {
-  username: 'player_uno',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
-const mockSecondPlayer = {
-  username: 'player_dos',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
-const mockThirdPlayer = {
-  username: 'player_tres',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
@@ -53,11 +35,6 @@ describe('AuthController', () => {
     await app.init();
   });
 
-  afterEach(async () => {
-    await model.deleteMany({}).exec();
-    jest.clearAllTimers();
-  });
-
   afterAll(async () => {
     await model.deleteMany({}).exec();
     await mongoConnection.close();
@@ -65,6 +42,11 @@ describe('AuthController', () => {
   });
 
   describe('/auth/register (POST)', () => {
+    beforeEach(async () => {
+      await model.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
     it('should register a new player', (done) => {
       request(app.getHttpServer())
         .post('/auth/register')
@@ -88,6 +70,9 @@ describe('AuthController', () => {
 
   describe('/auth/login (POST)', () => {
     beforeEach(async () => {
+      await model.deleteMany({}).exec();
+      jest.clearAllTimers();
+
       await service.register({
         username: mockSecondPlayer.username,
         unhashedPassword: mockSecondPlayer.unhashedPassword,
