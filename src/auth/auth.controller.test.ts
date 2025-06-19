@@ -5,31 +5,13 @@ import { Connection, Model } from 'mongoose';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 
+import { mockNow } from '@/__mocks__/commonMocks';
+import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
 import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
-
-const mockNow = new Date();
-const mockFirstPlayer = {
-  username: 'player_uno',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
-const mockSecondPlayer = {
-  username: 'player_dos',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
-const mockThirdPlayer = {
-  username: 'player_tres',
-  unhashedPassword: 'superdupergoodpassword',
-  createdAt: mockNow,
-  updatedAt: mockNow,
-};
 
 describe('AuthController', () => {
   let app: INestApplication<App>;
