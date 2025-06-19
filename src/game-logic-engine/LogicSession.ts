@@ -1,12 +1,8 @@
 import { UUID } from 'node:crypto';
 import * as uuid from 'uuid';
 
-import {
-  GameBoard,
-  GameSessionStatus,
-  PlayerColor,
-} from '@/game-logic-engine/constants';
-import { LogicBoard } from '@/game-logic-engine';
+import { GameBoard, GameSessionStatus, PlayerColor } from './constants';
+import { LogicBoard } from './';
 
 export class LogicSession {
   #activePlayer: PlayerColor;

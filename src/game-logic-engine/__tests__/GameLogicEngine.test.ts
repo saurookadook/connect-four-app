@@ -1,12 +1,12 @@
 import { UUID, randomUUID } from 'crypto';
 
-import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
-import { GameSessionStatus, PlayerColor } from '@/game-logic-engine/constants';
+import { GameSessionStatus, PlayerColor } from '../constants';
 import {
   populateBoardWithOneMoveTilWin,
   populateBoardWithDescendingSlopeDiagonalWinOne,
   winningConditionGeneratorFuncs,
-} from '@/game-logic-engine/testing-utils/winConditionGenerators';
+} from '../testing-utils/winConditionGenerators';
+import { GameLogicEngine, LogicSession } from '..';
 
 describe('GameLogicEngine', () => {
   const mockPlayerOneID: UUID = randomUUID();

@@ -5,13 +5,13 @@ import { Connection, Model } from 'mongoose';
 
 import { GAME_SESSION_MODEL_TOKEN, GameSessionStatus } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
+import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import {
   GameSession,
   GameSessionDocument,
-} from '@game-engine/schemas/game-session.schema';
-import { GameSessionModule } from '@game-engine/session/game-session.module';
-import { GameSessionService } from '@game-engine/session/game-session.service';
-import { expectHydratedDocumentToMatch } from '@/utils/testing';
+} from '../schemas/game-session.schema';
+import { GameSessionModule } from './game-session.module';
+import { GameSessionService } from './game-session.service';
 
 const mockFirstPlayerID = randomUUID();
 const mockSecondPlayerID = randomUUID();
@@ -71,9 +71,12 @@ describe('GameSessionService', () => {
         playerTwoID: mockSecondPlayerID,
       });
 
-      expectHydratedDocumentToMatch<GameSession>(newGameSession, {
-        ...mockGameSession,
-      });
+      expectHydratedDocumentToMatch<GameSession>(
+        newGameSession, // force formatting
+        {
+          ...mockGameSession,
+        },
+      );
     });
   });
 
@@ -88,12 +91,12 @@ describe('GameSessionService', () => {
     });
 
     it('should find a game session document by ID', async () => {
-      const foundGameSession = await service.findOneById(
+      const foundGameSession = (await service.findOneById(
         initialGameSession._id.toString(),
-      );
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        foundGameSession as GameSessionDocument,
+        foundGameSession, // force formatting
         {
           ...mockGameSession,
         },
@@ -167,15 +170,15 @@ describe('GameSessionService', () => {
         },
       ];
 
-      const updatedGameSession = await service.updateOne(
+      const updatedGameSession = (await service.updateOne(
         initialGameSession._id.toString(),
         {
           moves: [...initialGameSession.moves, ...updatedMoves],
         },
-      );
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        updatedGameSession as GameSessionDocument,
+        updatedGameSession, // force formatting
         {
           ...mockGameSession,
           moves: [...mockGameSession.moves, ...updatedMoves],
@@ -200,10 +203,12 @@ describe('GameSessionService', () => {
       });
 
       const initialID = initialGameSession._id.toString();
-      const deletedGameSession = await service.deleteOneById(initialID);
+      const deletedGameSession = (await service.deleteOneById(
+        initialID,
+      )) as GameSessionDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
-        deletedGameSession as GameSessionDocument,
+        deletedGameSession, // force formatting
         {
           ...mockGameSession,
         },

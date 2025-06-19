@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { reduce } from 'rxjs/operators';
 
 import { databaseProviders } from '@/database/database.providers';
-import { GameEventsGateway } from '@/game-engine/events/game-events.gateway';
-import { GameEngineModule } from '@/game-engine/game-engine.module';
+import { GameEngineModule } from '../game-engine.module';
+import { GameEventsGateway } from './game-events.gateway';
 
 describe('GameEventsGateway', () => {
   const mockPlayerOneID = randomUUID();

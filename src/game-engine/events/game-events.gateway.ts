@@ -18,7 +18,7 @@ import {
   START_GAME,
   SEND_GAME_SESSION,
 } from '@/constants';
-import { GameEngineService } from '@/game-engine/game-engine.service';
+import { GameEngineService } from '../game-engine.service';
 
 @Injectable()
 @WebSocketGateway(8090)

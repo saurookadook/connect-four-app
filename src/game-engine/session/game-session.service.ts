@@ -6,12 +6,12 @@ import { Model } from 'mongoose';
 import {
   CreateGameSessionDTO,
   UpdateGameSessionDTO,
-} from '@game-engine/dtos/game-session.dto';
+} from '../dtos/game-session.dto';
 import {
   GameSession,
   GameSessionDocument,
   NullableGameSessionDocument,
-} from '@game-engine/schemas/game-session.schema';
+} from '../schemas/game-session.schema';
 
 @Injectable()
 export class GameSessionService {

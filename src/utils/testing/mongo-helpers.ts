@@ -9,12 +9,13 @@ export function expectHydratedDocumentToMatch<T>(
   expected: Partial<T> & { _id?: ObjectId },
 ): void {
   expect(documentUnderTest).not.toBeNull();
-  expect(documentUnderTest._id).toEqual(expect.any(ObjectId));
+  expect(documentUnderTest).toHaveProperty('_id', expect.any(ObjectId));
+
   for (const [key, value] of Object.entries(expected)) {
     if (dateFields.has(key)) {
-      expect(documentUnderTest[key]).toEqual(expect.any(Date));
+      expect(documentUnderTest).toHaveProperty(key, expect.any(Date));
     } else {
-      expect(documentUnderTest[key]).toEqual(value);
+      expect(documentUnderTest).toHaveProperty(key, value);
     }
   }
 }

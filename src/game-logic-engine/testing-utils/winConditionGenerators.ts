@@ -1,5 +1,5 @@
-import { PlayerColor } from '@/game-logic-engine/constants';
-import { LogicSession } from '@/game-logic-engine';
+import { PlayerColor } from '../constants';
+import { LogicSession } from '..';
 
 export function populateBoardWithOneMoveTilWin(
   logicSessionRef: LogicSession,
