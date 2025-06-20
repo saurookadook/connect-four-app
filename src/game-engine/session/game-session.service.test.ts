@@ -1,14 +1,13 @@
 import { randomUUID } from 'node:crypto';
 import { inspect } from 'node:util';
 import { INestApplication } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
 import { DataSource } from 'typeorm';
 
-import baseConfig from '@/config/base.config';
 import { GameSessionStatus } from '@/constants';
+import { DatabaseModule } from '@/database/database.module';
 import { GameSession } from '@game-engine/session/game-session.entity';
 import { GameSessionModule } from '@game-engine/session/game-session.module';
 import { GameSessionService } from '@game-engine/session/game-session.service';
@@ -38,32 +37,7 @@ describe('GameSessionService', () => {
     });
     const module = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-          isGlobal: true,
-          load: [baseConfig],
-        }),
-        TypeOrmModule.forRootAsync({
-          imports: [ConfigModule],
-          useFactory: (configService: ConfigService) => {
-            // console.log({
-            //   name: 'GameSessionService.useFactory',
-            //   database: configService.get('database.dbName'),
-            //   host: configService.get('database.host'),
-            //   port: configService.get('database.port'),
-            // });
-
-            return {
-              type: 'mongodb',
-              database: configService.get('database.dbName'),
-              host: configService.get('database.host'),
-              port: configService.get('database.port'),
-              entities: [__dirname + '/**/*.entity{.ts,.js}'],
-              synchronize: true,
-            };
-          },
-          inject: [ConfigService],
-        }),
+        DatabaseModule,
         TypeOrmModule.forFeature([GameSession]),
         GameSessionModule,
       ],
