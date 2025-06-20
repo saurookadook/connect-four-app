@@ -8,7 +8,7 @@ import { App } from 'supertest/types';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
-import { databaseProviders } from '@/database/database.providers';
+import { DatabaseModule } from '@/database/database.module';
 import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
@@ -22,7 +22,7 @@ describe('AuthController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ...databaseProviders, // force formatting
+        DatabaseModule, // force formatting
         AuthModule,
       ],
     }).compile();

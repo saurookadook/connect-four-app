@@ -4,7 +4,7 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants/db';
-import { databaseProviders } from '@/database/database.providers';
+import { DatabaseModule } from '@/database/database.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { Player, PlayerDocument } from './schemas/player.schema';
 import { PlayerModule } from './player.module';
@@ -33,7 +33,7 @@ describe('PlayerService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ...databaseProviders, // force formatting
+        DatabaseModule, // force formatting
         PlayerModule,
       ],
     }).compile();

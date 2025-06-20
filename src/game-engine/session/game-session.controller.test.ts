@@ -7,15 +7,15 @@ import { App } from 'supertest/types';
 
 import { mockNow } from '@/__mocks__/commonMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
-import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
-import { PlayerModule } from '@/player/player.module';
-import { Player } from '@/player/schemas/player.schema';
 import {
   GAME_SESSION_MODEL_TOKEN,
   PLAYER_MODEL_TOKEN,
   GameSessionStatus,
 } from '@/constants';
-import { databaseProviders } from '@/database/database.providers';
+import { DatabaseModule } from '@/database/database.module';
+import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
+import { PlayerModule } from '@/player/player.module';
+import { Player } from '@/player/schemas/player.schema';
 import { GameSession } from '../schemas/game-session.schema';
 import { GameSessionModule } from './game-session.module';
 import { GameSessionService } from './game-session.service';
@@ -32,7 +32,7 @@ describe('GameSessionController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ...databaseProviders, // force formatting
+        DatabaseModule, // force formatting
         GameSessionModule,
         PlayerModule,
       ],

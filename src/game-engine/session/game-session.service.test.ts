@@ -12,7 +12,7 @@ import {
   PLAYER_MODEL_TOKEN,
   GameSessionStatus,
 } from '@/constants';
-import { databaseProviders } from '@/database/database.providers';
+import { DatabaseModule } from '@/database/database.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import {
   GameSession,
@@ -44,7 +44,7 @@ describe('GameSessionService', () => {
     });
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ...databaseProviders, // force formatting
+        DatabaseModule, // force formatting
         GameSessionModule,
         PlayerModule,
       ],
