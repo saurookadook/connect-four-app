@@ -69,6 +69,8 @@ describe('GameSessionService', () => {
 
     const foundGameSession = await service.findOneById(insertResult.insertedId);
 
+    // NOTE: this doesn't pass because something about TypeOrm's column decoarators
+    // aren't respecting settings like `default`, `nullable`, etc.
     expect(foundGameSession).toEqual(expect.objectContaining(mockGameSession));
   });
 

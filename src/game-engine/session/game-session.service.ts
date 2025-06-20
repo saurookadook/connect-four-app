@@ -1,4 +1,5 @@
 import { UUID } from 'node:crypto';
+import { inspect } from 'node:util';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import {
@@ -18,7 +19,6 @@ import {
   GameSession,
   NullableGameSession,
 } from '@game-engine/session/game-session.entity';
-import { inspect } from 'node:util';
 
 @Injectable()
 export class GameSessionService {
@@ -32,11 +32,33 @@ export class GameSessionService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<InsertOneResult<GameSession>> {
-    return await this.gameSessionRepo.insertOne(gameSession);
+    const insertResult = await this.gameSessionRepo.insertOne(gameSession);
+    console.log(
+      '    GameSessionService.createOne    '
+        .padStart(100, '=')
+        .padEnd(180, '='),
+      '\n',
+      inspect(insertResult, { colors: true, depth: 2, compact: false }),
+      '\n',
+      '='.repeat(180),
+    );
+    return insertResult;
   }
 
   async findOneById(id: ObjectId): Promise<NullableGameSession> {
-    return await this.gameSessionRepo.findOneBy({ id });
+    const foundGameSession = await this.gameSessionRepo.findOneBy({
+      _id: id,
+    });
+    console.log(
+      '    GameSessionService.findOneById    '
+        .padStart(100, '=')
+        .padEnd(180, '='),
+      '\n',
+      inspect(foundGameSession, { colors: true, depth: 2, compact: false }),
+      '\n',
+      '='.repeat(180),
+    );
+    return foundGameSession;
   }
 
   async findAllForPlayer(playerID: UUID): Promise<GameSession[]> {
