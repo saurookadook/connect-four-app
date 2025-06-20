@@ -7,6 +7,7 @@ import { App } from 'supertest/types';
 
 import { mockNow } from '@/__mocks__/commonMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
+import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
 import {
@@ -35,6 +36,7 @@ describe('GameSessionController', () => {
         GameSessionModule,
         PlayerModule,
       ],
+      providers: [HttpExceptionFilterProvider],
     }).compile();
 
     app = module.createNestApplication();
