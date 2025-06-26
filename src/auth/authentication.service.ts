@@ -10,6 +10,7 @@ import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
 export type AuthenticationResult = {
   message: string;
+  statusCode: number;
 };
 
 export type AuthenticationSuccessResult = AuthenticationResult & {
@@ -20,7 +21,6 @@ export type AuthenticationSuccessResult = AuthenticationResult & {
 
 export type AuthenticationErrorResult = AuthenticationResult & {
   // TODO: other stuff?
-  statusCode: number;
 };
 
 @Injectable()
@@ -45,12 +45,11 @@ export class AuthenticationService {
       email: registrationData.email,
     });
 
-    return {
+    return this._formSuccessResponse({
       message: 'Registration successful!',
-      playerID: newPlayer.playerID,
-      playerObjectID: newPlayer._id,
-      username: newPlayer.username,
-    };
+      player: newPlayer,
+      statusCode: 202,
+    });
   }
 
   async login(
@@ -70,16 +69,33 @@ export class AuthenticationService {
       };
     }
 
-    return {
+    return this._formSuccessResponse({
       message: 'Login successful!',
-      playerID: player.playerID,
-      playerObjectID: player._id,
-      username: player.username,
-    };
+      player: player,
+      statusCode: 202,
+    });
   }
 
   async logout(playerID: string): Promise<string> {
     // Invalidate the player's session (implementation depends on your auth strategy)
     return new Promise((resolve) => resolve('Logout successful!'));
+  }
+
+  _formSuccessResponse({
+    message,
+    player,
+    statusCode,
+  }: {
+    message: string;
+    player: PlayerDocument;
+    statusCode: number;
+  }) {
+    return {
+      message,
+      playerID: player.playerID,
+      playerObjectID: player._id,
+      statusCode,
+      username: player.username,
+    };
   }
 }
