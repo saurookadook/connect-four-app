@@ -1,10 +1,12 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { type Request as ExpressRequest } from 'express';
 
 import {
   AuthenticationRequestDTO,
   RegisterDTO,
   LoginDTO,
 } from './dtos/auth.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthenticationService } from './authentication.service';
 import { plainToInstance } from 'class-transformer';
 
@@ -18,9 +20,18 @@ export class AuthController {
     return this.authenticationService.register(dataAsDTO);
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() requestData: AuthenticationRequestDTO) {
     const dataAsDTO = plainToInstance(LoginDTO, requestData);
     return this.authenticationService.login(dataAsDTO);
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('logout')
+  async logout(@Request() req: ExpressRequest) {
+    // const playerID = req.user.playerID;
+    // return this.authenticationService.logout(playerID);
+    return req.logout();
   }
 }
