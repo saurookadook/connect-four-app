@@ -1,8 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
+import * as connectMongoDBSession from 'connect-mongodb-session';
 import * as session from 'express-session';
 
+import baseConfig from '@/config';
 import { AppModule } from './app.module';
+
+const MongoDBStore = connectMongoDBSession(session);
+const { dbName, host, port } = baseConfig().database;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,10 +18,18 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET,
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+        secure: true,
+      },
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: true },
+      secret: process.env.SESSION_SECRET,
+      store: new MongoDBStore({
+        collection: 'player_sessions',
+        databaseName: dbName,
+        uri: `mongodb://${host}:${port}/${dbName}`,
+      }),
     }),
   );
 
