@@ -1,7 +1,7 @@
 import { UUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PlayerDocument } from '@/player/schemas/player.schema';
@@ -15,7 +15,7 @@ export type AuthenticationResult = {
 
 export type AuthenticationSuccessResult = AuthenticationResult & {
   playerID: UUID;
-  playerObjectID: ObjectId; // MongoDB ObjectId
+  playerObjectID: Types.ObjectId; // MongoDB ObjectId
   username: string;
 };
 
