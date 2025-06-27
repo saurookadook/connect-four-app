@@ -33,10 +33,8 @@ export class AuthenticationService {
     registrationData: RegisterDTO,
   ): Promise<AuthenticationSuccessResult> {
     // TODO: validate username and password?
-    const salt = await bcrypt.genSalt(AuthenticationService.SALT_ROUNDS);
-    const passwordHash = await bcrypt.hash(
+    const passwordHash = await this._createPasswordHash(
       registrationData.unhashedPassword,
-      salt,
     );
     const newPlayer = await this.playerService.createOne({
       username: registrationData.username,
@@ -55,19 +53,10 @@ export class AuthenticationService {
   async login(
     loginData: LoginDTO,
   ): Promise<AuthenticationSuccessResult | AuthenticationErrorResult> {
-    const player = await this.playerService.findOneByUsername(
-      loginData.username,
-    );
-
-    if (
-      player == null ||
-      !(await bcrypt.compare(loginData.unhashedPassword, player.password))
-    ) {
-      return {
-        message: 'Invalid username or password.',
-        statusCode: 401,
-      };
-    }
+    const player = await this.validatePlayer({
+      username: loginData.username,
+      unhashedPassword: loginData.unhashedPassword,
+    });
 
     return this._formSuccessResponse({
       message: 'Login successful!',
@@ -79,6 +68,30 @@ export class AuthenticationService {
   async logout(playerID: string): Promise<string> {
     // Invalidate the player's session (implementation depends on your auth strategy)
     return new Promise((resolve) => resolve('Logout successful!'));
+  }
+
+  async validatePlayer({
+    username,
+    unhashedPassword,
+  }: {
+    username: LoginDTO['username'];
+    unhashedPassword: LoginDTO['unhashedPassword'];
+  }) {
+    const player = await this.playerService.findOneByUsername(username);
+
+    if (
+      player == null ||
+      !(await bcrypt.compare(unhashedPassword, player.password))
+    ) {
+      throw new Error('Invalid username or password.');
+    }
+
+    return player;
+  }
+
+  async _createPasswordHash(unhashedPassword: string): Promise<string> {
+    const salt = await bcrypt.genSalt(AuthenticationService.SALT_ROUNDS);
+    return await bcrypt.hash(unhashedPassword, salt);
   }
 
   _formSuccessResponse({
