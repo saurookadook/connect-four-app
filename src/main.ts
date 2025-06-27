@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Additional configuration available here: https://github.com/expressjs/cors#configuration-options
   app.enableCors();
   app.setGlobalPrefix('api');
   app.useWebSocketAdapter(new WsAdapter(app));
