@@ -15,16 +15,36 @@ export class AuthController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('register')
-  async register(@Body() requestData: AuthenticationRequestDTO) {
+  async register(
+    @Req() req: Request,
+    @Body() requestData: AuthenticationRequestDTO,
+  ) {
     const dataAsDTO = plainToInstance(RegisterDTO, requestData);
-    return this.authenticationService.register(dataAsDTO);
+    const playerDetails = await this.authenticationService.register(dataAsDTO);
+    req.login(playerDetails, (err) => {
+      if (err) {
+        throw new Error('Login failed after registration.');
+      }
+      // should this redirect somewhere?
+    });
+    return playerDetails;
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Body() requestData: AuthenticationRequestDTO) {
+  async login(
+    @Req() req: Request,
+    @Body() requestData: AuthenticationRequestDTO,
+  ) {
     const dataAsDTO = plainToInstance(LoginDTO, requestData);
-    return this.authenticationService.login(dataAsDTO);
+    const playerDetails = await this.authenticationService.login(dataAsDTO);
+    req.login(playerDetails, (err) => {
+      if (err) {
+        throw new Error('Login failed.');
+      }
+      // should this redirect somewhere?
+    });
+    return playerDetails;
   }
 
   @UseGuards(LocalAuthGuard)

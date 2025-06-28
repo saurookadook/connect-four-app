@@ -3,12 +3,30 @@ import { WsAdapter } from '@nestjs/platform-ws';
 import * as connectMongoDBSession from 'connect-mongodb-session';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+import * as passport from 'passport';
 
 import baseConfig from '@/config';
+import { PlayerDetails } from '@/types/main';
 import { AppModule } from './app.module';
 
 const MongoDBStore = connectMongoDBSession(session);
 const { dbName, host, port } = baseConfig().database;
+
+passport.serializeUser(function (user: PlayerDetails, callback) {
+  process.nextTick(function () {
+    return callback(null, {
+      playerID: user.playerID,
+      playerObjectID: user.playerObjectID, // MongoDB ObjectId
+      username: user.username,
+    });
+  });
+});
+
+passport.deserializeUser(function (user: PlayerDetails, callback) {
+  process.nextTick(function () {
+    return callback(null, user);
+  });
+});
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -36,6 +54,7 @@ async function bootstrap() {
       }),
     }),
   );
+  app.use(passport.session());
 
   // Additional configuration available here: https://github.com/expressjs/cors#configuration-options
   app.enableCors();
