@@ -1,6 +1,8 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import { type Request } from 'express';
 
+import { PlayerDetails } from '@/types/main';
 import {
   AuthenticationRequestDTO,
   RegisterDTO,
@@ -8,7 +10,6 @@ import {
 } from './dtos/auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthenticationService } from './authentication.service';
-import { plainToInstance } from 'class-transformer';
 
 @Controller('auth')
 export class AuthController {
@@ -21,12 +22,13 @@ export class AuthController {
   ) {
     const dataAsDTO = plainToInstance(RegisterDTO, requestData);
     const playerDetails = await this.authenticationService.register(dataAsDTO);
-    req.login(playerDetails, (err) => {
-      if (err) {
-        throw new Error('Login failed after registration.');
-      }
-      // should this redirect somewhere?
+
+    this._handlePassportLogin({
+      req,
+      playerDetails,
+      errorMessage: 'Login failed after registration.',
     });
+
     return playerDetails;
   }
 
@@ -38,12 +40,17 @@ export class AuthController {
   ) {
     const dataAsDTO = plainToInstance(LoginDTO, requestData);
     const playerDetails = await this.authenticationService.login(dataAsDTO);
-    req.login(playerDetails, (err) => {
-      if (err) {
-        throw new Error('Login failed.');
-      }
-      // should this redirect somewhere?
+
+    this._handlePassportLogin({
+      req,
+      playerDetails: {
+        playerID: playerDetails.playerID,
+        playerObjectID: playerDetails.playerObjectID,
+        username: playerDetails.username,
+      },
+      errorMessage: 'Login failed.',
     });
+
     return playerDetails;
   }
 
@@ -53,5 +60,30 @@ export class AuthController {
     // const playerID = req.user.playerID;
     // return this.authenticationService.logout(playerID);
     return req.logout();
+  }
+
+  _handlePassportLogin({
+    req,
+    playerDetails,
+    errorMessage,
+  }: {
+    req: Request;
+    playerDetails: PlayerDetails;
+    errorMessage: string;
+  }) {
+    if (typeof req.login !== 'function') {
+      console.warn(
+        `[AuthController._handlePassportLogin] 'req.login' is not of type 'function'; type is '${typeof req.login}'`,
+      );
+      return;
+    }
+
+    req.login(playerDetails, (err) => {
+      if (err) {
+        console.error(err);
+        throw new Error(`${errorMessage} [REASON] ${err.toString()}`);
+      }
+      // should this redirect somewhere?
+    });
   }
 }
