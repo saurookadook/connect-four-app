@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { WsAdapter } from '@nestjs/platform-ws';
 import * as connectMongoDBSession from 'connect-mongodb-session';
+import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 
 import baseConfig from '@/config';
@@ -16,6 +17,9 @@ async function bootstrap() {
     throw new Error("'SESSION_SECRET' environment variable is not set.");
   }
 
+  const secretKey = process.env.SESSION_SECRET;
+
+  app.use(cookieParser(secretKey));
   app.use(
     session({
       cookie: {
@@ -24,7 +28,7 @@ async function bootstrap() {
       },
       resave: false,
       saveUninitialized: false,
-      secret: process.env.SESSION_SECRET,
+      secret: secretKey,
       store: new MongoDBStore({
         collection: 'player_sessions',
         databaseName: dbName,

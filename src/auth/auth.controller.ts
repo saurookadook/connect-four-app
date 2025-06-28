@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
-import { type Request as ExpressRequest } from 'express';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { type Request } from 'express';
 
 import {
   AuthenticationRequestDTO,
@@ -29,7 +29,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('logout')
-  async logout(@Request() req: ExpressRequest) {
+  async logout(@Req() req: Request) {
     // const playerID = req.user.playerID;
     // return this.authenticationService.logout(playerID);
     return req.logout();
