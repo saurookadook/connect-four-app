@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '@/database/database.module';
 import { GameSessionModule } from '@/game-engine/session/game-session.module';
 import { PlayerModule } from '@/player/player.module';
+import { SeedPlayersCommand } from './commands/seed-players.command';
 import { TestCommand } from './commands/test.command';
 
 @Module({
@@ -12,7 +13,8 @@ import { TestCommand } from './commands/test.command';
     PlayerModule,
   ],
   providers: [
-    TestCommand, // force formatting
+    SeedPlayersCommand, // force formatting
+    TestCommand,
   ],
 })
 export class ScriptsModule {}
