@@ -1,14 +1,14 @@
 import { GameSessionStatus } from '@/constants';
 
-import { seedPlayersData } from './players.data';
+import { playersSeedData } from './players.data';
 
 const playerCombinations = [
-  [seedPlayersData[0].playerID, seedPlayersData[1].playerID],
-  [seedPlayersData[0].playerID, seedPlayersData[2].playerID],
-  [seedPlayersData[1].playerID, seedPlayersData[0].playerID],
-  [seedPlayersData[1].playerID, seedPlayersData[2].playerID],
-  [seedPlayersData[2].playerID, seedPlayersData[0].playerID],
-  [seedPlayersData[2].playerID, seedPlayersData[1].playerID],
+  [playersSeedData[0].playerID, playersSeedData[1].playerID],
+  [playersSeedData[0].playerID, playersSeedData[2].playerID],
+  [playersSeedData[1].playerID, playersSeedData[0].playerID],
+  [playersSeedData[1].playerID, playersSeedData[2].playerID],
+  [playersSeedData[2].playerID, playersSeedData[0].playerID],
+  [playersSeedData[2].playerID, playersSeedData[1].playerID],
 ];
 
 export const unstartedGameSessions = playerCombinations.map(
