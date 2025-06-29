@@ -3,12 +3,12 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model } from 'mongoose';
 import * as request from 'supertest';
-import { App } from 'supertest/types';
+import type { App } from 'supertest/types';
 
-import { mockNow } from '@/__mocks__/commonMocks';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
+import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
 import { Player } from '@/player/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
@@ -28,11 +28,13 @@ describe('AuthController', () => {
     }).compile();
 
     app = module.createNestApplication();
-    mongoConnection = await app.resolve(getConnectionToken());
+    applyGlobalSessionMiddleware(app);
 
+    await app.init();
+
+    mongoConnection = await app.resolve(getConnectionToken());
     service = await app.resolve(AuthenticationService);
     model = await app.resolve(PLAYER_MODEL_TOKEN);
-    await app.init();
   });
 
   afterAll(async () => {

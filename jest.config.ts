@@ -10,14 +10,17 @@ export default {
     '@constants/(.*)': '<rootDir>/src/constants/$1',
     '@game-engine/(.*)': '<rootDir>/src/game-engine/$1',
   },
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
   // preset: "ts-jest",
   // preset: '@shelf/jest-mongodb',
   rootDir: '.',
   setupFilesAfterEnv: ['./jest-setup.ts'],
   testEnvironment: 'node',
-  // testPathIgnorePatterns: [
-  //     ".+\.d.ts",
-  // ],
+  testPathIgnorePatterns: [
+    '/node_modules/', // force formatting
+    '/dist/',
+    '.+\\.d.ts',
+  ],
   testRegex: '.*\\.\\S*test\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': [

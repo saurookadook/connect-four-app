@@ -38,6 +38,7 @@ export default tseslint.config(
         'warn', // force formatting
         { argsIgnorePattern: '_|type' }
       ],
+      '@typescript-eslint/require-await': 'warn',
     },
   },
 );

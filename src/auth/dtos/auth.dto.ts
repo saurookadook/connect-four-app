@@ -22,6 +22,7 @@ export class AuthenticationRequestDTO {
 
 @Exclude()
 export class RegisterDTO {
+  // TODO: enforce limits on min/max characters and character types
   @IsNotEmpty()
   @IsString()
   @Expose()
@@ -41,6 +42,7 @@ export class RegisterDTO {
 
 @Exclude()
 export class LoginDTO {
+  // TODO: enforce limits on min/max characters and character types
   @IsNotEmpty()
   @IsString()
   @Expose()

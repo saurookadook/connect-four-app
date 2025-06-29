@@ -1,8 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
-import { Connection, Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Connection, Model, Types } from 'mongoose';
 
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
@@ -61,7 +60,7 @@ describe('AuthenticationService', () => {
         expect.objectContaining({
           message: 'Registration successful!',
           playerID: expect.toBeUUID(),
-          playerObjectID: expect.any(ObjectId),
+          playerObjectID: expect.any(Types.ObjectId),
           username: mockPlayerData.username,
         }),
       );
@@ -81,7 +80,7 @@ describe('AuthenticationService', () => {
         expect.objectContaining({
           message: 'Login successful!',
           playerID: expect.toBeUUID(),
-          playerObjectID: expect.any(ObjectId),
+          playerObjectID: expect.any(Types.ObjectId),
           username: mockPlayerData.username,
         }),
       );
