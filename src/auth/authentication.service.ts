@@ -1,11 +1,11 @@
 import { UUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Types } from 'mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
 import { PlayerDocument } from '@/player/schemas/player.schema';
 import { PlayerService } from '@/player/player.service';
+import { PlayerDetails } from '@/types/main';
 import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
 export type AuthenticationResult = {
@@ -13,14 +13,10 @@ export type AuthenticationResult = {
   statusCode: number;
 };
 
-export type AuthenticationSuccessResult = AuthenticationResult & {
-  playerID: UUID;
-  playerObjectID: Types.ObjectId; // MongoDB ObjectId
-  username: string;
-};
+export type AuthenticationSuccessResult = AuthenticationResult & PlayerDetails;
 
 export type AuthenticationErrorResult = AuthenticationResult & {
-  // TODO: other stuff?
+  // TODO: better control error result in error response?
 };
 
 @Injectable()
@@ -50,9 +46,7 @@ export class AuthenticationService {
     });
   }
 
-  async login(
-    loginData: LoginDTO,
-  ): Promise<AuthenticationSuccessResult | AuthenticationErrorResult> {
+  async login(loginData: LoginDTO): Promise<AuthenticationSuccessResult> {
     const player = await this.validatePlayer({
       username: loginData.username,
       unhashedPassword: loginData.unhashedPassword,
