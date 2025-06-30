@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 
+import { AuthenticationService } from '@/auth/authentication.service';
 import { DatabaseModule } from '@/database/database.module';
 import { GameSessionModule } from '@/game-engine/session/game-session.module';
 import { PlayerModule } from '@/player/player.module';
@@ -16,11 +17,13 @@ import { SeedService } from './services/seed.service';
     PlayerModule,
   ],
   providers: [
+    AuthenticationService,
+    SeedService,
+    // COMMANDS
+    TestCommand,
     SeedDbCommand,
     SeedGameSessionsCommand,
     SeedPlayersCommand,
-    SeedService,
-    TestCommand, // force formatting
   ],
   // exports: [SeedService],
 })
