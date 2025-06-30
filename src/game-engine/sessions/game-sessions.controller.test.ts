@@ -6,16 +6,14 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 
 import { mockNow } from '@/__mocks__/commonMocks';
+import { createNewGameSessionMock } from '@/__mocks__/gameSessionMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
-import {
-  GAME_SESSION_MODEL_TOKEN,
-  PLAYER_MODEL_TOKEN,
-  GameSessionStatus,
-} from '@/constants';
+import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
+import { expectSerializedDocumentToMatch } from '@/utils/testing';
 import { GameSession } from '../schemas/game-session.schema';
 import { GameSessionsModule } from './game-sessions.module';
 import { GameSessionsService } from './game-sessions.service';
@@ -46,68 +44,121 @@ describe('GameSessionsController', () => {
     service = await app.resolve(GameSessionsService);
     model = await app.resolve(GAME_SESSION_MODEL_TOKEN);
     await app.init();
-  });
 
-  beforeEach(async () => {
     await playerModel.insertMany([
       mockFirstPlayer,
       mockSecondPlayer,
       mockThirdPlayer,
     ]);
-    await service.createOne({
-      playerOneID: mockFirstPlayer.playerID,
-      playerTwoID: mockSecondPlayer.playerID,
-    });
-    await service.createOne({
-      playerOneID: mockSecondPlayer.playerID,
-      playerTwoID: mockFirstPlayer.playerID,
-    });
-    await service.createOne({
-      playerOneID: mockThirdPlayer.playerID,
-      playerTwoID: mockSecondPlayer.playerID,
-    });
-  });
-
-  afterEach(async () => {
-    await model.deleteMany({}).exec();
-    jest.clearAllTimers();
   });
 
   afterAll(async () => {
+    await playerModel.deleteMany({}).exec();
     await model.deleteMany({}).exec();
     await mongoConnection.close();
     jest.useRealTimers();
   });
 
   describe('/game-sessions/history (GET)', () => {
-    it('should return game session history for a player', async () => {
+    beforeEach(async () => {
+      await service.createOne({
+        playerOneID: mockFirstPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+      await service.createOne({
+        playerOneID: mockSecondPlayer.playerID,
+        playerTwoID: mockFirstPlayer.playerID,
+      });
+      await service.createOne({
+        playerOneID: mockThirdPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+    });
+
+    afterEach(async () => {
+      await model.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('[mockFirstPlayer] should return game session history for a player', async () => {
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockFirstPlayer.playerID}`)
+        .get(`/game-sessions/history/${mockFirstPlayer.playerID}`)
         .expect((result) => {
-          // console.log({ result });
           const resultBody = JSON.parse(result.text);
           expect(resultBody.sessions).toHaveLength(2);
-          // TODO: add more assertions
+
+          const [firstSession, secondSession] = resultBody.sessions;
+
+          expectSerializedDocumentToMatch<GameSession>(
+            firstSession,
+            createNewGameSessionMock({
+              playerOneID: mockFirstPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+          expectSerializedDocumentToMatch<GameSession>(
+            secondSession,
+            createNewGameSessionMock({
+              playerOneID: mockSecondPlayer.playerID,
+              playerTwoID: mockFirstPlayer.playerID,
+            }),
+          );
+
           expect(result.status).toBe(200);
         });
+    });
 
+    it('[mockSecondPlayer] should return game session history for a player', async () => {
       await request(app.getHttpServer())
         .get(`/game-sessions/history/${mockSecondPlayer.playerID}`)
         .expect((result) => {
-          // console.log({ result });
           const resultBody = JSON.parse(result.text);
           expect(resultBody.sessions).toHaveLength(3);
-          // TODO: add more assertions
+
+          const [firstSession, secondSession, thirdSession] =
+            resultBody.sessions;
+
+          expectSerializedDocumentToMatch<GameSession>(
+            firstSession,
+            createNewGameSessionMock({
+              playerOneID: mockFirstPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+          expectSerializedDocumentToMatch<GameSession>(
+            secondSession,
+            createNewGameSessionMock({
+              playerOneID: mockSecondPlayer.playerID,
+              playerTwoID: mockFirstPlayer.playerID,
+            }),
+          );
+          expectSerializedDocumentToMatch<GameSession>(
+            thirdSession,
+            createNewGameSessionMock({
+              playerOneID: mockThirdPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+
           expect(result.status).toBe(200);
         });
+    });
 
+    it('[mockThirdPlayer] should return game session history for a player', async () => {
       await request(app.getHttpServer())
         .get(`/game-sessions/history/${mockThirdPlayer.playerID}`)
         .expect((result) => {
-          // console.log({ result });
           const resultBody = JSON.parse(result.text);
           expect(resultBody.sessions).toHaveLength(1);
-          // TODO: add more assertions
+
+          expectSerializedDocumentToMatch<GameSession>(
+            resultBody.sessions[0],
+            createNewGameSessionMock({
+              playerOneID: mockThirdPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+
           expect(result.status).toBe(200);
         });
     });
