@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/no-namespace,@typescript-eslint/restrict-template-expressions */
 import type { MatcherFunction } from 'expect';
 
-export const toBeUUID: MatcherFunction = function (received: unknown) {
+export const toBeISODateString: MatcherFunction = function (received: unknown) {
   if (typeof received !== 'string') {
     throw new TypeError(
       `Expected a string but received ${typeof received} ('${received}')`,
     );
   }
 
-  const pass =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(
-      received,
-    );
+  const pass = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(
+    received,
+  );
   if (pass) {
     return {
       message: () =>
-        `expected ${this.utils.printReceived(received)} (type: ${typeof received}) not to be a valid UUID`,
+        `expected ${this.utils.printReceived(received)} (type ${typeof received}) not to be an ISO date string`,
       pass: true,
     };
   } else {
     return {
       message: () =>
-        `expected ${this.utils.printReceived(received)} (type: ${typeof received}) to be a valid UUID`,
+        `expected ${this.utils.printReceived(received)} (type ${typeof received}) to be an ISO date string`,
       pass: false,
     };
   }
@@ -33,15 +32,15 @@ export const toBeUUID: MatcherFunction = function (received: unknown) {
 declare global {
   namespace jest {
     interface Expect {
-      toBeUUID: () => void;
+      toBeISODateString: () => void;
     }
 
     interface AsymmetricMatchers {
-      toBeUUID: () => void;
+      toBeISODateString: () => void;
     }
 
     interface Matchers<R> {
-      toBeUUID(): R;
+      toBeISODateString(): R;
     }
   }
 }
