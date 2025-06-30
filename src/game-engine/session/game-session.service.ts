@@ -1,5 +1,5 @@
 import { UUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -46,6 +46,14 @@ export class GameSessionService {
   }
 
   async findAllForPlayer(playerID: UUID): Promise<GameSessionDocument[]> {
+    const foundPlayer = await this.playerService.findOneByPlayerID(playerID);
+
+    if (foundPlayer == null) {
+      throw new NotFoundException(
+        `[GameSessionsService.findAllForPlayer] Player with playerID '${playerID}' not found`,
+      );
+    }
+
     return this.gameSessionModel
       .find({
         $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
@@ -57,7 +65,7 @@ export class GameSessionService {
     id: string,
     gameSession: UpdateGameSessionDTO,
   ): Promise<NullableGameSessionDocument> {
-    return this.gameSessionModel
+    return await this.gameSessionModel
       .findByIdAndUpdate(id, gameSession, { new: true })
       .exec();
   }
