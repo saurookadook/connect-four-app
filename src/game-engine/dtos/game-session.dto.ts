@@ -1,7 +1,7 @@
 import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
-import { PlayerMove } from '@/constants/game';
+import { GameSessionStatus, PlayerMove } from '@/constants/game';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
 
 @Exclude()
@@ -16,7 +16,7 @@ export class GameSessionDTO extends BaseDTO {
   moves: PlayerMove[];
 
   @Expose()
-  status: string;
+  status: GameSessionStatus;
 
   // constructor(partial: Partial<GameSessionDTO>) {
   //   Object.assign(this, partial);
