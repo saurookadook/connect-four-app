@@ -1,6 +1,6 @@
-import { randomUUID, type UUID } from 'node:crypto';
+import { type UUID } from 'node:crypto';
 
-type PlayerSeed = {
+export type PlayerSeed = {
   playerID: UUID;
   username: string;
   password: string;
@@ -18,7 +18,7 @@ export const playersSeedData: PlayerSeed[] = [
     password: 'ilovezero',
   },
   {
-    playerID: randomUUID(),
+    playerID: 'f2e0eff3-8861-44fb-81d9-304cc47f1b74',
     username: 'BobbyFischer',
     password: 'ch3ssm4Ster!',
   },

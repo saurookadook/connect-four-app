@@ -1,6 +1,14 @@
-import { GameSessionStatus } from '@/constants';
+import { type UUID } from 'node:crypto';
 
+import { GameSessionStatus } from '@/constants';
 import { playersSeedData } from './players.data';
+
+export type GameSessionSeed = {
+  playerOneID: UUID;
+  playerTwoID: UUID;
+  moves: any[];
+  status: GameSessionStatus;
+};
 
 const playerCombinations = [
   [playersSeedData[0].playerID, playersSeedData[1].playerID],
@@ -11,7 +19,7 @@ const playerCombinations = [
   [playersSeedData[2].playerID, playersSeedData[1].playerID],
 ];
 
-export const unstartedGameSessions = playerCombinations.map(
+export const unstartedGameSessions: GameSessionSeed[] = playerCombinations.map(
   ([playerOneID, playerTwoID]) => {
     return {
       playerOneID,
@@ -22,4 +30,6 @@ export const unstartedGameSessions = playerCombinations.map(
   },
 );
 
-export const allSeedGameSessionsData = [...unstartedGameSessions];
+export const allGameSessionsSeedData: GameSessionSeed[] = [
+  ...unstartedGameSessions,
+];
