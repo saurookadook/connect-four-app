@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { AuthenticationService } from '@/auth/authentication.service';
-import { GameSessionService } from '@/game-engine/session/game-session.service';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 import { PlayerService } from '@/player/player.service';
 import { GameSessionSeed, PlayerSeed } from '@/scripts/seed-data';
 
@@ -9,7 +9,7 @@ import { GameSessionSeed, PlayerSeed } from '@/scripts/seed-data';
 export class SeedService {
   constructor(
     private readonly authenticationService: AuthenticationService,
-    private readonly gameSessionService: GameSessionService,
+    private readonly gameSessionsService: GameSessionsService,
     private readonly playerService: PlayerService,
   ) {}
 
@@ -23,7 +23,7 @@ export class SeedService {
     );
 
     const createGameSessionPromises = gameSessionsSeedData.map((sessionSeed) =>
-      this.gameSessionService.createOne(sessionSeed),
+      this.gameSessionsService.createOne(sessionSeed),
     );
 
     await Promise.allSettled(createGameSessionPromises).then((results) =>

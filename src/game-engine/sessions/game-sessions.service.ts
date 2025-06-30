@@ -15,7 +15,7 @@ import {
 } from '../schemas/game-session.schema';
 
 @Injectable()
-export class GameSessionService {
+export class GameSessionsService {
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
@@ -35,7 +35,7 @@ export class GameSessionService {
     } catch (error) {
       // console.error(error);
       throw new Error(
-        '[GameSessionService.createOne] Encountered ERROR while creating game session: ',
+        '[GameSessionsService.createOne] Encountered ERROR while creating game session: ',
         error,
       );
     }
@@ -83,7 +83,7 @@ export class GameSessionService {
   }): Promise<void> {
     if (playerOneID === playerTwoID) {
       throw new TypeError(
-        '[GameSessionService._validatePlayers] Player IDs must be different.',
+        '[GameSessionsService._validatePlayers] Player IDs must be different.',
       );
     }
 
@@ -92,7 +92,7 @@ export class GameSessionService {
 
     if (!playerOneExists) {
       throw new Error(
-        `[GameSessionService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
+        `[GameSessionsService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
       );
     }
 
@@ -101,7 +101,7 @@ export class GameSessionService {
 
     if (!playerTwoExists) {
       throw new Error(
-        `[GameSessionService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
+        `[GameSessionsService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
       );
     }
   }

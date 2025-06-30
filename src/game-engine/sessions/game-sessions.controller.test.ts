@@ -17,23 +17,23 @@ import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
 import { GameSession } from '../schemas/game-session.schema';
-import { GameSessionModule } from './game-session.module';
-import { GameSessionService } from './game-session.service';
+import { GameSessionsModule } from './game-sessions.module';
+import { GameSessionsService } from './game-sessions.service';
 
-describe('GameSessionController', () => {
+describe('GameSessionsController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
 
   let app: INestApplication<App>;
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
-  let service: GameSessionService;
+  let service: GameSessionsService;
   let model: Model<GameSession>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         DatabaseModule, // force formatting
-        GameSessionModule,
+        GameSessionsModule,
         PlayerModule,
       ],
       providers: [HttpExceptionFilterProvider],
@@ -43,7 +43,7 @@ describe('GameSessionController', () => {
     mongoConnection = await app.resolve(getConnectionToken());
 
     playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
-    service = await app.resolve(GameSessionService);
+    service = await app.resolve(GameSessionsService);
     model = await app.resolve(GAME_SESSION_MODEL_TOKEN);
     await app.init();
   });
@@ -79,7 +79,7 @@ describe('GameSessionController', () => {
     jest.useRealTimers();
   });
 
-  describe('/game-session/history (GET)', () => {
+  describe('/game-sessions/history (GET)', () => {
     it('should return game session history for a player', async () => {
       await request(app.getHttpServer())
         .get(`/game-session/history/${mockFirstPlayer.playerID}`)
@@ -92,7 +92,7 @@ describe('GameSessionController', () => {
         });
 
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockSecondPlayer.playerID}`)
+        .get(`/game-sessions/history/${mockSecondPlayer.playerID}`)
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);
@@ -102,7 +102,7 @@ describe('GameSessionController', () => {
         });
 
       await request(app.getHttpServer())
-        .get(`/game-session/history/${mockThirdPlayer.playerID}`)
+        .get(`/game-sessions/history/${mockThirdPlayer.playerID}`)
         .expect((result) => {
           // console.log({ result });
           const resultBody = JSON.parse(result.text);

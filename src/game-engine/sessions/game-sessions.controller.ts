@@ -1,16 +1,16 @@
 import { UUID } from 'node:crypto';
 import { Controller, Get, Param } from '@nestjs/common';
 
-import { GameSessionService } from '@game-engine/session/game-session.service';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 
-@Controller('game-session')
-export class GameSessionController {
-  constructor(private readonly gameSessionService: GameSessionService) {}
+@Controller('game-sessions')
+export class GameSessionsController {
+  constructor(private readonly gameSessionsService: GameSessionsService) {}
 
   @Get('history/:playerID')
   async getGameSessionHistory(@Param('playerID') playerID: UUID) {
     const playerSessions =
-      await this.gameSessionService.findAllForPlayer(playerID);
+      await this.gameSessionsService.findAllForPlayer(playerID);
     return {
       sessions: playerSessions,
     };

@@ -18,8 +18,8 @@ import {
   GameSession,
   GameSessionDocument,
 } from '../schemas/game-session.schema';
-import { GameSessionModule } from './game-session.module';
-import { GameSessionService } from './game-session.service';
+import { GameSessionsModule } from './game-sessions.module';
+import { GameSessionsService } from './game-sessions.service';
 
 const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
 const mockGameSession = {
@@ -31,10 +31,10 @@ const mockGameSession = {
   updatedAt: mockNow,
 };
 
-describe('GameSessionService', () => {
+describe('GameSessionsService', () => {
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
-  let service: GameSessionService;
+  let service: GameSessionsService;
   let model: Model<GameSession>;
 
   beforeAll(async () => {
@@ -45,14 +45,14 @@ describe('GameSessionService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         DatabaseModule, // force formatting
-        GameSessionModule,
+        GameSessionsModule,
         PlayerModule,
       ],
     }).compile();
 
     mongoConnection = await module.resolve(getConnectionToken());
     playerModel = await module.resolve(PLAYER_MODEL_TOKEN);
-    service = await module.resolve(GameSessionService);
+    service = await module.resolve(GameSessionsService);
     model = await module.resolve(GAME_SESSION_MODEL_TOKEN);
   });
 

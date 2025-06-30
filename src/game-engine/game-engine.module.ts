@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 
 import { GameEngineController } from './game-engine.controller';
-import { GameSessionModule } from './session/game-session.module';
+import { GameSessionsModule } from './sessions/game-sessions.module';
 import { GameEngineService } from './game-engine.service';
 
 @Module({
   controllers: [GameEngineController],
-  imports: [GameSessionModule],
+  imports: [GameSessionsModule],
   providers: [GameEngineService],
   exports: [GameEngineService],
 })
