@@ -31,9 +31,9 @@ export const toBeStringIncluding: MatcherFunction<[subString: string]> =
  */
 declare global {
   namespace jest {
-    // interface Expect {
-    //   toBeStringIncluding: () => void;
-    // }
+    interface Expect {
+      toBeStringIncluding: (subString: string) => void;
+    }
 
     interface AsymmetricMatchers {
       toBeStringIncluding: (subString: string) => void;
