@@ -1,5 +1,10 @@
 import { UUID } from 'node:crypto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -25,20 +30,12 @@ export class GameSessionsService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    try {
-      await this._validatePlayers({
-        playerOneID: gameSession.playerOneID,
-        playerTwoID: gameSession.playerTwoID,
-      });
-      const createdGameSession = new this.gameSessionModel(gameSession);
-      return createdGameSession.save();
-    } catch (error) {
-      // console.error(error);
-      throw new Error(
-        '[GameSessionsService.createOne] Encountered ERROR while creating game session: ',
-        error,
-      );
-    }
+    await this._validatePlayers({
+      playerOneID: gameSession.playerOneID,
+      playerTwoID: gameSession.playerTwoID,
+    });
+    const createdGameSession = new this.gameSessionModel(gameSession);
+    return createdGameSession.save();
   }
 
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
@@ -50,7 +47,7 @@ export class GameSessionsService {
 
     if (foundPlayer == null) {
       throw new NotFoundException(
-        `[GameSessionsService.findAllForPlayer] Player with playerID '${playerID}' not found`,
+        `[GameSessionsService.findAllForPlayer] : Player with playerID '${playerID}' not found`,
       );
     }
 
@@ -82,7 +79,7 @@ export class GameSessionsService {
     playerTwoID: UUID;
   }): Promise<void> {
     if (playerOneID === playerTwoID) {
-      throw new TypeError(
+      throw new BadRequestException(
         '[GameSessionsService._validatePlayers] Player IDs must be different.',
       );
     }
@@ -91,7 +88,7 @@ export class GameSessionsService {
       await this.playerService.findOneByPlayerID(playerOneID);
 
     if (!playerOneExists) {
-      throw new Error(
+      throw new UnauthorizedException(
         `[GameSessionsService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
       );
     }
@@ -100,7 +97,7 @@ export class GameSessionsService {
       await this.playerService.findOneByPlayerID(playerTwoID);
 
     if (!playerTwoExists) {
-      throw new Error(
+      throw new UnauthorizedException(
         `[GameSessionsService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
       );
     }
