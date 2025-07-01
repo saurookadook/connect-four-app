@@ -14,13 +14,13 @@ export const toBeISODateString: MatcherFunction = function (received: unknown) {
   if (pass) {
     return {
       message: () =>
-        `expected ${this.utils.printReceived(received)} (type ${typeof received}) not to be an ISO date string`,
+        `expected ${this.utils.printReceived(received)} not to be an ISO date string`,
       pass: true,
     };
   } else {
     return {
       message: () =>
-        `expected ${this.utils.printReceived(received)} (type ${typeof received}) to be an ISO date string`,
+        `expected ${this.utils.printReceived(received)} to be an ISO date string`,
       pass: false,
     };
   }
