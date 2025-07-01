@@ -29,7 +29,7 @@ export class AuthenticationService {
     registrationData: RegisterDTO,
   ): Promise<AuthenticationSuccessResult> {
     // TODO: validate username and password?
-    const passwordHash = await this._createPasswordHash(
+    const passwordHash = await AuthenticationService.createPasswordHash(
       registrationData.unhashedPassword,
     );
     const newPlayer = await this.playerService.createOne({
@@ -83,7 +83,12 @@ export class AuthenticationService {
     return player;
   }
 
-  async _createPasswordHash(unhashedPassword: string): Promise<string> {
+  static createPasswordHashSync(unhashedPassword: string): string {
+    const salt = bcrypt.genSaltSync(AuthenticationService.SALT_ROUNDS);
+    return bcrypt.hashSync(unhashedPassword, salt);
+  }
+
+  static async createPasswordHash(unhashedPassword: string): Promise<string> {
     const salt = await bcrypt.genSalt(AuthenticationService.SALT_ROUNDS);
     return await bcrypt.hash(unhashedPassword, salt);
   }
