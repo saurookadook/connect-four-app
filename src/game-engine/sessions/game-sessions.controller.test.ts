@@ -96,7 +96,7 @@ describe('GameSessionsController', () => {
         });
     });
 
-    it('should throw an error if players are the same', async () => {
+    it('should respond with error details if players are the same', async () => {
       await request(app.getHttpServer())
         .post('/game-sessions/start')
         .send({
@@ -105,17 +105,15 @@ describe('GameSessionsController', () => {
         })
         .set('Accept', 'application/json')
         .expect((result) => {
-          const resultBody = JSON.parse(result.text);
+          const { message, statusCode } = JSON.parse(result.text);
 
-          expect(resultBody.message).toBeStringIncluding(
-            'Player IDs must be different.',
-          );
-          expect(resultBody.statusCode).toBe(400);
+          expect(message).toBeStringIncluding('Player IDs must be different.');
+          expect(statusCode).toBe(400);
         })
         .expect(400);
     });
 
-    it("should throw an error if player one isn't registered", async () => {
+    it("should respond with error details if player one isn't registered", async () => {
       await request(app.getHttpServer())
         .post('/game-sessions/start')
         .send({
@@ -124,17 +122,17 @@ describe('GameSessionsController', () => {
         })
         .set('Accept', 'application/json')
         .expect((result) => {
-          const resultBody = JSON.parse(result.text);
+          const { message, statusCode } = JSON.parse(result.text);
 
-          expect(resultBody.message).toBeStringIncluding(
+          expect(message).toBeStringIncluding(
             `Player One with ID '${unregisteredPlayerID}' does not exist.`,
           );
-          expect(resultBody.statusCode).toBe(401);
+          expect(statusCode).toBe(401);
         })
         .expect(401);
     });
 
-    it("should throw an error if player two isn't registered", async () => {
+    it("should respond with error details if player two isn't registered", async () => {
       await request(app.getHttpServer())
         .post('/game-sessions/start')
         .send({
@@ -143,12 +141,12 @@ describe('GameSessionsController', () => {
         })
         .set('Accept', 'application/json')
         .expect((result) => {
-          const resultBody = JSON.parse(result.text);
+          const { message, statusCode } = JSON.parse(result.text);
 
-          expect(resultBody.message).toBeStringIncluding(
+          expect(message).toBeStringIncluding(
             `Player Two with ID '${unregisteredPlayerID}' does not exist.`,
           );
-          expect(resultBody.statusCode).toBe(401);
+          expect(statusCode).toBe(401);
         })
         .expect(401);
     });
@@ -256,6 +254,50 @@ describe('GameSessionsController', () => {
 
           expect(result.status).toBe(200);
         });
+    });
+  });
+
+  describe('/game-sessions/:sessionID (GET)', () => {
+    it('correctly returns a game-session by its ID', async () => {
+      const gameSession = await gameSessionsService.createOne({
+        playerOneID: mockFirstPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${gameSession.id}`)
+        .expect((result) => {
+          const { session } = JSON.parse(result.text);
+
+          expect(session).toBeDefined();
+          expect(session.id).toBe(gameSession.id.toString());
+          expectSerializedDocumentToMatch<GameSession>(
+            session,
+            createNewGameSessionMock({
+              playerOneID: mockFirstPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+
+          expect(result.status).toBe(200);
+        })
+        .expect(200);
+    });
+
+    it("should respond with error details if a game-session can't be found", async () => {
+      const nonExistentGameSessionID = '6861e45ef5c14f14a62b8643';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${nonExistentGameSessionID}`)
+        .expect((result) => {
+          const { message, statusCode } = JSON.parse(result.text);
+
+          expect(message).toBeStringIncluding(
+            `Could not find 'game-session' with ID '${nonExistentGameSessionID}'.`,
+          );
+          expect(statusCode).toBe(404);
+        })
+        .expect(404);
     });
   });
 });
