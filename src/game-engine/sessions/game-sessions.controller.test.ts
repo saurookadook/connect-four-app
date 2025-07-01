@@ -10,7 +10,11 @@ import { createNewGameSessionMock } from '@/__mocks__/gameSessionMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
-import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
+import {
+  CatchAllFilterProvider,
+  HttpExceptionFilterProvider,
+} from '@/filters/filters.providers';
+import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
@@ -24,8 +28,8 @@ describe('GameSessionsController', () => {
   let app: INestApplication<App>;
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
-  let service: GameSessionsService;
-  let model: Model<GameSession>;
+  let gameSessionsService: GameSessionsService;
+  let gameSessionModel: Model<GameSession>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,16 +38,18 @@ describe('GameSessionsController', () => {
         GameSessionsModule,
         PlayerModule,
       ],
-      providers: [HttpExceptionFilterProvider],
+      providers: [CatchAllFilterProvider, HttpExceptionFilterProvider],
     }).compile();
 
     app = module.createNestApplication();
-    mongoConnection = await app.resolve(getConnectionToken());
+    applyGlobalSessionMiddleware(app);
 
-    playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
-    service = await app.resolve(GameSessionsService);
-    model = await app.resolve(GAME_SESSION_MODEL_TOKEN);
     await app.init();
+
+    mongoConnection = await app.resolve(getConnectionToken());
+    playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
+    gameSessionsService = await app.resolve(GameSessionsService);
+    gameSessionModel = await app.resolve(GAME_SESSION_MODEL_TOKEN);
 
     await playerModel.insertMany([
       mockFirstPlayer,
@@ -54,29 +60,118 @@ describe('GameSessionsController', () => {
 
   afterAll(async () => {
     await playerModel.deleteMany({}).exec();
-    await model.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
     await mongoConnection.close();
     jest.useRealTimers();
   });
 
+  describe('/game-sessions/start (POST)', () => {
+    const unregisteredPlayerID = 'e3f64a31-4977-4da4-bb2b-7057b9f2c3e7';
+
+    afterEach(async () => {
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('should create a new game session', async () => {
+      await request(app.getHttpServer())
+        .post('/game-sessions/start')
+        .send({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        })
+        .set('Accept', 'application/json')
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.session).not.toBeNull();
+          expectSerializedDocumentToMatch<GameSession>(
+            resultBody.session,
+            createNewGameSessionMock({
+              playerOneID: mockFirstPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+          expect(result.status).toBe(201);
+        });
+    });
+
+    it('should throw an error if players are the same', async () => {
+      await request(app.getHttpServer())
+        .post('/game-sessions/start')
+        .send({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        })
+        .set('Accept', 'application/json')
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Player IDs must be different.',
+          );
+          expect(resultBody.statusCode).toBe(400);
+        })
+        .expect(400);
+    });
+
+    it("should throw an error if player one isn't registered", async () => {
+      await request(app.getHttpServer())
+        .post('/game-sessions/start')
+        .send({
+          playerOneID: unregisteredPlayerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        })
+        .set('Accept', 'application/json')
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            `Player One with ID '${unregisteredPlayerID}' does not exist.`,
+          );
+          expect(resultBody.statusCode).toBe(401);
+        })
+        .expect(401);
+    });
+
+    it("should throw an error if player two isn't registered", async () => {
+      await request(app.getHttpServer())
+        .post('/game-sessions/start')
+        .send({
+          playerOneID: mockSecondPlayer.playerID,
+          playerTwoID: unregisteredPlayerID,
+        })
+        .set('Accept', 'application/json')
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            `Player Two with ID '${unregisteredPlayerID}' does not exist.`,
+          );
+          expect(resultBody.statusCode).toBe(401);
+        })
+        .expect(401);
+    });
+  });
+
   describe('/game-sessions/history (GET)', () => {
     beforeEach(async () => {
-      await service.createOne({
+      await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
-      await service.createOne({
+      await gameSessionsService.createOne({
         playerOneID: mockSecondPlayer.playerID,
         playerTwoID: mockFirstPlayer.playerID,
       });
-      await service.createOne({
+      await gameSessionsService.createOne({
         playerOneID: mockThirdPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
