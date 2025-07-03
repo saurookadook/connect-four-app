@@ -22,10 +22,10 @@ export function expectHydratedDocumentToMatch<T>(
 
 export function expectSerializedDocumentToMatch<T>(
   documentUnderTest: Partial<T>,
-  expected: Partial<T> & { _id?: string },
+  expected: Partial<T> & { id?: string },
 ): void {
   expect(documentUnderTest).not.toBeNull();
-  expect(documentUnderTest).toHaveProperty('_id', expect.any(String));
+  expect(documentUnderTest).toHaveProperty('id', expect.any(String));
 
   for (const [key, value] of Object.entries(expected)) {
     if (dateFields.has(key)) {

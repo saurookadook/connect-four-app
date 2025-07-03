@@ -1,9 +1,17 @@
 import { UUID } from 'node:crypto';
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
 import { Public } from '@/auth/decorators/public.decorator';
-import { CreateGameSessionDTO } from '../dtos/game-session.dto';
+import { CreateGameSessionDTO, GameSessionDTO } from '../dtos/game-session.dto';
 import { GameSessionsService } from '../sessions/game-sessions.service';
 
 @Controller('game-sessions')
@@ -14,22 +22,49 @@ export class GameSessionsController {
   @Post('start')
   async createNewGameSession(
     @Body() requestData: CreateGameSessionDTO, // force formatting
-  ) {
+  ): Promise<{ session: GameSessionDTO }> {
     const dataAsDTO = plainToInstance(CreateGameSessionDTO, requestData);
     const createdGameSession =
       await this.gameSessionsService.createOne(dataAsDTO);
+
     return {
-      session: createdGameSession,
+      session: plainToInstance(GameSessionDTO, createdGameSession.toJSON()),
+    };
+  }
+
+  @Public()
+  @Get(':sessionID')
+  async getGameSession(
+    @Param('sessionID') sessionID: string,
+  ): Promise<{ session: GameSessionDTO }> {
+    const foundGameSession =
+      await this.gameSessionsService.findOneById(sessionID);
+
+    if (foundGameSession == null) {
+      throw new NotFoundException(
+        `[GameSessionsController.getGameSession] : Could not find 'game-session' with ID '${sessionID}'.`,
+      );
+    }
+
+    return {
+      session: plainToInstance(GameSessionDTO, foundGameSession.toJSON()),
     };
   }
 
   @Public()
   @Get('history/:playerID')
-  async getGameSessionHistory(@Param('playerID') playerID: UUID) {
+  async getGameSessionHistory(
+    @Param('playerID') playerID: UUID,
+  ): Promise<{ sessions: GameSessionDTO[] }> {
     const playerSessions =
       await this.gameSessionsService.findAllForPlayer(playerID);
+
+    const transformedSessions = playerSessions.map((session) =>
+      plainToInstance(GameSessionDTO, session.toJSON()),
+    );
+
     return {
-      sessions: playerSessions,
+      sessions: transformedSessions,
     };
   }
 }
