@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
@@ -34,8 +33,8 @@ const mockGameSession = {
 describe('GameSessionsService', () => {
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
-  let service: GameSessionsService;
-  let model: Model<GameSession>;
+  let gameSessionsService: GameSessionsService;
+  let gameSessionModel: Model<GameSession>;
 
   beforeAll(async () => {
     jest.useFakeTimers({
@@ -52,43 +51,41 @@ describe('GameSessionsService', () => {
 
     mongoConnection = await module.resolve(getConnectionToken());
     playerModel = await module.resolve(PLAYER_MODEL_TOKEN);
-    service = await module.resolve(GameSessionsService);
-    model = await module.resolve(GAME_SESSION_MODEL_TOKEN);
+    gameSessionsService = await module.resolve(GameSessionsService);
+    gameSessionModel = await module.resolve(GAME_SESSION_MODEL_TOKEN);
+
+    await playerModel.insertMany([
+      mockFirstPlayer,
+      mockSecondPlayer,
+      mockThirdPlayer,
+    ]);
   });
 
   beforeEach(async () => {
-    await model.deleteMany({}).exec();
-    await playerModel.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
     jest.clearAllTimers();
   });
 
   afterAll(async () => {
-    await model.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
     await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
     jest.useRealTimers();
   });
 
   describe("'createOne' method", () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
-
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
-      await playerModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
     it('should insert a new game session document', async () => {
-      const newGameSession = await service.createOne({
+      const newGameSession = await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
@@ -103,7 +100,7 @@ describe('GameSessionsService', () => {
 
     it('throws error if player IDs are the same', async () => {
       await expect(
-        service.createOne({
+        gameSessionsService.createOne({
           playerOneID: mockFirstPlayer.playerID,
           playerTwoID: mockFirstPlayer.playerID,
         }),
@@ -112,7 +109,7 @@ describe('GameSessionsService', () => {
 
     it('throws error for invalid player IDs', async () => {
       await expect(
-        service.createOne({
+        gameSessionsService.createOne({
           playerOneID: mockFirstPlayer.playerID,
           playerTwoID: mockFirstPlayer.playerID,
         }),
@@ -127,26 +124,19 @@ describe('GameSessionsService', () => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
-
-      initialGameSession = await service.createOne({
+      initialGameSession = await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
-      await playerModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
     it('should find a game session document by ID', async () => {
-      const foundGameSession = (await service.findOneById(
+      const foundGameSession = (await gameSessionsService.findOneById(
         initialGameSession._id.toString(),
       )) as GameSessionDocument;
 
@@ -160,34 +150,27 @@ describe('GameSessionsService', () => {
   });
 
   describe("'findAllForPlayer' method", () => {
-    beforeEach(async () => {
+    beforeEach(() => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
-
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
-      await playerModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
     it('should find all game session documents for a player by their ID', async () => {
-      const gameSessionOne = await service.createOne({
+      const gameSessionOne = await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
-      const gameSessionTwo = await service.createOne({
+      const gameSessionTwo = await gameSessionsService.createOne({
         playerOneID: mockThirdPlayer.playerID,
         playerTwoID: mockFirstPlayer.playerID,
       });
 
-      const foundGameSessions = await service.findAllForPlayer(
+      const foundGameSessions = await gameSessionsService.findAllForPlayer(
         mockFirstPlayer.playerID,
       );
 
@@ -214,21 +197,14 @@ describe('GameSessionsService', () => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
-
-      initialGameSession = await service.createOne({
+      initialGameSession = await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
-      await playerModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
@@ -258,7 +234,7 @@ describe('GameSessionsService', () => {
         },
       ];
 
-      const updatedGameSession = (await service.updateOne(
+      const updatedGameSession = (await gameSessionsService.updateOne(
         initialGameSession._id.toString(),
         {
           moves: [...initialGameSession.moves, ...updatedMoves],
@@ -282,21 +258,14 @@ describe('GameSessionsService', () => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
-
-      initialGameSession = await service.createOne({
+      initialGameSession = await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
         playerTwoID: mockSecondPlayer.playerID,
       });
     });
 
     afterEach(async () => {
-      await model.deleteMany({}).exec();
-      await playerModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
@@ -306,7 +275,7 @@ describe('GameSessionsService', () => {
       });
 
       const initialID = initialGameSession._id.toString();
-      const deletedGameSession = (await service.deleteOneById(
+      const deletedGameSession = (await gameSessionsService.deleteOneById(
         initialID,
       )) as GameSessionDocument;
 
@@ -317,7 +286,7 @@ describe('GameSessionsService', () => {
         },
       );
 
-      const emptyResult = await service.findOneById(initialID);
+      const emptyResult = await gameSessionsService.findOneById(initialID);
       expect(emptyResult).toBeNull();
     });
   });
