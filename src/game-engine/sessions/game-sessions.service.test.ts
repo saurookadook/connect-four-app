@@ -150,6 +150,60 @@ describe('GameSessionsService', () => {
     });
   });
 
+  describe("'findAll' method", () => {
+    let gameSessions: GameSessionDocument[];
+
+    beforeEach(async () => {
+      gameSessions = await Promise.all([
+        gameSessionsService.createOne({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockSecondPlayer.playerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockThirdPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+      ]);
+    });
+
+    afterEach(async () => {
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('should find all game session documents', async () => {
+      const foundGameSessions = await gameSessionsService.findAll();
+
+      expect(foundGameSessions).toHaveLength(3);
+
+      foundGameSessions.forEach((foundGameSession, index) => {
+        const gameSessionAtInverseIndex = gameSessions.at(-1 - index);
+
+        expectHydratedDocumentToMatch(
+          foundGameSession,
+          createNewGameSessionDocumentMock({
+            _id: gameSessionAtInverseIndex!._id,
+            __v: gameSessionAtInverseIndex!.__v,
+            playerOneID: gameSessionAtInverseIndex!.playerOneID,
+            playerTwoID: gameSessionAtInverseIndex!.playerTwoID,
+          }),
+        );
+      });
+    });
+
+    it('should return an empty array if no documents exist', async () => {
+      await gameSessionModel.deleteMany({}).exec();
+
+      const foundGameSessions = await gameSessionsService.findAll();
+
+      expect(foundGameSessions).toHaveLength(0);
+    });
+  });
+
   describe("'findAllForPlayer' method", () => {
     let gameSessions: GameSessionDocument[];
 
@@ -179,8 +233,6 @@ describe('GameSessionsService', () => {
     });
 
     it('should find all game session documents for a player by their ID', async () => {
-      const [gameSessionOne, gameSessionTwo] = gameSessions;
-
       const foundGameSessions = await gameSessionsService.findAllForPlayer(
         mockFirstPlayer.playerID,
       );
@@ -188,6 +240,8 @@ describe('GameSessionsService', () => {
       expect(foundGameSessions).toHaveLength(2);
 
       const [foundGameSessionOne, foundGameSessionTwo] = foundGameSessions;
+      const [gameSessionOne, gameSessionTwo] = gameSessions;
+
       expectHydratedDocumentToMatch<GameSession>(
         foundGameSessionOne,
         createNewGameSessionDocumentMock({

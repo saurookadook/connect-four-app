@@ -52,8 +52,10 @@ export class GameSessionsController {
   }
 
   @Public()
+  @Get('history')
+  @Public()
   @Get('history/:playerID')
-  async getGameSessionHistory(
+  async getGameSessionsHistoryForPlayerID(
     @Param('playerID') playerID: UUID,
   ): Promise<{ sessions: GameSessionDTO[] }> {
     const playerSessions =
