@@ -6,7 +6,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 
 import { mockNow } from '@/__mocks__/commonMocks';
-import { createNewGameSessionMock } from '@/__mocks__/gameSessionMocks';
+import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
