@@ -1,43 +1,45 @@
-import { randomUUID } from 'node:crypto';
-
+import { AuthenticationService } from '@/auth/authentication.service';
 import { Player } from '@/player/schemas/player.schema';
 import { mockNow } from './commonMocks';
 
-export const mockFirstPlayerID = randomUUID();
-export const mockSecondPlayerID = randomUUID();
-export const mockThirdPlayerID = randomUUID();
+type MockUnregisteredPlayer = Omit<Player, 'password'> & {
+  unhashedPassword: string;
+};
 
-export const mockFirstPlayer = {
-  playerID: mockFirstPlayerID,
+export const mockFirstPlayer: MockUnregisteredPlayer = {
+  playerID: '80ac649a-ab17-4726-805e-d9cdd82e7eeb',
   username: 'player_uno',
   unhashedPassword: 'superdupergoodpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
-export const mockSecondPlayer = {
-  playerID: mockSecondPlayerID,
+export const mockSecondPlayer: MockUnregisteredPlayer = {
+  playerID: '55993b33-add4-4a8f-9549-bd41fe32a62c',
   username: 'player_dos',
-  unhashedPassword: 'superdupergoodpassword',
+  unhashedPassword: 'anothersuperduperpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
-export const mockThirdPlayer = {
-  playerID: mockThirdPlayerID,
+export const mockThirdPlayer: MockUnregisteredPlayer = {
+  playerID: '5ba3e6b9-ff75-42b7-89e8-f362a4a3a4af',
   username: 'player_tres',
-  unhashedPassword: 'superdupergoodpassword',
+  unhashedPassword: 'eatmoarveggies',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
 
+export function createPlayerWithHashedPassword(
+  unregisteredPlayer: MockUnregisteredPlayer,
+): Player {
+  const { unhashedPassword, ...rest } = unregisteredPlayer;
+  return {
+    ...rest,
+    password: AuthenticationService.createPasswordHashSync(unhashedPassword),
+  };
+}
+
 export const mockPlayers = [
-  mockFirstPlayer,
+  mockFirstPlayer, // force formatting
   mockSecondPlayer,
   mockThirdPlayer,
-].reduce((acc, player) => {
-  const { unhashedPassword, ...rest } = player;
-  acc.push({
-    ...rest,
-    password: unhashedPassword,
-  });
-  return acc;
-}, [] as Player[]);
+].map(createPlayerWithHashedPassword);

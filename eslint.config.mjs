@@ -36,7 +36,10 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn', // force formatting
-        { argsIgnorePattern: '_|type' }
+        {
+          argsIgnorePattern: '_(\d+)?|type',
+          varsIgnorePattern: '_(\d+)?|type',
+        },
       ],
       '@typescript-eslint/require-await': 'warn',
     },

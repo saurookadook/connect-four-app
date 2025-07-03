@@ -20,8 +20,11 @@ import {
 } from '@/constants';
 import { GameEngineService } from '../game-engine.service';
 
+// TODO: better way to handle this?
+const WS_PORT = parseInt(process.env.WS_PORT || '8090', 10);
+
 @Injectable()
-@WebSocketGateway(8090)
+@WebSocketGateway(WS_PORT)
 export class GameEventsGateway {
   #loggingEnabled = false;
 

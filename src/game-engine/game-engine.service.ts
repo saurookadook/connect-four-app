@@ -9,11 +9,11 @@ import {
   GameSessionDocument,
   NullableGameSessionDocument,
 } from './schemas/game-session.schema';
-import { GameSessionService } from './session/game-session.service';
+import { GameSessionsService } from './sessions/game-sessions.service';
 
 @Injectable()
 export class GameEngineService {
-  constructor(private readonly gameSessionService: GameSessionService) {}
+  constructor(private readonly gameSessionsService: GameSessionsService) {}
 
   async startGame({
     gameSessionID,
@@ -27,14 +27,14 @@ export class GameEngineService {
     let foundGame: NullableGameSessionDocument = null;
 
     if (gameSessionID != null) {
-      foundGame = await this.gameSessionService.findOneById(
+      foundGame = await this.gameSessionsService.findOneById(
         gameSessionID || '',
       );
     }
 
     return (
       foundGame ??
-      (await this.gameSessionService.createOne({
+      (await this.gameSessionsService.createOne({
         playerOneID,
         playerTwoID,
       }))

@@ -1,5 +1,10 @@
 import { UUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -15,7 +20,7 @@ import {
 } from '../schemas/game-session.schema';
 
 @Injectable()
-export class GameSessionService {
+export class GameSessionsService {
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
@@ -25,20 +30,12 @@ export class GameSessionService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    try {
-      await this._validatePlayers({
-        playerOneID: gameSession.playerOneID,
-        playerTwoID: gameSession.playerTwoID,
-      });
-      const createdGameSession = new this.gameSessionModel(gameSession);
-      return createdGameSession.save();
-    } catch (error) {
-      // console.error(error);
-      throw new Error(
-        '[GameSessionService.createOne] Encountered ERROR while creating game session: ',
-        error,
-      );
-    }
+    await this._validatePlayers({
+      playerOneID: gameSession.playerOneID,
+      playerTwoID: gameSession.playerTwoID,
+    });
+    const createdGameSession = new this.gameSessionModel(gameSession);
+    return createdGameSession.save();
   }
 
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
@@ -46,6 +43,14 @@ export class GameSessionService {
   }
 
   async findAllForPlayer(playerID: UUID): Promise<GameSessionDocument[]> {
+    const foundPlayer = await this.playerService.findOneByPlayerID(playerID);
+
+    if (foundPlayer == null) {
+      throw new NotFoundException(
+        `[GameSessionsService.findAllForPlayer] : Player with playerID '${playerID}' not found`,
+      );
+    }
+
     return this.gameSessionModel
       .find({
         $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
@@ -57,7 +62,7 @@ export class GameSessionService {
     id: string,
     gameSession: UpdateGameSessionDTO,
   ): Promise<NullableGameSessionDocument> {
-    return this.gameSessionModel
+    return await this.gameSessionModel
       .findByIdAndUpdate(id, gameSession, { new: true })
       .exec();
   }
@@ -74,8 +79,8 @@ export class GameSessionService {
     playerTwoID: UUID;
   }): Promise<void> {
     if (playerOneID === playerTwoID) {
-      throw new TypeError(
-        '[GameSessionService._validatePlayers] Player IDs must be different.',
+      throw new BadRequestException(
+        '[GameSessionsService._validatePlayers] Player IDs must be different.',
       );
     }
 
@@ -83,8 +88,8 @@ export class GameSessionService {
       await this.playerService.findOneByPlayerID(playerOneID);
 
     if (!playerOneExists) {
-      throw new Error(
-        `[GameSessionService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
+      throw new UnauthorizedException(
+        `[GameSessionsService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
       );
     }
 
@@ -92,8 +97,8 @@ export class GameSessionService {
       await this.playerService.findOneByPlayerID(playerTwoID);
 
     if (!playerTwoExists) {
-      throw new Error(
-        `[GameSessionService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
+      throw new UnauthorizedException(
+        `[GameSessionsService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
       );
     }
   }

@@ -19,3 +19,20 @@ export function expectHydratedDocumentToMatch<T>(
     }
   }
 }
+
+export function expectSerializedDocumentToMatch<T>(
+  documentUnderTest: Partial<T>,
+  expected: Partial<T> & { id?: string },
+): void {
+  expect(documentUnderTest).not.toBeNull();
+  expect(documentUnderTest).toHaveProperty('id', expect.any(String));
+
+  for (const [key, value] of Object.entries(expected)) {
+    if (dateFields.has(key)) {
+      expect(documentUnderTest).toHaveProperty(key);
+      expect(documentUnderTest[key]).toBeISODateString();
+    } else {
+      expect(documentUnderTest).toHaveProperty(key, value);
+    }
+  }
+}
