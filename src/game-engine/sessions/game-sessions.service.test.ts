@@ -3,6 +3,7 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 
 import { mockNow } from '@/__mocks__/commonMocks';
+import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
@@ -150,9 +151,26 @@ describe('GameSessionsService', () => {
   });
 
   describe("'findAllForPlayer' method", () => {
-    beforeEach(() => {
+    let gameSessions: GameSessionDocument[];
+
+    beforeEach(async () => {
       jest.setSystemTime(mockNow);
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
+
+      gameSessions = await Promise.all([
+        gameSessionsService.createOne({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockSecondPlayer.playerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockThirdPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+      ]);
     });
 
     afterEach(async () => {
@@ -161,14 +179,7 @@ describe('GameSessionsService', () => {
     });
 
     it('should find all game session documents for a player by their ID', async () => {
-      const gameSessionOne = await gameSessionsService.createOne({
-        playerOneID: mockFirstPlayer.playerID,
-        playerTwoID: mockSecondPlayer.playerID,
-      });
-      const gameSessionTwo = await gameSessionsService.createOne({
-        playerOneID: mockThirdPlayer.playerID,
-        playerTwoID: mockFirstPlayer.playerID,
-      });
+      const [gameSessionOne, gameSessionTwo] = gameSessions;
 
       const foundGameSessions = await gameSessionsService.findAllForPlayer(
         mockFirstPlayer.playerID,
@@ -177,16 +188,24 @@ describe('GameSessionsService', () => {
       expect(foundGameSessions).toHaveLength(2);
 
       const [foundGameSessionOne, foundGameSessionTwo] = foundGameSessions;
-      expectHydratedDocumentToMatch<GameSession>(foundGameSessionOne, {
-        ...mockGameSession,
-        _id: gameSessionOne._id,
-      });
-      expectHydratedDocumentToMatch<GameSession>(foundGameSessionTwo, {
-        ...mockGameSession,
-        _id: gameSessionTwo._id,
-        playerOneID: mockThirdPlayer.playerID,
-        playerTwoID: mockFirstPlayer.playerID,
-      });
+      expectHydratedDocumentToMatch<GameSession>(
+        foundGameSessionOne,
+        createNewGameSessionDocumentMock({
+          _id: gameSessionOne._id,
+          __v: gameSessionOne.__v,
+          playerOneID: gameSessionOne.playerOneID,
+          playerTwoID: gameSessionOne.playerTwoID,
+        }),
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        foundGameSessionTwo,
+        createNewGameSessionDocumentMock({
+          _id: gameSessionTwo._id,
+          __v: gameSessionTwo.__v,
+          playerOneID: gameSessionTwo.playerOneID,
+          playerTwoID: gameSessionTwo.playerTwoID,
+        }),
+      );
     });
   });
 
