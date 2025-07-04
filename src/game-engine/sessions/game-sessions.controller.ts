@@ -12,6 +12,7 @@ import { plainToInstance } from 'class-transformer';
 
 import { Public } from '@/auth/decorators/public.decorator';
 import { CreateGameSessionDTO, GameSessionDTO } from '../dtos/game-session.dto';
+import { GameSessionDocument } from '../schemas/game-session.schema';
 import { GameSessionsService } from '../sessions/game-sessions.service';
 
 @Controller('game-sessions')
@@ -33,6 +34,39 @@ export class GameSessionsController {
   }
 
   @Public()
+  @Get('all')
+  async getAllGameSessions(): Promise<{ sessions: GameSessionDTO[] }> {
+    const gameSessions = await this.gameSessionsService.findAll();
+
+    return {
+      sessions: this.createTransformedSessions(gameSessions),
+    };
+  }
+
+  @Public()
+  @Get('history/:playerID')
+  async getGameSessionsHistoryForPlayerID(
+    @Param('playerID') playerID: UUID,
+  ): Promise<{ sessions: GameSessionDTO[] }> {
+    const playerSessions =
+      await this.gameSessionsService.findAllForPlayer(playerID);
+
+    return {
+      sessions: this.createTransformedSessions(playerSessions),
+    };
+  }
+
+  createTransformedSessions(
+    gameSessions: GameSessionDocument[],
+  ): GameSessionDTO[] {
+    const transformedSessions = gameSessions.map((session) =>
+      plainToInstance(GameSessionDTO, session.toJSON()),
+    );
+
+    return transformedSessions;
+  }
+
+  @Public()
   @Get(':sessionID')
   async getGameSession(
     @Param('sessionID') sessionID: string,
@@ -48,23 +82,6 @@ export class GameSessionsController {
 
     return {
       session: plainToInstance(GameSessionDTO, foundGameSession.toJSON()),
-    };
-  }
-
-  @Public()
-  @Get('history/:playerID')
-  async getGameSessionHistory(
-    @Param('playerID') playerID: UUID,
-  ): Promise<{ sessions: GameSessionDTO[] }> {
-    const playerSessions =
-      await this.gameSessionsService.findAllForPlayer(playerID);
-
-    const transformedSessions = playerSessions.map((session) =>
-      plainToInstance(GameSessionDTO, session.toJSON()),
-    );
-
-    return {
-      sessions: transformedSessions,
     };
   }
 }

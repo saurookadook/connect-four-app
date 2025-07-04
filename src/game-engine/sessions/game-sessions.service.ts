@@ -42,6 +42,14 @@ export class GameSessionsService {
     return await this.gameSessionModel.findById(id).exec();
   }
 
+  async findAll(): Promise<GameSessionDocument[]> {
+    const foundGameSessions = await this.gameSessionModel
+      .find({})
+      .sort({ updatedAt: -1 });
+
+    return foundGameSessions;
+  }
+
   async findAllForPlayer(playerID: UUID): Promise<GameSessionDocument[]> {
     const foundPlayer = await this.playerService.findOneByPlayerID(playerID);
 

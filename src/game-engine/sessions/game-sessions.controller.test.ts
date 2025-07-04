@@ -6,7 +6,7 @@ import * as request from 'supertest';
 import { App } from 'supertest/types';
 
 import { mockNow } from '@/__mocks__/commonMocks';
-import { createNewGameSessionMock } from '@/__mocks__/gameSessionMocks';
+import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
@@ -18,7 +18,10 @@ import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
-import { GameSession } from '../schemas/game-session.schema';
+import {
+  GameSession,
+  GameSessionDocument,
+} from '../schemas/game-session.schema';
 import { GameSessionsModule } from './game-sessions.module';
 import { GameSessionsService } from './game-sessions.service';
 
@@ -56,6 +59,10 @@ describe('GameSessionsController', () => {
       mockSecondPlayer,
       mockThirdPlayer,
     ]);
+  });
+
+  afterEach(async () => {
+    await gameSessionModel.deleteMany({}).exec();
   });
 
   afterAll(async () => {
@@ -149,6 +156,94 @@ describe('GameSessionsController', () => {
           expect(statusCode).toBe(401);
         })
         .expect(401);
+    });
+  });
+
+  describe('/game-sessions/all (GET)', () => {
+    afterAll(async () => {
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('should return all game session documents', async () => {
+      const gameSessions: GameSessionDocument[] = await Promise.all([
+        gameSessionsService.createOne({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockSecondPlayer.playerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockThirdPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+      ]);
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/all`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+          expect(resultBody.sessions).toHaveLength(3);
+
+          resultBody.sessions.forEach((foundGameSession, index) => {
+            const gameSessionAtInverseIndex = gameSessions.at(-1 - index);
+
+            expectSerializedDocumentToMatch(
+              foundGameSession,
+              createNewGameSessionMock({
+                id: gameSessionAtInverseIndex!._id.toString(),
+                playerOneID: gameSessionAtInverseIndex!.playerOneID,
+                playerTwoID: gameSessionAtInverseIndex!.playerTwoID,
+              }),
+            );
+          });
+        });
+    });
+  });
+
+  describe('/game-sessions/:sessionID (GET)', () => {
+    it('correctly returns a game-session by its ID', async () => {
+      const gameSession = await gameSessionsService.createOne({
+        playerOneID: mockFirstPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${gameSession.id}`)
+        .expect((result) => {
+          const { session } = JSON.parse(result.text);
+
+          expect(session).toBeDefined();
+          expect(session.id).toBe(gameSession.id.toString());
+          expectSerializedDocumentToMatch<GameSession>(
+            session,
+            createNewGameSessionMock({
+              playerOneID: mockFirstPlayer.playerID,
+              playerTwoID: mockSecondPlayer.playerID,
+            }),
+          );
+
+          expect(result.status).toBe(200);
+        })
+        .expect(200);
+    });
+
+    it("should respond with error details if a game-session can't be found", async () => {
+      const nonExistentGameSessionID = '6861e45ef5c14f14a62b8643';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${nonExistentGameSessionID}`)
+        .expect((result) => {
+          const { message, statusCode } = JSON.parse(result.text);
+
+          expect(message).toBeStringIncluding(
+            `Could not find 'game-session' with ID '${nonExistentGameSessionID}'.`,
+          );
+          expect(statusCode).toBe(404);
+        })
+        .expect(404);
     });
   });
 
@@ -254,50 +349,6 @@ describe('GameSessionsController', () => {
 
           expect(result.status).toBe(200);
         });
-    });
-  });
-
-  describe('/game-sessions/:sessionID (GET)', () => {
-    it('correctly returns a game-session by its ID', async () => {
-      const gameSession = await gameSessionsService.createOne({
-        playerOneID: mockFirstPlayer.playerID,
-        playerTwoID: mockSecondPlayer.playerID,
-      });
-
-      await request(app.getHttpServer())
-        .get(`/game-sessions/${gameSession.id}`)
-        .expect((result) => {
-          const { session } = JSON.parse(result.text);
-
-          expect(session).toBeDefined();
-          expect(session.id).toBe(gameSession.id.toString());
-          expectSerializedDocumentToMatch<GameSession>(
-            session,
-            createNewGameSessionMock({
-              playerOneID: mockFirstPlayer.playerID,
-              playerTwoID: mockSecondPlayer.playerID,
-            }),
-          );
-
-          expect(result.status).toBe(200);
-        })
-        .expect(200);
-    });
-
-    it("should respond with error details if a game-session can't be found", async () => {
-      const nonExistentGameSessionID = '6861e45ef5c14f14a62b8643';
-
-      await request(app.getHttpServer())
-        .get(`/game-sessions/${nonExistentGameSessionID}`)
-        .expect((result) => {
-          const { message, statusCode } = JSON.parse(result.text);
-
-          expect(message).toBeStringIncluding(
-            `Could not find 'game-session' with ID '${nonExistentGameSessionID}'.`,
-          );
-          expect(statusCode).toBe(404);
-        })
-        .expect(404);
     });
   });
 });

@@ -54,10 +54,9 @@ export class SeedService {
     );
 
     const createPlayerPromises = playersSeedData.map(async (playerSeed) => {
-      const hashedPassword =
-        await this.authenticationService._createPasswordHash(
-          playerSeed.password,
-        );
+      const hashedPassword = await AuthenticationService.createPasswordHash(
+        playerSeed.password,
+      );
       return this.playerService.createOne({
         ...playerSeed,
         password: hashedPassword,
