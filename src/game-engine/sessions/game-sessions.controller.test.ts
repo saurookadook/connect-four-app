@@ -160,10 +160,13 @@ describe('GameSessionsController', () => {
   });
 
   describe('/game-sessions/all (GET)', () => {
-    let gameSessions: GameSessionDocument[];
+    afterAll(async () => {
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
 
-    beforeEach(async () => {
-      gameSessions = await Promise.all([
+    it('should return all game session documents', async () => {
+      const gameSessions: GameSessionDocument[] = await Promise.all([
         gameSessionsService.createOne({
           playerOneID: mockFirstPlayer.playerID,
           playerTwoID: mockSecondPlayer.playerID,
@@ -177,14 +180,7 @@ describe('GameSessionsController', () => {
           playerTwoID: mockSecondPlayer.playerID,
         }),
       ]);
-    });
 
-    afterAll(async () => {
-      await gameSessionModel.deleteMany({}).exec();
-      jest.clearAllTimers();
-    });
-
-    it('should return all game session documents', async () => {
       await request(app.getHttpServer())
         .get(`/game-sessions/all`)
         .expect((result) => {

@@ -151,12 +151,12 @@ describe('GameSessionsService', () => {
   });
 
   describe("'findAll' method", () => {
-    afterEach(async () => {
-      await gameSessionModel.deleteMany({}).exec();
+    afterEach(() => {
       jest.clearAllTimers();
     });
 
     it('should find all game session documents', async () => {
+      await gameSessionModel.deleteMany({}).exec();
       const gameSessions = await Promise.all([
         gameSessionsService.createOne({
           playerOneID: mockFirstPlayer.playerID,
