@@ -61,6 +61,10 @@ describe('GameSessionsController', () => {
     ]);
   });
 
+  afterEach(async () => {
+    await gameSessionModel.deleteMany({}).exec();
+  });
+
   afterAll(async () => {
     await playerModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
@@ -152,6 +156,54 @@ describe('GameSessionsController', () => {
           expect(statusCode).toBe(401);
         })
         .expect(401);
+    });
+  });
+
+  describe('/game-sessions/all (GET)', () => {
+    let gameSessions: GameSessionDocument[];
+
+    beforeEach(async () => {
+      gameSessions = await Promise.all([
+        gameSessionsService.createOne({
+          playerOneID: mockFirstPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockSecondPlayer.playerID,
+          playerTwoID: mockFirstPlayer.playerID,
+        }),
+        gameSessionsService.createOne({
+          playerOneID: mockThirdPlayer.playerID,
+          playerTwoID: mockSecondPlayer.playerID,
+        }),
+      ]);
+    });
+
+    afterAll(async () => {
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('should return all game session documents', async () => {
+      await request(app.getHttpServer())
+        .get(`/game-sessions/all`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+          expect(resultBody.sessions).toHaveLength(3);
+
+          resultBody.sessions.forEach((foundGameSession, index) => {
+            const gameSessionAtInverseIndex = gameSessions.at(-1 - index);
+
+            expectSerializedDocumentToMatch(
+              foundGameSession,
+              createNewGameSessionMock({
+                id: gameSessionAtInverseIndex!._id.toString(),
+                playerOneID: gameSessionAtInverseIndex!.playerOneID,
+                playerTwoID: gameSessionAtInverseIndex!.playerTwoID,
+              }),
+            );
+          });
+        });
     });
   });
 
