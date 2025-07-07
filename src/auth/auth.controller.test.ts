@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model } from 'mongoose';
-import * as request from 'supertest';
+import request from 'supertest';
 import type { App } from 'supertest/types';
 
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';

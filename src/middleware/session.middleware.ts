@@ -1,8 +1,9 @@
 import { INestApplication } from '@nestjs/common';
-import * as connectMongoDBSession from 'connect-mongodb-session';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import * as passport from 'passport';
+import connectMongoDBSession from 'connect-mongodb-session';
+import cookieParser from 'cookie-parser';
+import cookieSession from 'cookie-session';
+import session from 'express-session';
+import passport from 'passport';
 
 import baseConfig from '@/config';
 import { PlayerDetails } from '@/types/main';
@@ -16,6 +17,7 @@ export const applyGlobalSessionMiddleware = (app: INestApplication) => {
   const sessionStore = createSessionStore();
 
   app.use(cookieParser(secretKey));
+  // app.use(cookieSession())
   app.use(
     session({
       cookie: {
