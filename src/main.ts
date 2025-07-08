@@ -10,7 +10,16 @@ async function bootstrap() {
   applyGlobalSessionMiddleware(app);
 
   // Additional configuration available here: https://github.com/expressjs/cors#configuration-options
-  app.enableCors();
+  app.enableCors({
+    credentials: true,
+    exposedHeaders: ['set-cookie'],
+    methods: ['DELETE', 'GET', 'POST', 'PUT'],
+    origin: [
+      'http://localhost:5173',
+      'http://localhost:3993',
+      'http://127.0.0.1',
+    ],
+  });
   app.setGlobalPrefix('api');
   app.useWebSocketAdapter(new WsAdapter(app));
 
