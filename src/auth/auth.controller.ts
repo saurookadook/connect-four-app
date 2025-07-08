@@ -1,6 +1,7 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { inspect } from 'node:util';
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { type Request } from 'express';
+import { type Request, type Response } from 'express';
 
 import { PlayerDetails } from '@/types/main';
 import {
@@ -18,6 +19,7 @@ export class AuthController {
   @Post('register')
   async register(
     @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
     @Body() requestData: AuthenticationRequestDTO,
   ) {
     const dataAsDTO = plainToInstance(RegisterDTO, requestData);
@@ -36,6 +38,7 @@ export class AuthController {
   @Post('login')
   async login(
     @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
     @Body() requestData: AuthenticationRequestDTO,
   ) {
     const dataAsDTO = plainToInstance(LoginDTO, requestData);
@@ -51,6 +54,37 @@ export class AuthController {
       errorMessage: 'Login failed.',
     });
 
+    req.login({ ...playerDetails }, (err) => {
+      console.warn('!'.repeat(process.stdout.columns));
+      console.error(err);
+      console.warn('!'.repeat(process.stdout.columns));
+    });
+
+    // res.cookie(process.env.COOKIE_KEY as string, req.sessionID, {
+    //   httpOnly: true,
+    //   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    //   sameSite: 'lax',
+    //   secure: false,
+    //   signed: true,
+    // });
+    res.set({
+      Credentials: 'include',
+    });
+
+    // console.log(
+    //   inspect({
+    //     reqCookies: req.cookies,
+    //     reqSession: req.session,
+    //     reqUser: req.user,
+    //     resHeaders: res?.getHeaders(),
+    //   }),
+    //   {
+    //     colors: true,
+    //     compact: false,
+    //     depth: 2,
+    //     showHidden: true,
+    //   },
+    // );
     return playerDetails;
   }
 

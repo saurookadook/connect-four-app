@@ -1,8 +1,8 @@
 import { INestApplication } from '@nestjs/common';
-import * as connectMongoDBSession from 'connect-mongodb-session';
-import * as cookieParser from 'cookie-parser';
-import * as session from 'express-session';
-import * as passport from 'passport';
+import connectMongoDBSession from 'connect-mongodb-session';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import passport from 'passport';
 
 import baseConfig from '@/config';
 import { PlayerDetails } from '@/types/main';
@@ -12,19 +12,24 @@ export const applyGlobalSessionMiddleware = (app: INestApplication) => {
     throw new Error("'SESSION_SECRET' environment variable is not set.");
   }
 
-  const secretKey = process.env.SESSION_SECRET;
+  const { NODE_ENV, SESSION_SECRET } = process.env;
+
+  const isProd = NODE_ENV === 'prod';
+
   const sessionStore = createSessionStore();
 
-  app.use(cookieParser(secretKey));
+  app.use(cookieParser(SESSION_SECRET));
   app.use(
     session({
       cookie: {
+        httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        secure: true,
+        sameSite: isProd ? 'strict' : 'lax',
+        secure: isProd,
       },
       resave: false,
-      saveUninitialized: false,
-      secret: secretKey,
+      saveUninitialized: true,
+      secret: SESSION_SECRET,
       store: sessionStore,
     }),
   );
