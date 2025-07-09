@@ -17,11 +17,11 @@
   "scripts": {
     "//build:all": "yarn nx run-many -t build",
     "//dep-graph": "yarn nx graph",
-    "all:base": "yarn workspaces foreach --from {client,server} -R -pt",
+    "all:base": "yarn workspaces foreach --from {client,@connect-four-app/api} -R -pt",
     "all:install": "yarn all:base install",
     "all:build": "yarn all:base run build",
     "all:start:dev": "yarn all:base run start:dev",
-    "server:base": "yarn workspaces foreach --from server -R"
+    "server:base": "yarn workspace @connect-four-app/api"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

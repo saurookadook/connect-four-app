@@ -1,4 +1,11 @@
 services:
+  all:
+    image: alpine
+    command: sh -C "echo start"
+    depends_on:
+      - mongo
+      - server
+
   mongo:
     image: mongo:latest
     container_name: mongo
@@ -8,3 +15,13 @@ services:
     volumes:
       - ./.docker/mongodb/data/db/:/data/db/
       - ./.docker/mongodb/data/log/:/var/log/mongodb/
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: server-dev
+    env_file: .env
+    volumes:
+      - ./server:/opt/connect-four-app/server
+      - /opt/connect-four-app/node_modules
