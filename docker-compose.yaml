@@ -23,5 +23,8 @@ services:
       target: server-dev
     env_file: .env
     volumes:
-      - ./server:/opt/connect-four-app/server
       - /opt/connect-four-app/node_modules
+      - ./server:/opt/connect-four-app/server
+      - ./.env:/opt/connect-four-app/.env
+      - ./package.json:/opt/connect-four-app/package.json
+      - ./yarn.lock:/opt/connect-four-app/yarn.lock
