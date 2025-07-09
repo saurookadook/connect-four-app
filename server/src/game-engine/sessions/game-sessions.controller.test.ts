@@ -24,6 +24,7 @@ import {
 } from '../schemas/game-session.schema';
 import { GameSessionsModule } from './game-sessions.module';
 import { GameSessionsService } from './game-sessions.service';
+import { inspect } from 'node:util';
 
 describe('GameSessionsController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
@@ -179,7 +180,13 @@ describe('GameSessionsController', () => {
           playerOneID: mockThirdPlayer.playerID,
           playerTwoID: mockSecondPlayer.playerID,
         }),
-      ]);
+      ]).then((results) =>
+        results.sort(
+          (a, b) =>
+            Number(new Date(a.updatedAt) < new Date(b.updatedAt)) -
+            Number(new Date(a.updatedAt) > new Date(b.updatedAt)),
+        ),
+      );
 
       await request(app.getHttpServer())
         .get(`/game-sessions/all`)
@@ -188,7 +195,7 @@ describe('GameSessionsController', () => {
           expect(resultBody.sessions).toHaveLength(3);
 
           resultBody.sessions.forEach((foundGameSession, index) => {
-            const gameSessionAtInverseIndex = gameSessions.at(-1 - index);
+            const gameSessionAtInverseIndex = gameSessions.at(index);
 
             expectSerializedDocumentToMatch(
               foundGameSession,
