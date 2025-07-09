@@ -1,26 +1,17 @@
 {
-  "name": "connect-four-api",
+  "name": "@connect-four-app/api",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
-  "engines": {
-    "node": ">=22.10.0",
-    "yarn": ">=4.8.0"
-  },
-  "packageManager": "yarn@4.8.1+sha512.bc946f2a022d7a1a38adfc15b36a66a3807a67629789496c3714dd1703d2e6c6b1c69ff9ec3b43141ac7a1dd853b7685638eb0074300386a59c18df351ef8ff6",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "start:dev": "NODE_ENV=dev nest start --watch",
+    "start:dev": "cp ../.env ./.env && NODE_ENV=dev nest start --watch",
     "start:debug": "yarn start:dev --debug",
     "start:prod": "NODE_ENV=prod node dist/main",
     "ncs": "ts-node -r tsconfig-paths/register src/scripts/run.script.ts",
     "ncs:test_script": "yarn ncs test_script",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "NODE_ENV=test jest --runInBand --detectOpenHandles",
+    "test": "cp ../.env.test ./.env.test && NODE_ENV=test yarn jest:test --runInBand --detectOpenHandles",
     "test:watch": "test --watch",
     "test:cov": "test --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -52,8 +43,6 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/devtools-integration": "^0.2.0",
     "@nestjs/schematics": "^11.0.0",
@@ -66,25 +55,12 @@
     "@types/express": "^5.0.0",
     "@types/express-session": "^1",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.7",
     "@types/passport": "^0",
     "@types/passport-local": "^1.0.38",
     "@types/readline-sync": "^1.4.8",
     "@types/supertest": "^6.0.2",
-    "@types/ws": "^8",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
     "jest": "^29.7.0",
-    "prettier": "^3.4.2",
-    "source-map-support": "^0.5.21",
-    "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "supertest": "^7.0.0"
   }
 }
