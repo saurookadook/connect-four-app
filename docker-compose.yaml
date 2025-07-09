@@ -21,10 +21,19 @@ services:
       context: .
       dockerfile: server/Dockerfile
       target: server-dev
+    depends_on:
+      - mongo
     env_file: .env
     volumes:
       - /opt/connect-four-app/node_modules
       - ./server:/opt/connect-four-app/server
       - ./.env:/opt/connect-four-app/.env
+      - ./.env.test:/opt/connect-four-app/.env.test
       - ./package.json:/opt/connect-four-app/package.json
       - ./yarn.lock:/opt/connect-four-app/yarn.lock
+
+  server-test:
+    build:
+      target: server-test
+    env_file: .env.test
+    extends: server

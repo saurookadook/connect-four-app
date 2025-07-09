@@ -1,6 +1,4 @@
-
-
-FROM node:22-bullseye AS server-dev
+FROM node:22-bullseye AS server-dev-base
 ARG NODE_ENV=development
 ENV NODE_ENV=$NODE_ENV
 ENV YARN_VERSION=4.8.1
@@ -11,7 +9,12 @@ COPY server/ /opt/connect-four-app/server/
 RUN corepack enable
 RUN corepack use yarn@$YARN_VERSION
 RUN $yarn server:base build
-ENTRYPOINT [ "yarn", "start:dev" ]
+
+FROM server-dev-base AS server-dev
+ENTRYPOINT [ "yarn", "server:base", "start:dev" ]
+
+FROM server-dev-base AS server-test
+ENTRYPOINT [ "yarn", "server:base", "test" ]
 
 
 #########################################################################################
