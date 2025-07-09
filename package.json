@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "author": "Andy Maskiell",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "type": "module",
   "private": true,
   "engines": {
