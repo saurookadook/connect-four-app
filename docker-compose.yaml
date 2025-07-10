@@ -3,9 +3,26 @@ services:
     image: alpine
     command: sh -C "echo start"
     depends_on:
+      - client
       - mongo
       - nginx
       - server
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      target: client-dev
+    depends_on:
+      - server
+    env_file: .env
+    volumes:
+      - /opt/connect-four-app/node_modules
+      - ./client:/opt/connect-four-app/client
+      - ./.env:/opt/connect-four-app/.env
+      - ./.env.test:/opt/connect-four-app/.env.test
+      - ./package.json:/opt/connect-four-app/package.json
+      - ./yarn.lock:/opt/connect-four-app/yarn.lock
 
   mongo:
     image: mongo:latest
