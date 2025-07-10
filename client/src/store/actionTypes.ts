@@ -1,0 +1,26 @@
+// connect-four
+export const RESET_GAME = 'RESET_GAME';
+export const START_GAME = 'START_GAME';
+export const MAKE_MOVE = 'MAKE_MOVE';
+export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
+
+// game-session-history
+export const REQUEST_ALL_GAME_SESSIONS = 'REQUEST_ALL_GAME_SESSIONS';
+export const REQUEST_GAME_SESSIONS_HISTORY = 'REQUEST_GAME_SESSIONS_HISTORY';
+export const SET_ALL_GAME_SESSIONS = 'SET_ALL_GAME_SESSIONS';
+export const SET_GAME_SESSIONS_HISTORY = 'SET_GAME_SESSIONS_HISTORY';
+
+// login
+export const ATTEMPT_LOGIN = 'ATTEMPT_LOGIN';
+export const ATTEMPT_SIGN_UP = 'ATTEMPT_SIGN_UP';
+
+// messages
+export const LOAD_MESSAGES = 'LOAD_MESSAGES';
+export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
+export const SEND_MESSAGE = 'SEND_MESSAGE';
+// export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
+// export const RECEIVE_MESSAGE = 'RECEIVE_MESSAGE';
+
+// player
+export const REGISTER_NEW_PLAYER = 'REGISTER_NEW_PLAYER';
+export const LOG_IN_PLAYER = 'LOG_IN_PLAYER';

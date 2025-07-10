@@ -1,0 +1,12 @@
+.base-input {
+
+    &:not(:placeholder-shown) {
+        &:invalid {
+            border-color: var(--error);
+        }
+
+        &:valid {
+            border-color: var(--success);
+        }
+    }
+}

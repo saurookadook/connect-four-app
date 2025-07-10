@@ -1,0 +1,23 @@
+#connect-four {
+    background-color: #FFEEEE;
+    border: 0.25rem solid #123456;
+    color: #111111;
+    height: 40rem;
+    max-height: 80vh;
+    min-height: fit-content;
+    padding: 2rem 1rem;
+
+    & > .flex-row {
+        align-items: flex-start;
+        height: 100%;
+    }
+}
+
+#game-details {
+    align-items: flex-start;
+    max-width: 30%;
+}
+
+#game-board-container {
+    height: 100%;
+}
