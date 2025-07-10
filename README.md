@@ -6,12 +6,47 @@ A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built wit
 
 🚧 **WIP** 🚧
 
+### 1. Install local Node packages
+
 ```bash
 nvm use
 corepack enable
 yarn install
-docker compose up all -d
 ```
+
+### 2. Generate certs and other changes for NGINX
+
+If you don't have `mkcert` installed already, install it. 🙂
+
+```bash
+brew install mkcert
+# NOTE:
+# If this is your first time using mkcert, you'll need to run it with
+# the `-install` flag. This only needs to be done once, and it creates
+# a local certificate authority against which we will create our own
+# self-signed SSL certificates.
+mkcert -install
+```
+
+If this is your first time going through the setup instructions, you will need to make the `install.sh` script executable.
+
+```bash
+chmod +x nginx-reverse-proxy/install.sh
+```
+
+Finally, run the script. 🙂
+
+```bash
+nginx-reverse-proxy/install.sh
+```
+
+### 3. Build and Start the Docker Containers
+
+```bash
+docker compose up --build --no-cache all -d
+```
+
+---
 
 ## Project Structure
 
@@ -26,6 +61,8 @@ connect-four-app
   ┣ package.json
   ┗ yarn.lock
 ```
+
+---
 
 ## Generating Certs
 
