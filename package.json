@@ -12,32 +12,35 @@
   },
   "packageManager": "yarn@4.8.1+sha512.bc946f2a022d7a1a38adfc15b36a66a3807a67629789496c3714dd1703d2e6c6b1c69ff9ec3b43141ac7a1dd853b7685638eb0074300386a59c18df351ef8ff6",
   "workspaces": [
+    "client",
     "server"
   ],
   "scripts": {
     "//build:all": "yarn nx run-many -t build",
     "//dep-graph": "yarn nx graph",
-    "all:base": "yarn workspaces foreach --from {client,@connect-four-app/api} -R -pt",
+    "all:base": "yarn workspaces foreach --from \"@connect-four-app/{client,server}\" -R -pt",
     "all:install": "yarn all:base install",
     "all:build": "yarn all:base run build",
     "all:start:dev": "yarn all:base run start:dev",
-    "server:base": "yarn workspace @connect-four-app/api"
+    "client:base": "yarn workspace @connect-four-app/client",
+    "server:base": "yarn workspace @connect-four-app/server"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@eslint/js": "^9.18.0",
-    "@types/node": "^22.10.7",
+    "@eslint/js": "^9.22.0",
+    "@types/node": "^22.15.3",
     "@types/ws": "^8",
-    "eslint": "^9.18.0",
+    "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.26.1"
   }
 }
