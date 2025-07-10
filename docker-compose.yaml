@@ -4,6 +4,7 @@ services:
     command: sh -C "echo start"
     depends_on:
       - mongo
+      - nginx
       - server
 
   mongo:
@@ -15,6 +16,21 @@ services:
     volumes:
       - ./.docker/mongodb/data/db/:/data/db/
       - ./.docker/mongodb/data/log/:/var/log/mongodb/
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx-reverse-proxy/Dockerfile
+    links:
+      - server
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx-reverse-proxy/conf/:/etc/nginx/conf.d/:ro
+      - ./nginx-reverse-proxy/certs:/etc/nginx/certs
 
   server:
     build:
@@ -37,3 +53,7 @@ services:
       target: server-test
     env_file: .env.test
     extends: server
+#
+# networks:
+#   main_app:
+#     driver: bridge
