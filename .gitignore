@@ -2,8 +2,10 @@
 .docker/
 .yarn/
 build/
-dist/
-node_modules/
+node_modules
+dist
+dist-ssr
+*.local
 
 # Logs
 logs
@@ -29,9 +31,16 @@ lerna-debug.log*
 *.launch
 .settings/
 *.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 
 # IDE - VSCode
 .vscode/*
+!.vscode/*.example.json
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

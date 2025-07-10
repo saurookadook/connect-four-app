@@ -1,0 +1,13 @@
+{
+    "prettier.requireConfig": false,
+    "[json,jsonc]": {
+        // "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+        // "editor.defaultFormatter": "vscode.json-language-features",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 4
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2
+    }
+}
