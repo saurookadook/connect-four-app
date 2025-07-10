@@ -15,9 +15,10 @@ async function bootstrap() {
     exposedHeaders: ['set-cookie'],
     methods: ['DELETE', 'GET', 'POST', 'PUT'],
     origin: [
-      'http://localhost:5173',
-      'http://localhost:3993',
-      'http://127.0.0.1',
+      '.connect-four.dev',
+      // 'http://localhost:5173',
+      // 'http://localhost:3993',
+      // 'http://127.0.0.1',
     ],
   });
   app.setGlobalPrefix('api');
