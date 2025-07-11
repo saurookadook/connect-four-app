@@ -62,6 +62,9 @@ services:
     depends_on:
       - mongo
     env_file: .env
+    ports:
+      - '${SERVER_PORT}:3993'
+      - '${WS_PORT}:8090'
     volumes:
       - /opt/connect-four-app/node_modules
       - ./server:/opt/connect-four-app/server
