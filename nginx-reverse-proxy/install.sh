@@ -2,18 +2,18 @@
 
 set -e
 
-KEY_FILE="nginx-reverse-proxy/certs/app.connect-four.dev+2-key.pem"
-PEM_FILE="nginx-reverse-proxy/certs/app.connect-four.dev+2.pem"
+KEY_FILE="nginx-reverse-proxy/certs/app.connect-four.dev+4-key.pem"
+PEM_FILE="nginx-reverse-proxy/certs/app.connect-four.dev+4.pem"
 
 if [[ -f "$KEY_FILE" && -f "$PEM_FILE" ]]; then
     echo "✅ Certs for 'app.connect-four.dev' already exist!"
 else
     echo "⏳ Creating certs for 'app.connect-four.dev'..."
     cd nginx-reverse-proxy/certs
-    mkcert app.connect-four.dev "*.connect-four.dev" 127.0.0.1
+    mkcert app.connect-four.dev "*.connect-four.dev" localhost 127.0.0.1 ::1
     # NOTE: files created from the above command should be
-    # - app.connect-four.dev+2-key.pem
-    # - app.connect-four.dev+2.pem
+    # - app.connect-four.dev+4-key.pem
+    # - app.connect-four.dev+4.pem
     echo "✅ Certs for 'app.connect-four.dev' successfully created!"
     cd ../..
 fi

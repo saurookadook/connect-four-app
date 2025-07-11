@@ -1,0 +1,47 @@
+#game-sessions-history {
+    background-color: #FFEEEE;
+    border: 0.25rem solid #123456;
+    color: #111111;
+    max-width: 80vw;
+    min-height: fit-content;
+    padding: 2rem 1rem;
+    width: 75rem;
+}
+
+#all-game-sessions,
+#player-game-sessions {
+    align-self: flex-start;
+    max-width: 50%;
+    min-height: 20rem;
+
+    & .results-wrapper {
+        display: flex;
+        flex-grow: 1;
+        flex-shrink: 0;
+
+        & .game-session-history-item {
+            background: var(--butterfly-blue-fill-0\.5);
+            border: 1px solid var(--blue-fill);
+            border-top: 0px;
+            border-bottom: 0px;
+            /* border-radius: 5px; */
+            box-sizing: border-box;
+            padding: 1rem 1.5rem;
+            width: 100%;
+
+            &:first-child {
+                border-top: 1px solid var(--blue-fill);
+            }
+
+            &:last-child {
+                border-bottom: 1px solid var(--blue-fill);
+            }
+
+            &:nth-child(2n - 1) {
+                background: #ffffff;
+            }
+        }
+    }
+}
+
+

@@ -1,0 +1,38 @@
+#board {
+    border: 0.5rem solid var(--blue-darker-fill);
+    border-radius: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    height: 100%;
+    min-width: 34rem;
+
+    & [id^="cell-"] {
+        /* background: radial-gradient(circle at center, #000 50%, #333 50%, #eee 75%, #333 75%); */
+        background: radial-gradient(
+            circle at center,
+            transparent 50%,
+            var(--blue-darker-fill-0\.5) 51%,
+           var(--butterfly-blue-fill) 52%,
+           var(--butterfly-blue-fill) 100%
+           );
+        border: 1px solid var(--light-gray-edge);
+        /* height: 4rem;
+        width: 4rem; */
+    }
+
+    & .cell {
+        align-items: center;
+        aspect-ratio: 1 / 1;
+        color: #000000;
+        display: flex;
+        height: auto;
+        justify-content: center;
+        min-width: calc(100% / 7);
+
+        & span {
+            height: 100%;
+            width: 100%;
+        }
+    }
+}
