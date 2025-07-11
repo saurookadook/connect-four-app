@@ -1,14 +1,16 @@
 /// <reference types="vitest/config" />
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
+import type { InlineConfig } from 'vitest/node';
 import react from '@vitejs/plugin-react';
 
 const __dirname = path.resolve();
 
 const { SERVER_PORT } = process.env;
 
-// https://vite.dev/config/
-export default defineConfig({
+type ViteConfig = UserConfig & { test: InlineConfig };
+
+const config: ViteConfig = {
   plugins: [react()],
   resolve: {
     alias: {
@@ -40,4 +42,7 @@ export default defineConfig({
     },
     setupFiles: ['./vitest.setup.ts'],
   },
-});
+};
+
+// https://vite.dev/config/
+export default defineConfig(config);

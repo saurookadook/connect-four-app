@@ -10,11 +10,8 @@
             "@/*": ["./src/*"],
             "@ConnectFour/*": ["./src/pages/ConnectFour/*"]
         },
-        "typeRoots": ["./node_modules/@types", "./node_modules/@testing-library"],
-        "types": [
-            // "vitest/jsdom",
-            "jest-dom"
-        ]
+        "typeRoots": ["../node_modules/@types", "./node_modules/@types"]
     },
-    "include": ["src"]
+    "include": ["src"],
+    "exclude": ["**/*.test.{ts,tsx}", "**/testUtils.ts"]
 }

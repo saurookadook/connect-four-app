@@ -6,7 +6,11 @@
         "target": "ES2022",
         "lib": ["ES2023"],
         "module": "ESNext",
-        "typeRoots": ["./node_modules/@types", "./node_modules/@testing-library"],
+        "typeRoots": [
+            "../node_modules/@types",
+            "../node_modules/@testing-library",
+            "./node_modules/@types"
+        ],
         "types": ["vitest", "jest-dom"]
     },
     "include": ["vite.config.ts"]

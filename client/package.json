@@ -3,7 +3,8 @@
     "version": "0.0.0",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
+        "tsc:build": "tsc --project ./tsconfig.json",
+        "build": "yarn tsc:build && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
         "start:dev": "vite build && pnpm vite",
