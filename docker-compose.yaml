@@ -16,6 +16,8 @@ services:
     depends_on:
       - server
     env_file: .env
+    ports:
+      - '5173:5173'
     volumes:
       - /opt/connect-four-app/node_modules
       - ./client:/opt/connect-four-app/client
@@ -47,7 +49,10 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./nginx-reverse-proxy/conf/:/etc/nginx/conf.d/:ro
-      - ./nginx-reverse-proxy/certs:/etc/nginx/certs
+      - ./nginx-reverse-proxy/certs/:/etc/nginx/ssl/
+      # Assets to be served by NGINX
+      - ./client/dist/:/etc/nginx/html/
+      - ./client/index.html/:/etc/nginx/html/index.html
 
   server:
     build:

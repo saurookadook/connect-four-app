@@ -7,7 +7,7 @@
         "build": "yarn tsc:build && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
-        "start:dev": "vite build && pnpm vite",
+        "start:dev": "vite build && yarn dev",
         "test": "vitest --watch=false",
         "test:w": "vitest --watchAll",
         "test:cov": "vitest --coverage"

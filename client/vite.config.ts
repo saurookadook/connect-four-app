@@ -11,6 +11,9 @@ const { SERVER_PORT } = process.env;
 type ViteConfig = UserConfig & { test: InlineConfig };
 
 const config: ViteConfig = {
+  build: {
+    manifest: true,
+  },
   plugins: [react()],
   resolve: {
     alias: {
@@ -19,15 +22,24 @@ const config: ViteConfig = {
     },
   },
   server: {
+    allowedHosts: ['app.connect-four.dev'],
+    // https: {
+    //   cert: fs.readFileSync('../certs/app.connect-four.dev+4.pem'),
+    //   key: fs.readFileSync('../certs/app.connect-four.dev+4-key.pem'),
+    // },
+    host: true,
     proxy: {
       '/api': {
-        target: `http://localhost:${SERVER_PORT}`,
+        target: `http://server:${SERVER_PORT}`,
       },
       '/connect-ws': {
-        target: 'ws://localhost:8090',
+        target: 'ws://server:8090',
         ws: true,
         rewrite: (path) => path.replace(/^\/connect-ws/, ''),
       },
+    },
+    watch: {
+      usePolling: true,
     },
   },
   test: {
