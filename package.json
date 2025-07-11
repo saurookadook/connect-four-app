@@ -23,7 +23,9 @@
     "all:build": "yarn all:base run build",
     "all:start:dev": "yarn all:base run start:dev",
     "client:base": "yarn workspace @connect-four-app/client",
-    "server:base": "yarn workspace @connect-four-app/server"
+    "client:test": "yarn client:base test",
+    "server:base": "yarn workspace @connect-four-app/server",
+    "server:test": "yarn server:base test"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -23,21 +23,17 @@ const config: ViteConfig = {
   },
   server: {
     allowedHosts: ['app.connect-four.dev'],
-    // https: {
-    //   cert: fs.readFileSync('../certs/app.connect-four.dev+4.pem'),
-    //   key: fs.readFileSync('../certs/app.connect-four.dev+4-key.pem'),
-    // },
     host: true,
-    proxy: {
-      '/api': {
-        target: `http://server:${SERVER_PORT}`,
-      },
-      '/connect-ws': {
-        target: 'ws://server:8090',
-        ws: true,
-        rewrite: (path) => path.replace(/^\/connect-ws/, ''),
-      },
-    },
+    // proxy: {
+    //   '/api': {
+    //     target: `http://server:${SERVER_PORT}`,
+    //   },
+    //   '/connect-ws': {
+    //     target: 'ws://server:8090',
+    //     ws: true,
+    //     rewrite: (path) => path.replace(/^\/connect-ws/, ''),
+    //   },
+    // },
     watch: {
       usePolling: true,
     },
