@@ -1,4 +1,5 @@
 import { UUID } from 'node:crypto';
+import { inspect } from 'node:util';
 import { Injectable } from '@nestjs/common';
 import {
   MessageBody,
@@ -9,7 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { from, type Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Server } from 'ws';
+import { WebSocket, Server } from 'ws';
 
 import {
   PlayerMove,
@@ -26,7 +27,7 @@ const WS_PORT = parseInt(process.env.WS_PORT || '8090', 10);
 @Injectable()
 @WebSocketGateway(WS_PORT)
 export class GameEventsGateway {
-  #loggingEnabled = false;
+  #loggingEnabled = true;
 
   constructor(private readonly gameEngineService: GameEngineService) {}
 
@@ -34,17 +35,38 @@ export class GameEventsGateway {
   server: Server;
 
   // TODO: just temp for testing with frontend
-  @SubscribeMessage('health-check')
-  onTestEvent(@MessageBody('message') message: string) {
-    console.log(
+  @SubscribeMessage('broadcast-test')
+  onBroadcastTestEvent(@MessageBody('message') message: string) {
+    this._log(
       '='.repeat(160),
       '\n',
       `    [GameEventsGateway.onTestEvent] Message received: '${message}'`,
       '\n',
+      inspect(
+        { clients: this.server.clients },
+        { colors: true, compact: false, depth: 1, showHidden: true },
+      ),
+      '\n',
       '='.repeat(160),
     );
 
-    return '[server] Hello, world!';
+    this.server.clients.forEach((client, socket, wsSet) => {
+      this._log(
+        '?'.repeat(160),
+        '\n',
+        `    [GameEventsGateway.onTestEvent] 'clients.forEach' callback`,
+        '\n',
+        inspect(
+          { client, socket, wsSet },
+          { colors: true, compact: false, depth: 1, showHidden: true },
+        ),
+        '\n',
+        '?'.repeat(160),
+      );
+      if (client.readyState === WebSocket.OPEN) {
+        client.send('[server] Hello, world!');
+      }
+    });
   }
 
   @SubscribeMessage(START_GAME)
