@@ -3,6 +3,7 @@ export const RESET_GAME = 'RESET_GAME';
 export const START_GAME = 'START_GAME';
 export const MAKE_MOVE = 'MAKE_MOVE';
 export const SET_ACTIVE_PLAYER = 'SET_ACTIVE_PLAYER';
+export const SET_GAME_SESSION_ID = 'SET_GAME_SESSION_ID';
 
 // game-session-history
 export const REQUEST_ALL_GAME_SESSIONS = 'REQUEST_ALL_GAME_SESSIONS';
@@ -24,3 +25,4 @@ export const SEND_MESSAGE = 'SEND_MESSAGE';
 // player
 export const REGISTER_NEW_PLAYER = 'REGISTER_NEW_PLAYER';
 export const LOG_IN_PLAYER = 'LOG_IN_PLAYER';
+export const SET_PLAYER_ID = 'SET_PLAYER_ID';
