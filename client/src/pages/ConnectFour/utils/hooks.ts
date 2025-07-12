@@ -1,19 +1,21 @@
-import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useEffect } from 'react';
 
+import { AppDispatch } from '@/store';
+import { setGameSessionID, setPlayerID } from '@/store/actions';
 import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '../constants';
 
-type SetStateFunction = Dispatch<SetStateAction<string | null>>;
-
+/**
+ * @todo Should create a LOAD_GAME action type that will update
+ * both state slices accordingly
+ */
 export function useLoadGame({
-  gameSessionID, // force formatting
-  setGameSessionID,
+  dispatch, // force formatting
+  gameSessionID,
   playerID,
-  setPlayerID,
 }: {
+  dispatch: AppDispatch;
   gameSessionID: string | null;
-  setGameSessionID: SetStateFunction;
   playerID: string | null;
-  setPlayerID: SetStateFunction;
 }) {
   useEffect(() => {
     if (playerID != null) {
@@ -24,9 +26,9 @@ export function useLoadGame({
 
     if (storedPlayerDetails != null) {
       const parsedDetails = JSON.parse(storedPlayerDetails);
-      setPlayerID(parsedDetails.playerID);
+      setPlayerID({ dispatch, playerID: parsedDetails.playerID });
     }
-  }, [playerID, setPlayerID]);
+  }, [dispatch, playerID]);
 
   useEffect(() => {
     if (gameSessionID != null) {
@@ -37,13 +39,7 @@ export function useLoadGame({
 
     if (storedGameSession != null) {
       const parsedDetails = JSON.parse(storedGameSession);
-      setGameSessionID(parsedDetails.id);
-    } else {
-      // TODO: remove this once session endpoints are hooked up
-      const newGameSessionID = window.crypto.randomUUID();
-      const stringifiedDetails = JSON.stringify({ id: newGameSessionID });
-      window.localStorage.setItem(GAME_SESSION_LS_KEY, stringifiedDetails);
-      setGameSessionID(newGameSessionID);
+      setGameSessionID({ dispatch, gameSessionID: parsedDetails.id });
     }
-  }, [gameSessionID, setGameSessionID]);
+  }, [dispatch, gameSessionID]);
 }
