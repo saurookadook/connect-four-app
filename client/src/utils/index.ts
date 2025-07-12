@@ -10,7 +10,7 @@ class WebSocketManager {
     this.#ws = null;
   }
 
-  initializeConnection() {
+  initializeConnection(): WebSocketManager {
     try {
       const wsConn = this.getOpenWSConn();
 
@@ -32,6 +32,8 @@ class WebSocketManager {
     } catch (error: unknown) {
       console.error('ERROR creating WebSocket instance', error);
     }
+
+    return this;
   }
 
   getOpenWSConn(): WebSocket {

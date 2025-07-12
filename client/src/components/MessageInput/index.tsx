@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 
 import { setSendMessage } from '@/store/actions';
 import { useAppStore } from '@/store';
-import { ws } from '@/utils';
+import { wsManager } from '@/utils';
 import type { Message } from '@/types/main';
 
 export function MessageInput() {
   const { appDispatch } = useAppStore();
   const [messageContent, setMessageContent] = useState('');
+
+  const ws = wsManager.getOpenWSConn();
 
   function handleSubmit(
     event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,

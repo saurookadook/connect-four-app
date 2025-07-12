@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { FlexColumn, FlexRow } from '@/layouts';
 import { useAppStore } from '@/store';
-import { ws } from '@/utils';
+import { wsManager } from '@/utils';
 import { Board } from '@ConnectFour/components';
 import { useLoadGame } from '@ConnectFour/utils/hooks';
 import './styles.css';
@@ -15,11 +15,20 @@ export function ConnectFour() {
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
-      // console.log('    [WebSocket] Receiving message!     '.padStart(60, '-').padEnd(120, '-'));
-      // console.log('\n');
-      console.log({ event });
-      // console.log('\n');
-      const messageData = JSON.parse(event.data);
+      console.log(
+        '    [wsMessageHandler] Receiving message!     '.padStart(60, '-').padEnd(120, '-'),
+        '\n',
+        { event, eventData: event.data },
+        '\n',
+        '-'.repeat(120),
+      );
+      const messageData = (() => {
+        try {
+          return JSON.parse(event.data);
+        } catch {
+          return event.data;
+        }
+      })();
       // setReceiveMessage({ dispatch: appDispatch, receivedMessage: messageData });
       setWsData((prevData) => [...prevData, messageData]);
     },
@@ -28,9 +37,9 @@ export function ConnectFour() {
   );
 
   function handleSendMessage() {
-    ws.send(
+    wsManager.getOpenWSConn().send(
       JSON.stringify({
-        event: 'health-check',
+        event: 'broadcast-test',
         data: {
           message: '[client] Hello, world!',
         },
@@ -46,10 +55,12 @@ export function ConnectFour() {
   });
 
   useEffect(() => {
-    ws.addEventListener('message', wsMessageHandler);
+    wsManager.initializeConnection();
+    wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
 
     return () => {
-      ws.removeEventListener('message', wsMessageHandler);
+      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
+      wsManager.closeWSConn();
     };
   }, [wsMessageHandler]);
 
