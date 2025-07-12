@@ -9,9 +9,12 @@ import './styles.css';
 
 export function ConnectFour() {
   const { appState, appDispatch } = useAppStore();
-  const [gameSessionID, setGameSessionID] = useState<string | null>(null);
-  const [playerID, setPlayerID] = useState<string | null>(null);
   const [wsData, setWsData] = useState<unknown[]>([]);
+
+  const {
+    connectFour: { gameSessionID },
+    player: { playerID },
+  } = appState;
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
@@ -48,10 +51,9 @@ export function ConnectFour() {
   }
 
   useLoadGame({
+    dispatch: appDispatch,
     gameSessionID,
-    setGameSessionID,
     playerID,
-    setPlayerID,
   });
 
   useEffect(() => {
@@ -67,7 +69,18 @@ export function ConnectFour() {
   return (
     <section id="connect-four">
       <h2>{`🔴 ⚫ Connect Four 🔴 ⚫`}</h2>
-      <div>{playerID != null && <span>{`Player ID: ${playerID}`}</span>}</div>
+      <div className="game-session-details">
+        {gameSessionID != null && (
+          <span>
+            <b>Game Session ID</b>: {gameSessionID}
+          </span>
+        )}
+        {playerID != null && (
+          <span>
+            <b>Player ID</b>: {playerID}
+          </span>
+        )}
+      </div>
 
       <button onClick={handleSendMessage}>Send WS Message</button>
 
