@@ -18,7 +18,6 @@ const config: ViteConfig = {
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src/'),
-      '@ConnectFour': path.resolve(__dirname, './src/pages/ConnectFour/'),
     },
   },
   server: {

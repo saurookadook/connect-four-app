@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { FlexColumn, FlexRow } from '@/layouts';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
-import { Board } from '@ConnectFour/components';
-import { useLoadGame } from '@ConnectFour/utils/hooks';
+import { Board } from '@/pages/ConnectFour/components';
+import { useLoadGame } from '@/pages/ConnectFour/utils/hooks';
 import './styles.css';
 
 export function ConnectFour() {

@@ -1,6 +1,6 @@
 import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { PlayerColor } from '@ConnectFour/constants';
+import { PlayerColor } from '@/pages/ConnectFour/constants';
 
 export type ConnectFourStateSlice = {
   activePlayer: PlayerColor;
