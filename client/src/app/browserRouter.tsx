@@ -5,6 +5,7 @@ import {
 
 import { Root } from '@/layouts';
 import {
+  AccountPortal,
   ConnectFour, // force formatting
   GameSessionsHistory,
   Home,
@@ -38,21 +39,21 @@ export const routerConfig: RouteObject[] = [
         label: 'Home',
         element: <Home />,
       },
-      {
-        // TODO: make this page conditionally render Login/Register
-        // or maybe consolidate into auth portal?
-        path: 'login',
-        // @ts-expect-error: I hope this is just temporarily missing
-        label: 'Login',
-        element: <Login />,
-      },
-      {
-        // TODO: make this page conditionally render Login/Register
-        path: 'register',
-        // @ts-expect-error: I hope this is just temporarily missing
-        label: 'Register',
-        element: <Register />,
-      },
+      // {
+      //   // TODO: make this page conditionally render Login/Register
+      //   // or maybe consolidate into auth portal?
+      //   path: 'login',
+      //   // @ts-expect-error: I hope this is just temporarily missing
+      //   label: 'Login',
+      //   element: <Login />,
+      // },
+      // {
+      //   // TODO: make this page conditionally render Login/Register
+      //   path: 'register',
+      //   // @ts-expect-error: I hope this is just temporarily missing
+      //   label: 'Register',
+      //   element: <Register />,
+      // },
       {
         path: 'game-sessions-history',
         // @ts-expect-error: I hope this is just temporarily missing
@@ -64,6 +65,13 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'ConnectFour',
         element: <ConnectFour />,
+      },
+      {
+        // TODO: add dynamic path component?
+        path: 'account',
+        // @ts-expect-error: I hope this is just temporarily missing
+        label: 'Account',
+        element: <AccountPortal />,
       },
     ],
   },
