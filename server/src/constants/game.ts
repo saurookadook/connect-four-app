@@ -10,7 +10,8 @@ export type PlayersTuple = [UUID, UUID];
 
 export type PlayerMove = {
   columnIndex: number;
-  gameSessionID: UUID;
+  /** @note String representation of Mongo `ObjectId` */
+  gameSessionID: string;
   playerID: UUID;
   /** @todo Need to change this to `number` */
   timestamp: Date;
