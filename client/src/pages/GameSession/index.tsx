@@ -3,16 +3,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { FlexColumn, FlexRow } from '@/layouts';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
-import { Board } from '@/pages/ConnectFour/components';
-import { useLoadGame } from '@/pages/ConnectFour/utils/hooks';
+import { Board } from '@/pages/GameSession/components';
+import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import './styles.css';
 
-export function ConnectFour() {
+export function GameSession() {
   const { appState, appDispatch } = useAppStore();
   const [wsData, setWsData] = useState<unknown[]>([]);
 
   const {
-    connectFour: { gameSessionID },
+    gameSession: { activePlayer, gameSessionID },
     player: { playerID },
   } = appState;
 
@@ -96,7 +96,7 @@ export function ConnectFour() {
 
       <FlexRow>
         <FlexColumn id="game-details">
-          <h3>{`Active player: ${appState.connectFour.activePlayer}`}</h3>
+          <h3>{`Active player: ${activePlayer}`}</h3>
         </FlexColumn>
 
         <FlexColumn id="game-board-container">

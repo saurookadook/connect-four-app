@@ -1,0 +1,9 @@
+.game-session-history-item {
+    & .view-session-cta {
+        background-color: #123456;
+        border-radius: 0px;
+        color: #FFEEEE;
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+}

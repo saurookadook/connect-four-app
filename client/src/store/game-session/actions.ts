@@ -1,4 +1,4 @@
-import { PlayerColor } from '@/pages/ConnectFour/constants';
+import { PlayerColor } from '@/pages/GameSession/constants';
 import { RESET_GAME, SET_ACTIVE_PLAYER, SET_GAME_SESSION_ID } from '@/store';
 import type { BaseAction } from '@/types/main';
 

@@ -33,7 +33,7 @@ export function Login() {
         return;
       }
 
-      return navigate('/connect-four');
+      return navigate('/game-sessions-history');
     });
   }
 

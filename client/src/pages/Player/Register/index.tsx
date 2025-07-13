@@ -41,7 +41,7 @@ export function Register() {
         return;
       }
 
-      return navigate('/connect-four');
+      return navigate('/game-sessions-history');
     });
   }
 
