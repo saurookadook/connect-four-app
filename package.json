@@ -18,6 +18,7 @@
   "scripts": {
     "//build:all": "yarn nx run-many -t build",
     "//dep-graph": "yarn nx graph",
+    "dcr": "docker compose run --rm --remove-orphans",
     "all:base": "yarn workspaces foreach --from \"@connect-four-app/{client,server}\" -R -pt",
     "all:install": "yarn all:base install",
     "all:build": "yarn all:base run build",
@@ -25,7 +26,7 @@
     "client:base": "yarn workspace @connect-four-app/client",
     "client:test": "yarn client:base test",
     "server:base": "yarn workspace @connect-four-app/server",
-    "server:test": "yarn server:base test"
+    "server:test": "yarn dcr server-test"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
