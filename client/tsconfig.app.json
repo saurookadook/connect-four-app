@@ -5,12 +5,7 @@
         "target": "ES2020",
         "useDefineForClassFields": true,
         "lib": ["ESNEXT", "DOM", "DOM.Iterable"],
-        "module": "ESNext",
-        "paths": {
-            "@/*": ["./src/*"],
-            "@ConnectFour/*": ["./src/pages/ConnectFour/*"]
-        },
-        "typeRoots": ["../node_modules/@types", "./node_modules/@types"]
+        "module": "ESNext"
     },
     "include": ["src"],
     "exclude": ["**/*.test.{ts,tsx}", "**/testUtils.ts"]

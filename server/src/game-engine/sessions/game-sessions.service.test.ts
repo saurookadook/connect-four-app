@@ -285,19 +285,23 @@ describe('GameSessionsService', () => {
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
       const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
 
+      const initialGameSessionID = initialGameSession._id.toString();
       const updatedMoves = [
         {
           columnIndex: 3,
+          gameSessionID: initialGameSessionID,
           playerID: mockFirstPlayer.playerID,
           timestamp: new Date(),
         },
         {
           columnIndex: 2,
+          gameSessionID: initialGameSessionID,
           playerID: mockSecondPlayer.playerID,
           timestamp: nowPlus30Seconds,
         },
         {
           columnIndex: 3,
+          gameSessionID: initialGameSessionID,
           playerID: mockFirstPlayer.playerID,
           timestamp: nowPlus1Minute,
         },

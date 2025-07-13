@@ -9,6 +9,7 @@ import {
 } from '@/pages/ConnectFour/constants';
 import { setActivePlayer } from '@/store/connect-four/actions';
 import { useAppStore } from '@/store';
+import { wsManager } from '@/utils';
 import './styles.css';
 
 function createEmptyBoard() {
@@ -31,12 +32,24 @@ export function Board() {
   const [board, setBoard] = useState(createEmptyBoard());
 
   const { appState, appDispatch } = useAppStore();
-  const { connectFour } = appState;
+  const { connectFour, player } = appState;
 
   function handleCellClick(cell: Cell) {
     if (cell.state != null) {
       return;
     }
+
+    const message = JSON.stringify({
+      event: 'make-move',
+      data: {
+        columnIndex: cell.column,
+        gameSessionID: connectFour.gameSessionID,
+        playerID: player.playerID,
+        timestamp: Date.now(),
+      },
+    });
+
+    wsManager.getOpenWSConn().send(message);
 
     setActivePlayer({
       dispatch: appDispatch,

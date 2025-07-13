@@ -1,6 +1,6 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER } from '../actionTypes';
+import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
 
 export type PlayerStateSlice = {
   playerID: string | null;
@@ -16,8 +16,8 @@ const playerID: CombinedPlayerStateSlice['playerID'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case REGISTER_NEW_PLAYER:
-        return action.payload.playerID;
       case LOG_IN_PLAYER:
+      case SET_PLAYER_ID:
         return action.payload.playerID;
       default:
         return stateSlice;
