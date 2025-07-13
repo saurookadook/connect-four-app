@@ -1,9 +1,9 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import connectFourReducer, {
-  initialConnectFourStateSlice,
-  type ConnectFourStateSlice,
-} from '@/store/connect-four/reducer';
+import gameSessionReducer, {
+  initialGameSessionStateSlice,
+  type GameSessionStateSlice,
+} from '@/store/game-session/reducer';
 import gameSessionsReducer, {
   initialGameSessionsStateSlice,
   type GameSessionsStateSlice,
@@ -18,7 +18,7 @@ import playerReducer, {
 } from '@/store/player/reducer';
 
 export type AppState = {
-  connectFour: ConnectFourStateSlice;
+  gameSession: GameSessionStateSlice;
   gameSessions: GameSessionsStateSlice;
   messages: MessagesStateSlice;
   player: PlayerStateSlice;
@@ -26,14 +26,14 @@ export type AppState = {
 // & combineReducers.AmbiguousObject;
 
 export const initialAppState = {
-  connectFour: initialConnectFourStateSlice,
+  gameSession: initialGameSessionStateSlice,
   gameSessions: initialGameSessionsStateSlice,
   messages: initialMessagesStateSlice,
   player: initialPlayerStateSlice,
 };
 
 export default combineReducers({
-  connectFour: connectFourReducer,
+  gameSession: gameSessionReducer,
   gameSessions: gameSessionsReducer,
   messages: messagesReducer,
   player: playerReducer,

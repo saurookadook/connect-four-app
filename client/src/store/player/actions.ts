@@ -1,5 +1,5 @@
 import { BASE_API_SERVER_URL } from '@/constants';
-import { PLAYER_DETAILS_LS_KEY } from '@/pages/ConnectFour/constants';
+import { PLAYER_DETAILS_LS_KEY } from '@/pages/GameSession/constants';
 import type { BaseAction } from '@/types/main';
 import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
 

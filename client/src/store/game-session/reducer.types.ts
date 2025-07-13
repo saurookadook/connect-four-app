@@ -1,28 +1,28 @@
 import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { PlayerColor } from '@/pages/ConnectFour/constants';
+import { PlayerColor } from '@/pages/GameSession/constants';
 
-export type ConnectFourStateSlice = {
+export type GameSessionStateSlice = {
   activePlayer: PlayerColor;
   /** @note This should probably be a `UUID` */
   gameSessionID: string | null;
 };
 
-export type ConnectFourPlayerAction = CombineReducers.ReducerAction<{
+export type GameSessionPlayerAction = CombineReducers.ReducerAction<{
   player?: PlayerColor;
 }>;
 
-export type ConnectFourGameSessionAction = CombineReducers.ReducerAction<{
+export type GameSessionGameSessionAction = CombineReducers.ReducerAction<{
   gameSessionID?: string;
 }>;
 
-export type CombinedConnectFourStateSlice = {
+export type CombinedGameSessionStateSlice = {
   activePlayer: CombineReducers.ArgsTuple<
-    ConnectFourStateSlice['activePlayer'],
-    ConnectFourPlayerAction
+    GameSessionStateSlice['activePlayer'],
+    GameSessionPlayerAction
   >;
   gameSessionID: CombineReducers.ArgsTuple<
-    ConnectFourStateSlice['gameSessionID'],
-    ConnectFourGameSessionAction
+    GameSessionStateSlice['gameSessionID'],
+    GameSessionGameSessionAction
   >;
 };
