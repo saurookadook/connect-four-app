@@ -57,14 +57,18 @@ export function ConnectFour() {
   });
 
   useEffect(() => {
-    wsManager.initializeConnection();
+    if (gameSessionID == null || playerID == null || wsManager.ws != null) {
+      return;
+    }
+
+    wsManager.initializeConnection({ gameSessionID, playerID });
     wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
 
     return () => {
       wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
       wsManager.closeWSConn();
     };
-  }, [wsMessageHandler]);
+  }, [gameSessionID, playerID, wsMessageHandler]);
 
   return (
     <section id="connect-four">
