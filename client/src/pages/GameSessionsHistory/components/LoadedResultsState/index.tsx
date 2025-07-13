@@ -1,8 +1,10 @@
 import { Fragment, FragmentProps } from 'react';
+import { Link } from 'react-router-dom';
 
 import { FlexColumn } from '@/layouts';
 import { NoResults } from '..';
 import { GameSessionsItem } from '@/types/main';
+import './styles.css';
 
 export function LoadedResultsState({
   gameSessions,
@@ -19,6 +21,9 @@ export function LoadedResultsState({
               <span>{`Player 1 -- '${playerOneID}'`}</span>
               <span>{`Player 2 -- '${playerTwoID}'`}</span>
               <span>{`Status: ${status}`}</span>
+              <Link className="view-session-cta" to={`/game-session/${id}`}>
+                View Session
+              </Link>
             </FlexColumn>
           );
         })
