@@ -1,8 +1,12 @@
 {
     "compilerOptions": {
         "esModuleInterop": true,
-        "types": ["node", "vitest"],
-        "typeRoots": ["../node_modules/@types", "./node_modules/@types"]
+        "types": ["node", "vitest", "@testing-library/jest-dom"],
+        "typeRoots": [
+            "../node_modules/@types",
+            "../node_modules/@testing-library",
+            "./node_modules/@types"
+        ]
     },
     "files": [],
     "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]

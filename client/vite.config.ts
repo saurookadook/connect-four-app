@@ -38,8 +38,14 @@ const config: ViteConfig = {
     },
   },
   test: {
+    alias: {
+      /* Fixes for module resolutions */
+      '#saurookkadookk/react-utils-render-with-context': path.resolve(
+        __dirname,
+        '../node_modules/@saurookkadookk/react-utils-render-with-context/dist/esm',
+      ),
+    },
     environment: 'jsdom',
-    // globals: true,
     include: [
       '**/*.{test,spec}.{js,jsx,ts,tsx}', // force formatting
       '**/__tests__/**/*.{ts,tsx}',

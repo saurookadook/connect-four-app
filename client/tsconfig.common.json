@@ -18,12 +18,12 @@
         "paths": {
             "@/*": ["./src/*"],
             /* Fixes for module resolutions */
-            "#saurookkadookk/*": ["../node_modules/@saurookkadookk/*"],
-            "#testing-library/*": ["../node_modules/@testing-library/*"]
+            "#saurookkadookk/*": ["../node_modules/@saurookkadookk/*"]
         },
         "typeRoots": [
             "../node_modules/@types",
             "../node_modules/@testing-library",
+            "../node_modules/@saurookkadookk",
             "./node_modules/@types"
         ]
     }

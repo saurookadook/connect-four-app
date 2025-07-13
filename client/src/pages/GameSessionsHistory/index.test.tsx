@@ -6,8 +6,8 @@ import {
   it,
   vi,
 } from 'vitest';
-import renderWithContext from '@saurookkadookk/react-utils-render-with-context';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import renderWithContext from '#saurookkadookk/react-utils-render-with-context';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
