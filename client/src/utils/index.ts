@@ -2,15 +2,28 @@
 type Nullable<T> = T | null;
 
 class WebSocketManager {
-  #WS_CONNECTION_URL: string | URL;
+  #BASE_WS_CONNECTION_URL: string | URL;
+  #gameSessionID: string;
+  #playerID: string;
   #ws: Nullable<WebSocket>;
 
   constructor(connectionURL?: string | URL) {
-    this.#WS_CONNECTION_URL = connectionURL ?? 'ws://localhost:8090/connect-ws';
+    this.#BASE_WS_CONNECTION_URL = connectionURL ?? 'ws://localhost:8090/connect-ws';
+    this.#playerID = '';
+    this.#gameSessionID = '';
     this.#ws = null;
   }
 
-  initializeConnection(): WebSocketManager {
+  initializeConnection({
+    gameSessionID,
+    playerID,
+  }: {
+    gameSessionID: string;
+    playerID: string;
+  }): WebSocketManager {
+    this.#gameSessionID = gameSessionID;
+    this.#playerID = playerID;
+
     try {
       const wsConn = this.getOpenWSConn();
 
@@ -38,7 +51,11 @@ class WebSocketManager {
 
   getOpenWSConn(): WebSocket {
     if (this.#ws == null) {
-      this.#ws = new WebSocket(this.#WS_CONNECTION_URL);
+      const connURL = new URL(this.#BASE_WS_CONNECTION_URL);
+      connURL.searchParams.append('gsID', this.#gameSessionID);
+      connURL.searchParams.append('pID', this.#playerID);
+
+      this.#ws = new WebSocket(connURL);
     }
     return this.#ws;
   }
