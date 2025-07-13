@@ -6,8 +6,8 @@ import {
   PlayerColor,
   BOARD_ROWS,
   BOARD_COLS,
-} from '@/pages/ConnectFour/constants';
-import { setActivePlayer } from '@/store/connect-four/actions';
+} from '@/pages/GameSession/constants';
+import { setActivePlayer } from '@/store/game-session/actions';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
 import './styles.css';
@@ -32,7 +32,7 @@ export function Board() {
   const [board, setBoard] = useState(createEmptyBoard());
 
   const { appState, appDispatch } = useAppStore();
-  const { connectFour, player } = appState;
+  const { gameSession, player } = appState;
 
   function handleCellClick(cell: Cell) {
     if (cell.state != null) {
@@ -43,7 +43,7 @@ export function Board() {
       event: 'make-move',
       data: {
         columnIndex: cell.column,
-        gameSessionID: connectFour.gameSessionID,
+        gameSessionID: gameSession.gameSessionID,
         playerID: player.playerID,
         timestamp: Date.now(),
       },
@@ -53,7 +53,7 @@ export function Board() {
 
     setActivePlayer({
       dispatch: appDispatch,
-      player: connectFour.activePlayer === PlayerColor.RED ? PlayerColor.BLACK : PlayerColor.RED,
+      player: gameSession.activePlayer === PlayerColor.RED ? PlayerColor.BLACK : PlayerColor.RED,
     });
   }
 

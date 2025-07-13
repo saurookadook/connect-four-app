@@ -6,7 +6,7 @@ import {
 import { Root } from '@/layouts';
 import {
   AccountPortal,
-  ConnectFour, // force formatting
+  GameSession, // force formatting
   GameSessionsHistory,
   Home,
   Login,
@@ -61,10 +61,10 @@ export const routerConfig: RouteObject[] = [
         element: <GameSessionsHistory />,
       },
       {
-        path: 'connect-four',
+        path: 'game-session/:sessionID?',
         // @ts-expect-error: I hope this is just temporarily missing
-        label: 'ConnectFour',
-        element: <ConnectFour />,
+        label: 'GameSession',
+        element: <GameSession />,
       },
       {
         // TODO: add dynamic path component?
