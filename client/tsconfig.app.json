@@ -5,7 +5,8 @@
         "target": "ES2020",
         "useDefineForClassFields": true,
         "lib": ["ESNEXT", "DOM", "DOM.Iterable"],
-        "module": "ESNext"
+        "module": "ESNext",
+        "strict": true
     },
     "include": ["src"],
     "exclude": ["**/*.test.{ts,tsx}", "**/testUtils.ts"]

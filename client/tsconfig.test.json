@@ -1,12 +1,15 @@
 {
     "extends": "./tsconfig.common.json",
     "compilerOptions": {
-        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
         "esModuleInterop": true,
         "target": "ES2022",
         "lib": ["ES2023"],
         "module": "ESNext",
+        /* TODO: Figure out how to get this to apply correct in tests */
+        "strictNullChecks": false,
         "types": ["@testing-library", "vitest", "jest-dom"]
     },
-    "include": ["src", "vite.config.ts"]
+    "include": ["src/**/*", "vite.config.ts"],
+    "exclude": []
 }
