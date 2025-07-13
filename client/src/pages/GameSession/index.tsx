@@ -39,17 +39,6 @@ export function GameSession() {
     // [appDispatch],
   );
 
-  function handleSendMessage() {
-    wsManager.getOpenWSConn().send(
-      JSON.stringify({
-        event: 'broadcast-test',
-        data: {
-          message: '[client] Hello, world!',
-        },
-      }),
-    );
-  }
-
   useLoadGame({
     dispatch: appDispatch,
     gameSessionID,
@@ -71,7 +60,7 @@ export function GameSession() {
   }, [gameSessionID, playerID, wsMessageHandler]);
 
   return (
-    <section id="connect-four">
+    <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four 🔴 ⚫`}</h2>
       <div className="game-session-details">
         {gameSessionID != null && (
@@ -86,9 +75,8 @@ export function GameSession() {
         )}
       </div>
 
-      <button onClick={handleSendMessage}>Send WS Message</button>
-
       <div>
+        <h3>WebSocket Event Log</h3>
         <pre>
           <code>{JSON.stringify(wsData, null, 2)}</code>
         </pre>
