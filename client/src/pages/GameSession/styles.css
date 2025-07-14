@@ -29,6 +29,7 @@
 
     & #ws-event-log {
         overflow: scroll;
+        width: 50%;
 
         /* DEBUGGING DISPLAYED JSON */
         & pre {
@@ -36,7 +37,6 @@
             color: initial;
             margin-right: auto;
             margin-left: auto;
-            max-width: fit-content;
             padding: 1rem;
 
             & code {
