@@ -4,6 +4,8 @@ import { GameSessionStatus } from '@/types/main.d';
 import { mockPlayers } from './playerMocks';
 
 type GameSessionMock = {
+  /** @todo This should be a MongoDB `ObjectId` */
+  id: string;
   moves: Record<string, unknown>[];
   playerOneID: UUID;
   playerTwoID: UUID;
@@ -19,7 +21,10 @@ const playerCombinations = [
   [mockPlayers[2].playerID, mockPlayers[1].playerID],
 ];
 
-export function createMockGameSession({ id, ...args }: { id?: UUID } & Partial<GameSessionMock>) {
+export function createMockGameSession({
+  id,
+  ...args
+}: { id?: UUID | string } & Partial<GameSessionMock>) {
   const { playerOneID, playerTwoID } = (function () {
     if (args.playerOneID == null && args.playerTwoID == null) {
       const [firstPlayerCombination] = playerCombinations[0];
@@ -36,7 +41,7 @@ export function createMockGameSession({ id, ...args }: { id?: UUID } & Partial<G
   })();
 
   return {
-    // TODO: this should be a MongoDB `ObjectId`
+    /** @todo This should be a MongoDB `ObjectId` */
     id: id ?? randomUUID(),
     moves: [],
     playerOneID,
