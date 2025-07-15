@@ -5,10 +5,21 @@ import App from './app/App';
 import { AppStateProvider } from './store';
 import './index.css';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+function InitApp() {
+  const enableStrictMode = window.localStorage.getItem('cfStrictMode');
+
+  return enableStrictMode != null && enableStrictMode ? (
+    <StrictMode>
+      <AppStateProvider>
+        <App />
+      </AppStateProvider>
+    </StrictMode>
+  ) : (
     <AppStateProvider>
       <App />
     </AppStateProvider>
-  </StrictMode>,
-);
+  );
+}
+const rootEl = document.getElementById('root') as HTMLElement;
+
+createRoot(rootEl).render(<InitApp />);
