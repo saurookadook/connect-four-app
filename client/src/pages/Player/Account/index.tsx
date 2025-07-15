@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useAppStore } from '@/store';
 import { Login, Register } from '../playerPages';
+import { AppParams } from '@/types/main';
 
 function AccountDetails({
   email,
@@ -31,21 +33,25 @@ function AccountDetails({
 }
 
 function NewPlayerForm() {
-  const [isNewPlayer, setIsNewPlayer] = useState(false);
+  const navigate = useNavigate();
+  const params = useParams<AppParams>();
 
   return (
     <div id="new-player-form">
-      {isNewPlayer ? (
-        <Register />
-      ) : (
+      {/* This feels a little sloppy but ¯\_(ツ)_/¯ */}
+      {params.subPage === 'login' ? (
         <div>
           <Login />
 
           <span>
             {"Don't have an account? "}
-            <button onClick={() => setIsNewPlayer(true)}>{'Register for one here'}</button>
+            <button onClick={() => navigate('/account/register')}>
+              {'Register for one here'}
+            </button>
           </span>
         </div>
+      ) : (
+        <Register />
       )}
     </div>
   );

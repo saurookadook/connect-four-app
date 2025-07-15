@@ -67,8 +67,8 @@ export const routerConfig: RouteObject[] = [
         element: <GameSession />,
       },
       {
-        // TODO: add dynamic path component?
-        path: 'account',
+        // TODO: add dynamic path component? Better name than `subPage`?
+        path: 'account/:subPage',
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'Account',
         element: <AccountPortal />,

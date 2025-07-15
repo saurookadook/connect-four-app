@@ -24,4 +24,9 @@ export type GameSessionsItem = {
   playerTwoID: string;
 };
 
-export type RouterParams = ReturnType<typeof useParams<{ gameSessionID?: string }>>;
+export type AppParams = {
+  gameSessionID?: string;
+  subPage?: string;
+};
+
+export type RouterParams = ReturnType<typeof useParams<AppParams>>;
