@@ -1,3 +1,23 @@
+/****************************************************************
+Normalize
+****************************************************************/
+dl {
+    margin-block-start: 0rem;
+    margin-block-end: 0rem;
+    text-align: left;
+
+    & dt {
+        font-weight: 500;
+    }
+
+    & dd {
+        margin-bottom: 0.25rem;
+    }
+}
+
+/****************************************************************
+Global
+****************************************************************/
 :root {
   background-color: #242424;
   color-scheme: light dark;
@@ -9,6 +29,9 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --black: #000000;
+  --white: #FFFFFF;
 
   --butterfly-blue-fill: #38ACEC;
   --butterfly-blue-fill-0\.5: rgb(56 172 236 / 0.5);

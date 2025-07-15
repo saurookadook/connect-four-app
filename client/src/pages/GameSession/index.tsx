@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { LoadingState } from '@/components';
@@ -15,7 +15,13 @@ export function GameSession() {
   const params = useParams<{ gameSessionID?: string }>();
 
   const {
-    gameSession: { gameSessionRequestInProgress, activePlayer, gameSessionID },
+    gameSession: {
+      gameSessionRequestInProgress,
+      activePlayer,
+      gameSessionID,
+      playerOneID,
+      playerTwoID,
+    },
     player: { playerID },
   } = appState;
 
@@ -78,6 +84,19 @@ export function GameSession() {
       <FlexRow>
         <FlexColumn id="game-details">
           <h3>{`Active player: ${activePlayer}`}</h3>
+          <dl>
+            <span>
+              <b>Players</b>
+            </span>
+            {[playerOneID, playerTwoID].map((playerID, index) => {
+              return (
+                <Fragment key={playerID}>
+                  <dt>{`Player ${index === 0 ? 'One' : 'Two'}`}</dt>
+                  <dd>{playerID}</dd>
+                </Fragment>
+              );
+            })}
+          </dl>
         </FlexColumn>
 
         <FlexColumn id="game-board-container">

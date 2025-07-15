@@ -50,6 +50,17 @@
 #game-details {
     align-items: flex-start;
     max-width: 30%;
+    row-gap: 0.5rem;
+
+    & h3 {
+        margin: 0;
+    }
+
+    & dl span {
+        border-bottom: 1px solid var(--black);
+        display: block;
+        font-size: 1.125rem;
+    }
 }
 
 #game-board-container {
