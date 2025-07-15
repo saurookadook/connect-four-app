@@ -10,7 +10,7 @@ import {
 } from '../testUtils';
 
 function LoginWithRouter() {
-  return <WithMemoryRouter initialEntries={['/login']} />;
+  return <WithMemoryRouter initialEntries={['/account/login']} />;
 }
 
 describe('Login Page', () => {
@@ -65,7 +65,7 @@ describe('Login Page', () => {
 
       let connectFourPage;
       await waitFor(() => {
-        connectFourPage = container.querySelector('section#connect-four');
+        connectFourPage = container.querySelector('section#game-sessions-history');
         expect(connectFourPage).not.toBeNull();
       });
 
@@ -73,7 +73,9 @@ describe('Login Page', () => {
     });
 
     it('handles unregistered player', async () => {
-      const consoleErrorSpy = vi.spyOn(console, 'error');
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation((...args) => args);
       const user = userEvent.setup();
       render(<LoginWithRouter />);
 
@@ -97,7 +99,9 @@ describe('Login Page', () => {
       fireEvent.submit(formEl);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Login failed: Invalid username or password.');
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          'Login failed: Invalid username or password.',
+        );
       });
     });
   });

@@ -17,7 +17,7 @@ import {
 } from '../testUtils';
 
 function RegisterWithRouter() {
-  return <WithMemoryRouter initialEntries={['/register']} />;
+  return <WithMemoryRouter initialEntries={['/account/register']} />;
 }
 
 describe('Register Page', () => {
@@ -80,7 +80,7 @@ describe('Register Page', () => {
 
       let connectFourPage;
       await waitFor(() => {
-        connectFourPage = container.querySelector('section#connect-four');
+        connectFourPage = container.querySelector('section#game-sessions-history');
         expect(connectFourPage).not.toBeNull();
       });
 
