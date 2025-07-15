@@ -3,7 +3,7 @@ import { randomUUID, type UUID } from 'crypto';
 import { GameSessionStatus } from '@/types/main.d';
 import { mockPlayers } from './playerMocks';
 
-type GameSessionMock = {
+export type GameSessionMock = {
   /** @todo This should be a MongoDB `ObjectId` */
   id: string;
   moves: Record<string, unknown>[];

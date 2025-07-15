@@ -71,7 +71,8 @@ async function handleAuthRequest({
 
     if (!response.ok) {
       throw new Error(
-        response.statusText || `Unkonwn error handling auth request to '${requestPath}'`,
+        response.statusText ||
+          `Unkonwn error handling auth request to '${requestPath}'`,
       );
     }
 
