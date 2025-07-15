@@ -90,10 +90,12 @@ export function GameSession() {
             </span>
             {[playerOneID, playerTwoID].map((playerID, index) => {
               return (
-                <Fragment key={playerID}>
-                  <dt>{`Player ${index === 0 ? 'One' : 'Two'}`}</dt>
-                  <dd>{playerID}</dd>
-                </Fragment>
+                playerID != null && (
+                  <Fragment key={playerID}>
+                    <dt>{`Player ${index === 0 ? 'One' : 'Two'}`}</dt>
+                    <dd>{playerID}</dd>
+                  </Fragment>
+                )
               );
             })}
           </dl>
