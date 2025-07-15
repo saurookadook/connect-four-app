@@ -1,11 +1,18 @@
 import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
 import { PlayerColor } from '@/pages/GameSession/constants';
+import { GameSessionStatus } from '@/types/main';
 
 export type GameSessionStateSlice = {
+  gameSessionRequestInProgress: boolean;
   activePlayer: PlayerColor;
-  /** @note This should probably be a `UUID` */
+  /** @note This should be a Mongo `ObjectId` */
   gameSessionID: string | null;
+  /* TODO: fix this type later */
+  moves: unknown[];
+  playerOneID: string | null;
+  playerTwoID: string | null;
+  status: GameSessionStatus;
 };
 
 export type GameSessionPlayerAction = CombineReducers.ReducerAction<{
@@ -13,7 +20,12 @@ export type GameSessionPlayerAction = CombineReducers.ReducerAction<{
 }>;
 
 export type GameSessionGameSessionAction = CombineReducers.ReducerAction<{
-  gameSessionID?: string;
+  gameSessionID?: GameSessionStateSlice['gameSessionID'];
+  moves?: GameSessionStateSlice['moves'];
+  player?: PlayerColor;
+  playerOneID?: GameSessionStateSlice['playerOneID'];
+  playerTwoID?: GameSessionStateSlice['playerTwoID'];
+  status?: GameSessionStateSlice['status'];
 }>;
 
 export type CombinedGameSessionStateSlice = {
@@ -23,6 +35,26 @@ export type CombinedGameSessionStateSlice = {
   >;
   gameSessionID: CombineReducers.ArgsTuple<
     GameSessionStateSlice['gameSessionID'],
+    GameSessionGameSessionAction
+  >;
+  gameSessionRequestInProgress: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['gameSessionRequestInProgress'],
+    GameSessionGameSessionAction
+  >;
+  moves: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['moves'], // force formatting
+    GameSessionGameSessionAction
+  >;
+  playerOneID: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['playerOneID'],
+    GameSessionGameSessionAction
+  >;
+  playerTwoID: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['playerTwoID'],
+    GameSessionGameSessionAction
+  >;
+  status: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['status'], // force formatting
     GameSessionGameSessionAction
   >;
 };
