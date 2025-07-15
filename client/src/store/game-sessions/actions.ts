@@ -1,29 +1,19 @@
-import { BASE_API_SERVER_URL } from '@/constants';
 import {
   REQUEST_ALL_GAME_SESSIONS,
   REQUEST_GAME_SESSIONS_HISTORY,
   SET_ALL_GAME_SESSIONS,
   SET_GAME_SESSIONS_HISTORY,
 } from '@/store';
-import type { BaseAction, GameSessionsItem } from '@/types/main';
+import type { BaseAction, BoundThis, GameSessionsItem } from '@/types/main';
+import { safeFetch } from '@/utils/safeFetch';
 
-export async function fetchAllGameSessions({ dispatch }: BaseAction) {
+async function $fetchAllGameSessions(this: BoundThis, { dispatch }: BaseAction) {
   dispatch({ type: REQUEST_ALL_GAME_SESSIONS });
 
-  let responseData = null;
-
-  try {
-    const requestURL = new URL('/api/game-sessions/all', BASE_API_SERVER_URL);
-    const response = await fetch(requestURL, { method: 'GET' });
-
-    if (!response.ok || response.status >= 400) {
-      throw new Error(`[ERROR ${response.status}] Failed to fetch game sessions`);
-    }
-
-    responseData = await response.json();
-  } catch (error) {
-    console.error(error);
-  }
+  const responseData = await safeFetch.call(this, {
+    requestPathname: '/api/game-sessions/all',
+    fetchOpts: { method: 'GET' },
+  });
 
   return setAllGameSessions({
     dispatch,
@@ -33,29 +23,23 @@ export async function fetchAllGameSessions({ dispatch }: BaseAction) {
   });
 }
 
-export async function fetchGameSessionsHistory({
-  dispatch, // force formatting
-  playerID,
-}: BaseAction & { playerID: string | null }) {
+export const fetchAllGameSessions = $fetchAllGameSessions.bind({
+  name: $fetchAllGameSessions.name,
+});
+
+async function $fetchGameSessionsHistory(
+  this: BoundThis,
+  {
+    dispatch, // force formatting
+    playerID,
+  }: BaseAction & { playerID: string | null },
+) {
   dispatch({ type: REQUEST_GAME_SESSIONS_HISTORY });
 
-  let responseData = null;
-
-  try {
-    const requestURL = new URL(
-      `/api/game-sessions/history/${playerID}`, // force formatting
-      BASE_API_SERVER_URL,
-    );
-    const response = await fetch(requestURL, { method: 'GET' });
-
-    if (!response.ok || response.status >= 400) {
-      throw new Error(`[ERROR ${response.status}] Failed to fetch game session history`);
-    }
-
-    responseData = await response.json();
-  } catch (error) {
-    console.error(error);
-  }
+  const responseData = await safeFetch.call(this, {
+    requestPathname: `/api/game-sessions/history/${playerID}`, // force formatting
+    fetchOpts: { method: 'GET' },
+  });
 
   return setGameSessionsHistory({
     dispatch,
@@ -64,6 +48,10 @@ export async function fetchGameSessionsHistory({
     },
   });
 }
+
+export const fetchGameSessionsHistory = $fetchGameSessionsHistory.bind({
+  name: $fetchGameSessionsHistory.name,
+});
 
 export function setAllGameSessions({
   dispatch, // force formatting

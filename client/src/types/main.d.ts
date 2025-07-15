@@ -1,5 +1,11 @@
 import { AppDispatch } from '@/store';
 
+export type Nullable<T> = T | null;
+
+export type BoundThis = {
+  name: string;
+};
+
 export type Message = {
   content: string;
   id: string;
