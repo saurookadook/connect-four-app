@@ -9,9 +9,11 @@ export async function safeFetch(
   {
     requestPathname,
     fetchOpts,
+    onErrorCallback,
   }: {
     requestPathname: string;
     fetchOpts: RequestInit;
+    onErrorCallback?: () => void;
   },
 ) {
   const funcName = this.name
@@ -26,10 +28,15 @@ export async function safeFetch(
 
     if (!response.ok || response.status >= 400) {
       // other pattern: /(?:\S\+)?([A-Z])/g
-      const explanationFromFuncName = funcName.replace(/[A-Z]+/g, function (match, offset) {
-        return (offset > 0 ? ' ' : '') + match.toLowerCase();
-      });
-      throw new Error(`[ERROR ${response.status}] Failed to ${explanationFromFuncName}`);
+      const explanationFromFuncName = funcName.replace(
+        /[A-Z]+/g,
+        function (match, offset) {
+          return (offset > 0 ? ' ' : '') + match.toLowerCase();
+        },
+      );
+      throw new Error(
+        `[ERROR ${response.status}] Failed to ${explanationFromFuncName}`,
+      );
     }
 
     responseData = await response.json();
