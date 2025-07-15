@@ -5,7 +5,7 @@ export default {
   bracketSameLine: false,
   multilineArraysWrapThreshold: 2,
   plugins: plugins,
-  printWidth: 100,
+  printWidth: 88,
   proseWrap: 'always',
   semi: true,
   singleQuote: true,

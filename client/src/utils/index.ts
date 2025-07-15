@@ -29,7 +29,9 @@ class WebSocketManager {
 
       wsConn.addEventListener('open', (event) => {
         console.log(
-          '    [WebSocket] Opening WebSocket connection    '.padStart(60, '-').padEnd(120, '-'),
+          '    [WebSocket] Opening WebSocket connection    '
+            .padStart(60, '-')
+            .padEnd(120, '-'),
         );
         console.log('\n');
         console.log({ event });
@@ -37,7 +39,9 @@ class WebSocketManager {
       });
 
       wsConn.addEventListener('message', (event) => {
-        console.log('    [WebSocket] Receiving message!     '.padStart(60, '-').padEnd(120, '-'));
+        console.log(
+          '    [WebSocket] Receiving message!     '.padStart(60, '-').padEnd(120, '-'),
+        );
         console.log('\n');
         console.log({ event });
         console.log('\n');
@@ -63,10 +67,13 @@ class WebSocketManager {
   closeWSConn() {
     if (
       this.#ws != null &&
-      (this.#ws.readyState === this.#ws.OPEN || this.#ws.readyState === this.#ws.CONNECTING)
+      (this.#ws.readyState === this.#ws.OPEN ||
+        this.#ws.readyState === this.#ws.CONNECTING)
     ) {
       console.log(
-        '    [WebSocket] Closing WebSocket connection    '.padStart(60, '-').padEnd(120, '-'),
+        '    [WebSocket] Closing WebSocket connection    '
+          .padStart(60, '-')
+          .padEnd(120, '-'),
       );
       this.#ws.close();
       this.#ws = null;
@@ -82,4 +89,6 @@ const wsManager = new WebSocketManager();
 
 export { wsManager };
 export * from './deeplyMerge';
+export * from './safeFetch';
+export * from './safeParseJson';
 export * from './typeGuards';

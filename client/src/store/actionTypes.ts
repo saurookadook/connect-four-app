@@ -1,4 +1,6 @@
 // connect-four
+export const REQUEST_GAME_SESSION = 'REQUEST_GAME_SESSION';
+export const SET_GAME_SESSION = 'SET_GAME_SESSION';
 export const RESET_GAME = 'RESET_GAME';
 export const START_GAME = 'START_GAME';
 export const MAKE_MOVE = 'MAKE_MOVE';

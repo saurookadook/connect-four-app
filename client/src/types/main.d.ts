@@ -1,10 +1,9 @@
 import { AppDispatch } from '@/store';
 
-export type Message = {
-  content: string;
-  id: string;
-  sender: 'client' | 'server';
-  timestamp: number;
+export type Nullable<T> = T | null;
+
+export type BoundThis = {
+  name: string;
 };
 
 export type BaseAction = {
@@ -24,3 +23,5 @@ export type GameSessionsItem = {
   playerOneID: string;
   playerTwoID: string;
 };
+
+export type RouterParams = ReturnType<typeof useParams<{ gameSessionID?: string }>>;

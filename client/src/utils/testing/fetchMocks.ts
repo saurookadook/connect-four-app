@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { vi } from 'vitest';
 
 import { allGameSessionsMock } from '@/__mocks__/gameSessionsMocks';
@@ -18,6 +19,9 @@ function handleGetRequest(url: string, options: RequestInit) {
   //   url,
   //   options,
   // });
+  const urlObj = new URL(url);
+  const gameSessionID = urlObj.pathname.replace(/^\/api\/game-sessions\//, '');
+
   let responseData;
 
   switch (url) {
@@ -25,6 +29,22 @@ function handleGetRequest(url: string, options: RequestInit) {
       responseData = {
         sessions: [...allGameSessionsMock],
       };
+      break;
+    case `${BASE_API_SERVER_URL}/api/game-sessions/${gameSessionID}`:
+      const foundGameSession = allGameSessionsMock.find(
+        (gameSession) => gameSession.id === gameSessionID,
+      );
+
+      responseData =
+        foundGameSession != null
+          ? {
+              session: foundGameSession,
+            }
+          : {
+              message: `[handlePostRequest] [GameSessionsController.getGameSession] : Could not find 'game-session' with ID '${gameSessionID}'.`,
+              status: 404,
+            };
+
       break;
     default:
       responseData = {
@@ -49,7 +69,10 @@ function handlePostRequest(url: string, options: RequestInit) {
 
   switch (url) {
     case `${BASE_API_SERVER_URL}/api/auth/register`:
-      playerDetails = findPlayerByUsernameAndPassword(jsonBody.username, jsonBody.password);
+      playerDetails = findPlayerByUsernameAndPassword(
+        jsonBody.username,
+        jsonBody.password,
+      );
       if (playerDetails) {
         responseData = {
           message: 'Registration successful!',
@@ -64,7 +87,10 @@ function handlePostRequest(url: string, options: RequestInit) {
       }
       break;
     case `${BASE_API_SERVER_URL}/api/auth/login`:
-      playerDetails = findPlayerByUsernameAndPassword(jsonBody.username, jsonBody.password);
+      playerDetails = findPlayerByUsernameAndPassword(
+        jsonBody.username,
+        jsonBody.password,
+      );
       if (playerDetails) {
         responseData = {
           message: 'Login successful!',

@@ -34,7 +34,11 @@ const allPaginated: CombinedGameSessionsStateSlice['allPaginated'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case SET_ALL_GAME_SESSIONS:
-        return action.payload?.gameSessions?.allPaginated || [];
+        const nonNullStateSlice = stateSlice ?? [];
+        const { allPaginated } = action.payload?.gameSessions || {};
+        return allPaginated?.length > 0
+          ? [...allPaginated, nonNullStateSlice]
+          : nonNullStateSlice;
       default:
         return stateSlice;
     }
@@ -61,7 +65,8 @@ const playerHistory: CombinedGameSessionsStateSlice['playerHistory'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case SET_GAME_SESSIONS_HISTORY:
-        return action.payload?.gameSessions?.playerHisory || [];
+        const { playerHistory } = action.payload?.gameSessions || {};
+        return playerHistory?.length > 0 ? [...playerHistory] : [];
       default:
         return stateSlice;
     }

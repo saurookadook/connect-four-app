@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 
 import { AppDispatch } from '@/store';
-import { setGameSessionID, setPlayerID } from '@/store/actions';
+import { fetchGameSession, setPlayerID } from '@/store/actions';
+import { Nullable, RouterParams } from '@/types/main';
 import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '../constants';
 
 /**
@@ -10,10 +11,12 @@ import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '../constants';
  */
 export function useLoadGame({
   dispatch, // force formatting
+  params,
   gameSessionID,
   playerID,
 }: {
   dispatch: AppDispatch;
+  params: RouterParams;
   gameSessionID: string | null;
   playerID: string | null;
 }) {
@@ -22,6 +25,7 @@ export function useLoadGame({
       return;
     }
 
+    // TODO: should something else happen if `playerID` is null?
     const storedPlayerDetails = window.localStorage.getItem(PLAYER_DETAILS_LS_KEY);
 
     if (storedPlayerDetails != null) {
@@ -31,15 +35,37 @@ export function useLoadGame({
   }, [dispatch, playerID]);
 
   useEffect(() => {
-    if (gameSessionID != null) {
+    if (isCurrentGameSessionLoaded(gameSessionID, params)) {
       return;
     }
 
-    const storedGameSession = window.localStorage.getItem(GAME_SESSION_LS_KEY);
+    console.log({
+      name: 'loadGame',
+      params,
+    });
 
-    if (storedGameSession != null) {
-      const parsedDetails = JSON.parse(storedGameSession);
-      setGameSessionID({ dispatch, gameSessionID: parsedDetails.id });
+    if (typeof params.gameSessionID === 'string') {
+      fetchGameSession({ dispatch, gameSessionID: params.gameSessionID });
+    } else {
+      console.warn("Parameter 'gameSessionID' missing from params object!");
     }
-  }, [dispatch, gameSessionID]);
+
+    // const storedGameSession = window.localStorage.getItem(GAME_SESSION_LS_KEY);
+
+    // if (storedGameSession != null) {
+    //   const parsedDetails = JSON.parse(storedGameSession);
+    //   setGameSessionID({ dispatch, gameSessionID: parsedDetails.id });
+    // }
+  }, [dispatch, params, gameSessionID]);
+}
+
+function isCurrentGameSessionLoaded(
+  gameSessionID: Nullable<string>,
+  params: RouterParams,
+) {
+  return (
+    gameSessionID != null &&
+    params.gameSessionID != null &&
+    params.gameSessionID === gameSessionID
+  );
 }

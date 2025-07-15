@@ -2,31 +2,13 @@ import { useState } from 'react';
 
 import {
   Cell, // force formatting
-  GameBoard,
   PlayerColor,
-  BOARD_ROWS,
-  BOARD_COLS,
 } from '@/pages/GameSession/constants';
+import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { setActivePlayer } from '@/store/game-session/actions';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
 import './styles.css';
-
-function createEmptyBoard() {
-  const emptyBoard: GameBoard = new Array(BOARD_ROWS).fill([]);
-
-  for (let i = 0; i < BOARD_ROWS; i++) {
-    for (let j = 0; j < BOARD_COLS; j++) {
-      emptyBoard[i][j] = {
-        state: null,
-        row: i,
-        column: j,
-      };
-    }
-  }
-
-  return emptyBoard;
-}
 
 export function Board() {
   const [board, setBoard] = useState(createEmptyBoard());
@@ -59,13 +41,13 @@ export function Board() {
 
   return (
     <div id="board">
-      {board.map((row) => {
-        return row.map((cell) => {
+      {board.map((column) => {
+        return column.map((cell) => {
           return (
             <div
-              key={`${cell.row}-${cell.column}`}
+              key={`${cell.column}-${cell.row}`}
               className="cell"
-              id={`cell-${cell.row}-${cell.column}`}
+              id={`cell-${cell.column}-${cell.row}`}
               onClick={() => handleCellClick(cell)}
               // onClick={() => {
               //   const newBoard = [...board];

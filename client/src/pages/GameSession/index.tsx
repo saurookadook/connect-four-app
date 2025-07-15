@@ -1,25 +1,36 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
+import { LoadingState } from '@/components';
 import { FlexColumn, FlexRow } from '@/layouts';
+import { Board, DebuggingPanel } from '@/pages/GameSession/components';
+import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
-import { Board } from '@/pages/GameSession/components';
-import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import './styles.css';
 
 export function GameSession() {
   const { appState, appDispatch } = useAppStore();
   const [wsData, setWsData] = useState<unknown[]>([]);
+  const params = useParams<{ gameSessionID?: string }>();
 
   const {
-    gameSession: { activePlayer, gameSessionID },
+    gameSession: {
+      gameSessionRequestInProgress,
+      activePlayer,
+      gameSessionID,
+      playerOneID,
+      playerTwoID,
+    },
     player: { playerID },
   } = appState;
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
       console.log(
-        '    [wsMessageHandler] Receiving message!     '.padStart(60, '-').padEnd(120, '-'),
+        '    [wsMessageHandler] Receiving message!     '
+          .padStart(60, '-')
+          .padEnd(120, '-'),
         '\n',
         { event, eventData: event.data },
         '\n',
@@ -39,19 +50,9 @@ export function GameSession() {
     // [appDispatch],
   );
 
-  function handleSendMessage() {
-    wsManager.getOpenWSConn().send(
-      JSON.stringify({
-        event: 'broadcast-test',
-        data: {
-          message: '[client] Hello, world!',
-        },
-      }),
-    );
-  }
-
   useLoadGame({
     dispatch: appDispatch,
+    params,
     gameSessionID,
     playerID,
   });
@@ -71,36 +72,41 @@ export function GameSession() {
   }, [gameSessionID, playerID, wsMessageHandler]);
 
   return (
-    <section id="connect-four">
+    <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four 🔴 ⚫`}</h2>
-      <div className="game-session-details">
-        {gameSessionID != null && (
-          <span>
-            <b>Game Session ID</b>: {gameSessionID}
-          </span>
-        )}
-        {playerID != null && (
-          <span>
-            <b>Player ID</b>: {playerID}
-          </span>
-        )}
-      </div>
 
-      <button onClick={handleSendMessage}>Send WS Message</button>
-
-      <div>
-        <pre>
-          <code>{JSON.stringify(wsData, null, 2)}</code>
-        </pre>
-      </div>
+      <DebuggingPanel // force formatting
+        gameSessionID={gameSessionID}
+        playerID={playerID}
+        wsData={wsData}
+      />
 
       <FlexRow>
         <FlexColumn id="game-details">
           <h3>{`Active player: ${activePlayer}`}</h3>
+          <dl>
+            <span>
+              <b>Players</b>
+            </span>
+            {[playerOneID, playerTwoID].map((playerID, index) => {
+              return (
+                playerID != null && (
+                  <Fragment key={playerID}>
+                    <dt>{`Player ${index === 0 ? 'One' : 'Two'}`}</dt>
+                    <dd>{playerID}</dd>
+                  </Fragment>
+                )
+              );
+            })}
+          </dl>
         </FlexColumn>
 
         <FlexColumn id="game-board-container">
-          <Board />
+          {gameSessionRequestInProgress || gameSessionID == null ? (
+            <LoadingState />
+          ) : (
+            <Board />
+          )}
         </FlexColumn>
       </FlexRow>
     </section>

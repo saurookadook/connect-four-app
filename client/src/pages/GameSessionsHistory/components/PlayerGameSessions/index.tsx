@@ -6,12 +6,19 @@ import { fetchGameSessionsHistory } from '@/store/game-sessions/actions';
 import { useAppStore } from '@/store';
 import { LoadedResultsState } from '..';
 
-export function PlayerGameSessions() {
+export function PlayerGameSessions({
+  containerID = 'player-game-sessions',
+}: {
+  containerID?: string;
+}) {
   const { appState, appDispatch } = useAppStore();
   const { gameSessions, player } = appState;
 
   useEffect(() => {
-    if (gameSessions.playerHistory == null) {
+    if (
+      gameSessions.playerHistory == null &&
+      !gameSessions.playerHistoryRequestInProgress
+    ) {
       fetchGameSessionsHistory({
         dispatch: appDispatch, // force formatting
         playerID: player.playerID,
@@ -20,16 +27,19 @@ export function PlayerGameSessions() {
   }, [appDispatch, gameSessions.playerHistory, player.playerID]);
 
   return (
-    <FlexColumn id="player-game-sessions">
+    <FlexColumn id={containerID}>
       <h3>Your Game Sessions</h3>
 
-      <div className="results-wrapper">
+      <FlexColumn className="results-wrapper">
         {gameSessions.playerHistory == null ? (
           <LoadingState />
         ) : (
-          <LoadedResultsState gameSessions={gameSessions.playerHistory} />
+          <LoadedResultsState
+            gameSessions={gameSessions.playerHistory}
+            parentID={containerID}
+          />
         )}
-      </div>
+      </FlexColumn>
     </FlexColumn>
   );
 }

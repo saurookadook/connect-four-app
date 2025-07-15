@@ -61,7 +61,7 @@ export const routerConfig: RouteObject[] = [
         element: <GameSessionsHistory />,
       },
       {
-        path: 'game-session/:sessionID?',
+        path: 'game-session/:gameSessionID?',
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'GameSession',
         element: <GameSession />,
