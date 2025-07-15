@@ -53,14 +53,16 @@ export const fetchGameSessionsHistory = $fetchGameSessionsHistory.bind({
   name: $fetchGameSessionsHistory.name,
 });
 
-export function setAllGameSessions({
-  dispatch, // force formatting
-  gameSessions,
-}: BaseAction & {
+type AllGameSessions = {
   gameSessions: {
     allPaginated: GameSessionsItem[];
   };
-}) {
+};
+
+export function setAllGameSessions({
+  dispatch, // force formatting
+  gameSessions,
+}: BaseAction & AllGameSessions) {
   dispatch({
     type: SET_ALL_GAME_SESSIONS,
     payload: {
@@ -69,14 +71,16 @@ export function setAllGameSessions({
   });
 }
 
-export function setGameSessionsHistory({
-  dispatch, // force formatting
-  gameSessions,
-}: BaseAction & {
+type GameSessionsHistory = {
   gameSessions: {
     playerHistory: GameSessionsItem[];
   };
-}) {
+};
+
+export function setGameSessionsHistory({
+  dispatch, // force formatting
+  gameSessions,
+}: BaseAction & GameSessionsHistory) {
   dispatch({
     type: SET_GAME_SESSIONS_HISTORY,
     payload: {
