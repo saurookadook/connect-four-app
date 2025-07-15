@@ -1,6 +1,38 @@
 import { PlayerColor } from '@/pages/GameSession/constants';
-import { RESET_GAME, SET_ACTIVE_PLAYER, SET_GAME_SESSION_ID } from '@/store';
-import type { BaseAction } from '@/types/main';
+import {
+  REQUEST_GAME_SESSION,
+  RESET_GAME,
+  SET_ACTIVE_PLAYER,
+  SET_GAME_SESSION,
+  SET_GAME_SESSION_ID,
+} from '@/store';
+import type { BaseAction, BoundThis } from '@/types/main';
+import { safeFetch } from '@/utils/safeFetch';
+import { GameSessionStateSlice } from './reducer.types';
+
+async function $fetchGameSession(
+  this: BoundThis,
+  {
+    dispatch, // force formatting
+    gameSessionID,
+  }: BaseAction & { gameSessionID: string },
+) {
+  dispatch({ type: REQUEST_GAME_SESSION });
+
+  const responseData = await safeFetch.call(this, {
+    requestPathname: `/api/game-sessions/${gameSessionID}`,
+    fetchOpts: { method: 'GET' },
+  });
+
+  return setGameSession({
+    dispatch,
+    gameSession: responseData.session || {},
+  });
+}
+
+export const fetchGameSession = $fetchGameSession.bind({
+  name: $fetchGameSession.name,
+});
 
 export function resetGame({
   dispatch, // force formatting
@@ -17,7 +49,7 @@ export function setActivePlayer({
   return dispatch({
     type: SET_ACTIVE_PLAYER,
     payload: {
-      connectFour: {
+      gameSession: {
         activePlayer: player,
       },
     },
@@ -31,9 +63,21 @@ export function setGameSessionID({
   return dispatch({
     type: SET_GAME_SESSION_ID,
     payload: {
-      connectFour: {
+      gameSession: {
         gameSessionID: gameSessionID,
       },
+    },
+  });
+}
+
+export function setGameSession({
+  dispatch,
+  gameSession,
+}: BaseAction & { gameSession: Omit<GameSessionStateSlice, 'activePlayer'> }) {
+  return dispatch({
+    type: SET_GAME_SESSION,
+    payload: {
+      gameSession: gameSession,
     },
   });
 }
