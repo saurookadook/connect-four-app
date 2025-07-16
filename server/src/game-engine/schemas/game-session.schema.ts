@@ -10,8 +10,11 @@ import { GameSessionStatus, PlayerMove } from '@constants/game';
 @Schema({
   // @ts-expect-error: This is the documented way to add an enum validator [https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum()]
   status: { enum: GameSessionStatus, type: String },
-}) // NOTE: named with an `_` so that NestJS's Mongoose module creates the collection as `game_sessions` instead of `gamesessions`
+})
 class Game_Session {
+  // NOTE: named with an `_` so that NestJS's Mongoose module creates the
+  // collection as `game_sessions` instead of `gamesessions`
+
   @Prop({
     required: true,
     // type: randomUUID

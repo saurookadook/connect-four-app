@@ -6,3 +6,9 @@ export type PlayerDetails = {
   playerObjectID: Types.ObjectId;
   username: string;
 };
+
+export type BoardCell = {
+  cellState: any;
+  col: number;
+  row: number;
+};
