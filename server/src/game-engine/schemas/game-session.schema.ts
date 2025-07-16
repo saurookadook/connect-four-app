@@ -10,8 +10,8 @@ import { GameSessionStatus, PlayerMove } from '@constants/game';
 @Schema({
   // @ts-expect-error: This is the documented way to add an enum validator [https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum()]
   status: { enum: GameSessionStatus, type: String },
-})
-export class GameSession {
+}) // NOTE: named with an `_` so that NestJS's Mongoose module creates the collection as `game_sessions` instead of `gamesessions`
+class Game_Session {
   @Prop({
     required: true,
     // type: randomUUID
@@ -23,6 +23,11 @@ export class GameSession {
     // type: randomUUID
   })
   playerTwoID: UUID;
+
+  @Prop({
+    default: null,
+  })
+  winner: UUID;
 
   @Prop({ default: [], required: true })
   moves: PlayerMove[];
@@ -41,7 +46,9 @@ export class GameSession {
   updatedAt: Date;
 }
 
-export type GameSessionDocument = HydratedDocument<GameSession>;
+export { Game_Session as GameSession };
+
+export type GameSessionDocument = HydratedDocument<Game_Session>;
 export type NullableGameSessionDocument = GameSessionDocument | null;
 
-export const GameSessionSchema = SchemaFactory.createForClass(GameSession);
+export const GameSessionSchema = SchemaFactory.createForClass(Game_Session);
