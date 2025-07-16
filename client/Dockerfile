@@ -12,8 +12,10 @@ RUN corepack use yarn@$YARN_VERSION
 RUN $yarn client:base build
 
 FROM client-dev-base AS client-dev
-ENTRYPOINT [ "yarn", "client:base", "start:dev" ]
+ENTRYPOINT [ "yarn", "client:base" ]
+CMD [ "start:dev" ]
 
 FROM client-dev-base AS client-test
 COPY .env.test /opt/connect-four-app
-ENTRYPOINT [ "yarn", "client:base", "test" ]
+ENTRYPOINT [ "yarn", "client:base" ]
+CMD [ "test" ]
