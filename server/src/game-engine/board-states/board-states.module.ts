@@ -11,5 +11,6 @@ import { BoardStatesService } from './board-states.service';
     ]),
   ],
   providers: [BoardStatesService],
+  exports: [BoardStatesService],
 })
 export class BoardStatesModule {}
