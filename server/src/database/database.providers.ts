@@ -3,6 +3,30 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import baseConfig, { buildConnectionURI } from '@/config';
+import { BOARD_STATES_TTL_SECONDS } from '@/game-engine/schemas/board-states.schema';
+
+async function initSpecialCollections(mongoConn: Connection) {
+  const boardStatesCollName = 'board_states';
+  const updatedAtFieldName = 'updatedAt';
+
+  const boardStatesCollection = mongoConn.collection(boardStatesCollName);
+  const boardStatesCollectionIndices = await boardStatesCollection.indexes();
+
+  const updatedAtTTLIndex = boardStatesCollectionIndices.find((indexConfig) => {
+    return (indexConfig.name || '').indexOf(updatedAtFieldName) >= 0;
+  });
+
+  if (
+    updatedAtTTLIndex != null &&
+    updatedAtTTLIndex.expireAfterSeconds !== BOARD_STATES_TTL_SECONDS
+  ) {
+    await mongoConn
+      .collection(boardStatesCollName)
+      .dropIndex(`${updatedAtFieldName}_1`);
+    // NOTE: the index will be re-created with the value of
+    // BOARD_STATES_TTL_SECONDS by the `Board_State` model
+  }
+}
 
 export const databaseProviders = [
   ConfigModule.forRoot({
@@ -15,21 +39,16 @@ export const databaseProviders = [
     useFactory: (configService: ConfigService) => ({
       uri: buildConnectionURI(configService),
       onConnectionCreate: (connection: Connection) => {
-        connection.on('open', () => {
-          // TODO: better way to make sure this collection is created
-          // with a clusteredIndex?
-          void connection
-            .createCollection('board_states', {
-              clusteredIndex: {
-                key: { _id: 1 },
-                unique: true,
-                name: 'board_states clustered key',
-              },
-              expireAfterSeconds: 60 * 60 * 2, // 2 hours
-            })
-            .catch((reason) => {
-              console.error(reason);
-            });
+        connection.on('open', (...args) => {
+          void initSpecialCollections(connection).catch((reason) => {
+            console.log(
+              ' ERROR in initSpecialCollections '
+                .padStart(100, '=')
+                .padEnd(200, '='),
+            );
+            console.error(reason);
+            console.log('='.repeat(200));
+          });
         });
 
         return connection;
