@@ -1,11 +1,8 @@
-import { FlatRecord, HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { GameSessionStatus } from '@/constants';
 import { GameSessionDTO } from '@/game-engine/dtos/game-session.dto';
-import {
-  GameSession,
-  GameSessionDocument,
-} from '@/game-engine/schemas/game-session.schema';
+import { GameSession } from '@/game-engine/schemas/game-session.schema';
 import { mockNow } from './commonMocks';
 
 const commonDefaults = {
@@ -27,18 +24,14 @@ type GameSessionDocumentMock = Pick<
   | '__v'
 >;
 
-type OptionalCommonDefaults = Partial<
+type OptionalDocumentMockArgs = Partial<
   Pick<
     HydratedDocument<GameSession>,
-    'createdAt' | 'moves' | 'status' | 'updatedAt'
+    '_id' | 'createdAt' | 'moves' | 'status' | 'updatedAt' | '__v'
   >
 >;
 
-type OptionalDocumentArgs = Partial<
-  Pick<HydratedDocument<GameSession>, '_id' | '__v'>
->;
-
-type RequiredDocumentArgs = Pick<
+type RequiredDocumentMockArgs = Pick<
   HydratedDocument<GameSession>,
   'playerOneID' | 'playerTwoID'
 >;
@@ -46,7 +39,7 @@ type RequiredDocumentArgs = Pick<
 // TODO: this still isn't raising errors like it should when the 'args' includes
 // additional properties other than what is defined in the types
 export function createNewGameSessionDocumentMock(
-  args: RequiredDocumentArgs & OptionalDocumentArgs & OptionalCommonDefaults,
+  args: RequiredDocumentMockArgs & OptionalDocumentMockArgs,
 ): GameSessionDocumentMock {
   const { _id, __v, ...rest } = args;
   return {
@@ -57,12 +50,30 @@ export function createNewGameSessionDocumentMock(
   };
 }
 
-// TODO: need to fix types in this to be clearer like it is for above function
+type GameSessionMock = Pick<
+  GameSessionDTO,
+  | 'id'
+  | 'playerOneID'
+  | 'playerTwoID'
+  | 'moves'
+  | 'status'
+  | 'createdAt'
+  | 'updatedAt'
+>;
+
+type OptionalMockArgs = Partial<
+  Pick<GameSessionDTO, 'id' | 'createdAt' | 'moves' | 'status' | 'updatedAt'>
+>;
+
+type RequiredMockArgs = Pick<GameSessionDTO, 'playerOneID' | 'playerTwoID'>;
+
 export function createNewGameSessionMock(
-  args: Partial<GameSessionDTO>,
-): Partial<GameSessionDTO> {
+  args: RequiredMockArgs & OptionalMockArgs,
+): GameSessionMock {
+  const { id, ...rest } = args;
   return {
     ...commonDefaults,
-    ...args,
+    ...rest,
+    id: id ?? new Types.ObjectId().toString(),
   };
 }
