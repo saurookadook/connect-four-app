@@ -8,7 +8,7 @@ export type PlayerDetails = {
 };
 
 export type BoardCell = {
-  cellState: any;
+  cellState: PlayerDetails['playerID'] | null;
   col: number;
   row: number;
 };
