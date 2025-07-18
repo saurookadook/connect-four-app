@@ -1,9 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
+import {
+  GameSession,
+  GameSessionDocument,
+} from '@/game-engine/schemas/game-session.schema';
 import { BOARD_COLS, BOARD_ROWS } from '@/game-logic-engine/constants';
 import { BoardCell } from '@/types/main';
-import { GameSession } from './game-session.schema';
 
 export function createEmptyBoard() {
   const board: BoardCell[][] = [];
@@ -32,9 +35,9 @@ class Board_State {
 
   @Prop({
     ref: 'GameSession',
-    type: MongooseSchema.Types.ObjectId,
+    type: Types.ObjectId,
   })
-  gameSessionID: MongooseSchema.Types.ObjectId;
+  gameSessionID: Types.ObjectId;
 
   @Prop({
     default: createEmptyBoard(),
@@ -59,7 +62,8 @@ class Board_State {
 export { Board_State as BoardState };
 
 export type BoardStateDocumentOverride = {
-  gameSession: Types.Subdocument<Types.ObjectId> & GameSession;
+  // gameSession: Types.Subdocument<Types.ObjectId> & GameSession
+  gameSessionID: Types.ObjectId;
 };
 
 export type BoardStateDocument = HydratedDocument<
