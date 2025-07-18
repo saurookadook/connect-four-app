@@ -25,7 +25,7 @@ export class CreateBoardStateDTO {
 @Exclude()
 export class UpdateBoardStateDTO extends PartialBaseDTO {
   @Expose()
-  gameSessionID: BoardStateDTO['gameSessionID'];
+  gameSessionID?: BoardStateDTO['gameSessionID'];
 
   @Expose()
   move?: PlayerMove;
