@@ -1,6 +1,6 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { Collection, Connection } from 'mongoose';
 
 import baseConfig, { buildConnectionURI } from '@/config';
 import { BOARD_STATES_TTL_SECONDS } from '@/game-engine/schemas/board-states.schema';
@@ -9,7 +9,17 @@ async function initSpecialCollections(mongoConn: Connection) {
   const boardStatesCollName = 'board_states';
   const updatedAtFieldName = 'updatedAt';
 
-  const boardStatesCollection = mongoConn.collection(boardStatesCollName);
+  let boardStatesCollection: Collection;
+
+  try {
+    boardStatesCollection = mongoConn.collection(boardStatesCollName);
+  } catch (error) {
+    throw new Error(
+      `[initSpecialCollections] encountered ERROR: ${error.message}`,
+      { cause: error },
+    );
+  }
+
   const boardStatesCollectionIndices = await boardStatesCollection.indexes();
 
   const updatedAtTTLIndex = boardStatesCollectionIndices.find((indexConfig) => {
