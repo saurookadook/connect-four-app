@@ -2,19 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 
+import {
+  BoardState,
+  BoardStateDocument,
+  NullableBoardStateDocument,
+} from './board-states/schemas/board-states.schema';
+import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionDTO } from './dtos/game-session.dto';
 import {
   GameSession,
   GameSessionDocument,
   NullableGameSessionDocument,
 } from './schemas/game-session.schema';
-import {
-  BoardState,
-  BoardStateDocument,
-  NullableBoardStateDocument,
-} from './schemas/board-states.schema';
 import { GameSessionsService } from './sessions/game-sessions.service';
-import { BoardStatesService } from './board-states/board-states.service';
 
 @Injectable()
 export class GameEngineService {

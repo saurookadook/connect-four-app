@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { BoardState, BoardStateSchema } from '../schemas/board-states.schema';
+import { BoardState, BoardStateSchema } from './schemas/board-states.schema';
 import { BoardStatesService } from './board-states.service';
 
 @Module({
