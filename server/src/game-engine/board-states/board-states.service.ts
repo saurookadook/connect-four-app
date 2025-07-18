@@ -1,15 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 
-import { BOARD_COLS, BOARD_ROWS } from '@/game-logic-engine/constants';
-import { BoardCell } from '@/types/main';
-
+import {
+  BoardStateDTO,
+  CreateBoardStateDTO,
+  UpdateBoardStateDTO,
+} from './dtos/board-states.dto';
 import {
   BoardState,
   BoardStateDocument,
   NullableBoardStateDocument,
-} from '../schemas/board-states.schema';
+} from './schemas/board-states.schema';
 
 @Injectable()
 export class BoardStatesService {
@@ -17,4 +19,12 @@ export class BoardStatesService {
     @InjectModel(BoardState.name)
     private boardStateModel: Model<BoardStateDocument>,
   ) {}
+
+  async createOne(boardState: CreateBoardStateDTO) {}
+
+  async findOneByGameSessionID(gameSessionID: BoardStateDTO['id']) {}
+
+  async updateOne(id: string, boardState: UpdateBoardStateDTO) {}
+
+  async deleteOneByGameSessionID(gameSessionID: BoardStateDTO['id']) {}
 }
