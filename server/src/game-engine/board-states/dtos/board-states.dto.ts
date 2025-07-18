@@ -23,7 +23,7 @@ export class CreateBoardStateDTO {
 }
 
 @Exclude()
-export class UpdateGameSessionDTO extends PartialBaseDTO {
+export class UpdateBoardStateDTO extends PartialBaseDTO {
   @Expose()
   gameSessionID: BoardStateDTO['gameSessionID'];
 

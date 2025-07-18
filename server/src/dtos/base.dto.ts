@@ -14,9 +14,6 @@ export class BaseDTO {
 
 @Exclude()
 export class PartialBaseDTO {
-  @Expose({ name: '_id' })
-  id?: string;
-
   @Expose()
   createdAt?: Date;
 
