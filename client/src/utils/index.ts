@@ -88,7 +88,5 @@ class WebSocketManager {
 const wsManager = new WebSocketManager();
 
 export { wsManager };
-export * from './deeplyMerge';
+export * from '@connect-four-app/shared';
 export * from './safeFetch';
-export * from './safeParseJson';
-export * from './typeGuards';
