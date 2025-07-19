@@ -1,3 +1,3 @@
 export * from './deeplyMerge';
-export * from './safeParseJson';
+export * from './safeParseJSON';
 export * from './typeGuards';
