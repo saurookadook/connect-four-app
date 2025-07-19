@@ -12,7 +12,7 @@ const commonDefaults = {
   updatedAt: mockNow,
 };
 
-type GameSessionDocumentMock = Pick<
+export type GameSessionDocumentMock = Pick<
   HydratedDocument<GameSession>,
   | '_id'
   | 'playerOneID'
@@ -24,14 +24,14 @@ type GameSessionDocumentMock = Pick<
   | '__v'
 >;
 
-type OptionalDocumentMockArgs = Partial<
+export type OptionalDocumentMockArgs = Partial<
   Pick<
     HydratedDocument<GameSession>,
     '_id' | 'createdAt' | 'moves' | 'status' | 'updatedAt' | '__v'
   >
 >;
 
-type RequiredDocumentMockArgs = Pick<
+export type RequiredDocumentMockArgs = Pick<
   HydratedDocument<GameSession>,
   'playerOneID' | 'playerTwoID'
 >;
@@ -50,30 +50,33 @@ export function createNewGameSessionDocumentMock(
   };
 }
 
-type GameSessionMock = Pick<
-  GameSessionDTO,
-  | 'id'
-  | 'playerOneID'
-  | 'playerTwoID'
-  | 'moves'
-  | 'status'
-  | 'createdAt'
-  | 'updatedAt'
->;
+// prettier-ignore
+export type GameSessionMock =
+  { id?: GameSessionDTO['id'] } &
+  Pick<
+    GameSessionDTO,
+    | 'playerOneID' // force formatting
+    | 'playerTwoID'
+    | 'moves'
+    | 'status'
+    | 'createdAt'
+    | 'updatedAt'
+  >;
 
-type OptionalMockArgs = Partial<
+export type OptionalMockArgs = Partial<
   Pick<GameSessionDTO, 'id' | 'createdAt' | 'moves' | 'status' | 'updatedAt'>
 >;
 
-type RequiredMockArgs = Pick<GameSessionDTO, 'playerOneID' | 'playerTwoID'>;
+export type RequiredMockArgs = Pick<
+  GameSessionDTO,
+  'playerOneID' | 'playerTwoID'
+>;
 
 export function createNewGameSessionMock(
   args: RequiredMockArgs & OptionalMockArgs,
 ): GameSessionMock {
-  const { id, ...rest } = args;
   return {
     ...commonDefaults,
-    ...rest,
-    id: id ?? new Types.ObjectId().toString(),
+    ...args,
   };
 }
