@@ -3,26 +3,30 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
 import {
-  BoardStateDTO,
-  CreateBoardStateDTO,
+  CreateBoardStateDTO, // force formatting
   GameSessionDTO,
   UpdateBoardStateDTO,
 } from '@/game-engine/dtos';
 import {
   BoardState,
   BoardStateDocument,
-  GameSession,
   NullableBoardStateDocument,
+  GameSessionDocument,
 } from '@/game-engine/schemas';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
+import { GameLogicEngine } from '@/game-logic-engine';
 
 @Injectable()
 export class BoardStatesService {
+  readonly gameLogicEngine: GameLogicEngine;
+
   constructor(
     @InjectModel(BoardState.name)
     private boardStateModel: Model<BoardStateDocument>,
     private readonly gameSessionsService: GameSessionsService,
-  ) {}
+  ) {
+    this.gameLogicEngine = new GameLogicEngine();
+  }
 
   async createOne(
     boardState: CreateBoardStateDTO,
@@ -51,12 +55,28 @@ export class BoardStatesService {
     id: string,
     boardState: UpdateBoardStateDTO,
   ): Promise<NullableBoardStateDocument> {
-    if (boardState.gameSessionID != null) {
-      await this._validateGameSession(boardState.gameSessionID);
+    const foundBoardState = await this.boardStateModel.findById(id).exec();
+
+    if (foundBoardState == null) {
+      throw new NotFoundException(
+        `[BoardStatesService.updateOne] Board State with ID '${id}' not found`,
+      );
     }
 
+    const gameSession = await this._validateGameSession(
+      boardState.gameSessionID,
+    );
+    this.handleUpdateForMove(boardState, gameSession);
+
     return await this.boardStateModel // TODO: need to handle gameSessionID casting?
-      .findByIdAndUpdate(id, boardState, { new: true })
+      .findByIdAndUpdate(
+        id,
+        {
+          ...boardState,
+          gameSessionID: new Types.ObjectId(boardState.gameSessionID),
+        },
+        { new: true },
+      )
       .exec();
   }
 
@@ -68,7 +88,30 @@ export class BoardStatesService {
       .exec();
   }
 
-  async _validateGameSession(gameSessionID: GameSessionDTO['id']) {
+  handleUpdateForMove(
+    boardStateRef: UpdateBoardStateDTO,
+    gameSessionRef: GameSessionDocument,
+  ) {
+    if (gameSessionRef == null || boardStateRef.move == null) {
+      return;
+    }
+
+    let logicSession = this.gameLogicEngine.startGame({
+      playerOneID: gameSessionRef.playerOneID,
+      playerTwoID: gameSessionRef.playerTwoID,
+    });
+    logicSession = this.gameLogicEngine.handleMove({
+      columnIndex: boardStateRef.move.columnIndex,
+      playerID: boardStateRef.move.playerID,
+      sessionRef: logicSession,
+    });
+
+    boardStateRef.state = logicSession.board.gameBoardState;
+  }
+
+  async _validateGameSession(
+    gameSessionID: GameSessionDTO['id'],
+  ): Promise<GameSessionDocument> {
     const foundGameSession =
       await this.gameSessionsService.findOneById(gameSessionID);
 
@@ -77,5 +120,7 @@ export class BoardStatesService {
         `[BoardStatesService._validateGameSession] Game Session with ID '${gameSessionID}' not found`,
       );
     }
+
+    return foundGameSession;
   }
 }

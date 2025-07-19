@@ -18,13 +18,15 @@ import { DatabaseModule } from '@/database/database.module';
 import {
   BoardState,
   BoardStateDocument,
-  createEmptyBoard,
   GameSession,
 } from '@/game-engine/schemas';
+import { GameSessionsModule } from '@/game-engine/sessions/game-sessions.module';
+import { BOARD_ROWS } from '@/game-logic-engine/constants';
+import { LogicBoard } from '@/game-logic-engine';
 import { Player } from '@/player/schemas/player.schema';
 import { PlayerMove } from '@/types/main';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
-import { GameSessionsModule } from '../sessions/game-sessions.module';
+
 import { BoardStatesModule } from './board-states.module';
 import { BoardStatesService } from './board-states.service';
 
@@ -32,7 +34,7 @@ const [mockFirstPlayer, mockSecondPlayer] = mockPlayers;
 
 type BoardStateDocumentMock = {
   gameSessionID: Types.ObjectId;
-  state: ReturnType<typeof createEmptyBoard>;
+  state: ReturnType<typeof LogicBoard.createEmptyBoardState>;
   createdAt: Date;
   updatedAt: Date;
   __v: number;
@@ -43,7 +45,7 @@ const createBoardStateDocumentMock = (
 ): BoardStateDocumentMock => {
   return {
     gameSessionID: new Types.ObjectId(gameSessionID),
-    state: createEmptyBoard(),
+    state: LogicBoard.createEmptyBoardState(),
     createdAt: mockNow,
     updatedAt: mockNow,
     __v: 0,
@@ -130,9 +132,6 @@ describe('BoardStatesService', () => {
         gameSessionID: mockGameSessionID,
       });
 
-      console.log(
-        global.inspect(newBoardState, { colors: true, compact: false }),
-      );
       expectHydratedDocumentToMatch<BoardState>(
         newBoardState, // force formatting
         {
@@ -208,22 +207,28 @@ describe('BoardStatesService', () => {
 
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
       const initialBoardStateID = initialBoardState._id.toString();
+      const initialGameSessionID = initialBoardState.gameSessionID.toJSON();
       const latestMove: PlayerMove = {
         columnIndex: 3,
-        gameSessionID: initialBoardState.gameSessionID.toJSON(),
+        gameSessionID: initialGameSessionID,
         playerID: mockFirstPlayer.playerID,
         timestamp: nowPlus30Seconds,
       };
       const expectedCells = Array.from(initialBoardState.state);
-      expectedCells[3][0].cellState = mockFirstPlayer.playerID;
+      const lastRowIndex = BOARD_ROWS - 1;
+      expectedCells[3][lastRowIndex].cellState = mockFirstPlayer.playerID;
 
       const updatedBoardState = (await boardStatesService.updateOne(
         initialBoardStateID,
         {
+          gameSessionID: initialGameSessionID,
           move: latestMove,
         },
       )) as BoardStateDocument;
 
+      expect(updatedBoardState.state[3][lastRowIndex]).toEqual(
+        expectedCells[3][lastRowIndex],
+      );
       expectHydratedDocumentToMatch<BoardState>(
         updatedBoardState, // force formatting
         {
