@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import {
   BoardStateDTO,
@@ -29,7 +29,11 @@ export class BoardStatesService {
   ): Promise<BoardStateDocument> {
     await this._validateGameSession(boardState.gameSessionID);
 
-    const createdBoardState = new this.boardStateModel(boardState);
+    const { gameSessionID, ...rest } = boardState;
+    const createdBoardState = new this.boardStateModel({
+      ...rest,
+      gameSessionID: new Types.ObjectId(gameSessionID),
+    });
     return createdBoardState.save();
   }
 
@@ -39,7 +43,7 @@ export class BoardStatesService {
     await this._validateGameSession(gameSessionID);
 
     return await this.boardStateModel
-      .findOne({ gameSessionID: gameSessionID })
+      .findOne({ gameSessionID: new Types.ObjectId(gameSessionID) })
       .exec();
   }
 
@@ -51,7 +55,7 @@ export class BoardStatesService {
       await this._validateGameSession(boardState.gameSessionID);
     }
 
-    return await this.boardStateModel
+    return await this.boardStateModel // TODO: need to handle gameSessionID casting?
       .findByIdAndUpdate(id, boardState, { new: true })
       .exec();
   }
@@ -60,7 +64,7 @@ export class BoardStatesService {
     gameSessionID: GameSessionDTO['id'],
   ): Promise<NullableBoardStateDocument> {
     return await this.boardStateModel
-      .findOneAndDelete({ gameSessionID: gameSessionID })
+      .findOneAndDelete({ gameSessionID: new Types.ObjectId(gameSessionID) })
       .exec();
   }
 

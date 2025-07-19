@@ -1,10 +1,12 @@
-// @ts-nocheck
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model, Types } from 'mongoose';
 
 import { mockNow } from '@/__mocks__/commonMocks';
-import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
+import {
+  createNewGameSessionMock,
+  type GameSessionMock,
+} from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import {
   BOARD_STATE_MODEL_TOKEN,
@@ -13,7 +15,6 @@ import {
   GameSessionStatus,
 } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
-import { BoardStateDTO, GameSessionDTO } from '@/game-engine/dtos';
 import {
   BoardState,
   BoardStateDocument,
@@ -30,7 +31,6 @@ import { BoardStatesService } from './board-states.service';
 const [mockFirstPlayer, mockSecondPlayer] = mockPlayers;
 
 type BoardStateDocumentMock = {
-  _id: Types.ObjectId;
   gameSessionID: Types.ObjectId;
   state: ReturnType<typeof createEmptyBoard>;
   createdAt: Date;
@@ -42,12 +42,11 @@ const createBoardStateDocumentMock = (
   gameSessionID: string,
 ): BoardStateDocumentMock => {
   return {
-    _id: new Types.ObjectId(),
     gameSessionID: new Types.ObjectId(gameSessionID),
     state: createEmptyBoard(),
     createdAt: mockNow,
     updatedAt: mockNow,
-    __v: 1,
+    __v: 0,
   };
 };
 
@@ -57,8 +56,8 @@ describe('BoardStatesService', () => {
   let boardStatesService: BoardStatesService;
   let gameSessionModel: Model<GameSession>;
   let playerModel: Model<Player>;
-  let mockGameSession: GameSessionDTO;
-  let mockBoardState: BoardStateDTO;
+  let mockGameSession: GameSessionMock;
+  let mockGameSessionID: string;
   let mockBoardStateDocument: BoardStateDocumentMock;
 
   beforeAll(async () => {
@@ -90,20 +89,21 @@ describe('BoardStatesService', () => {
       playerTwoID: mockSecondPlayer.playerID,
     });
 
-    const { id, ...rest } = mockGameSession;
-    await gameSessionModel.insertOne({
-      ...rest,
-      _id: id,
+    const gameSessionDoc = await gameSessionModel.insertOne({
+      ...mockGameSession,
     });
+    mockGameSessionID = gameSessionDoc._id.toJSON();
 
-    mockBoardStateDocument = createBoardStateDocumentMock(mockGameSession.id);
+    mockBoardStateDocument = createBoardStateDocumentMock(mockGameSessionID);
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await boardStateModel.deleteMany({}).exec();
     jest.clearAllTimers();
   });
 
   afterAll(async () => {
+    await boardStateModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
     await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
@@ -121,18 +121,24 @@ describe('BoardStatesService', () => {
     });
 
     afterEach(async () => {
-      await gameSessionModel.deleteMany({}).exec();
+      await boardStateModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
     it('should insert a new board state document', async () => {
       const newBoardState = await boardStatesService.createOne({
-        gameSessionID: mockGameSession.id,
+        gameSessionID: mockGameSessionID,
       });
 
-      expectHydratedDocumentToMatch<BoardState>(newBoardState, {
-        ...mockBoardStateDocument,
-      });
+      console.log(
+        global.inspect(newBoardState, { colors: true, compact: false }),
+      );
+      expectHydratedDocumentToMatch<BoardState>(
+        newBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+        },
+      );
     });
 
     it('throws error if game session cannot be found', async () => {
@@ -152,7 +158,7 @@ describe('BoardStatesService', () => {
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
       initialBoardState = await boardStatesService.createOne({
-        gameSessionID: mockGameSession.id,
+        gameSessionID: mockGameSessionID,
       });
     });
 
@@ -162,9 +168,9 @@ describe('BoardStatesService', () => {
     });
 
     it("should find a board state document by 'gameSessionID'", async () => {
-      const foundBoardState = await boardStatesService.findOneByGameSessionID(
-        initialBoardState.gameSessionID.toString(),
-      );
+      const foundBoardState = (await boardStatesService.findOneByGameSessionID(
+        mockGameSessionID,
+      )) as BoardStateDocument;
 
       expectHydratedDocumentToMatch<BoardState>(
         foundBoardState, // force formatting
@@ -183,7 +189,7 @@ describe('BoardStatesService', () => {
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
       initialBoardState = await boardStatesService.createOne({
-        gameSessionID: mockGameSession.id,
+        gameSessionID: mockGameSessionID,
       });
     });
 
@@ -201,19 +207,28 @@ describe('BoardStatesService', () => {
       );
 
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
-      const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
       const initialBoardStateID = initialBoardState._id.toString();
       const latestMove: PlayerMove = {
         columnIndex: 3,
-        gameSessionID: initialBoardState.gameSessionID.toString(),
+        gameSessionID: initialBoardState.gameSessionID.toJSON(),
         playerID: mockFirstPlayer.playerID,
-        timestamp: new Date(),
+        timestamp: nowPlus30Seconds,
       };
+      const expectedCells = Array.from(initialBoardState.state);
+      expectedCells[3][0].cellState = mockFirstPlayer.playerID;
 
-      const updatedBoardState = await boardStatesService.updateOne(
+      const updatedBoardState = (await boardStatesService.updateOne(
         initialBoardStateID,
         {
           move: latestMove,
+        },
+      )) as BoardStateDocument;
+
+      expectHydratedDocumentToMatch<BoardState>(
+        updatedBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+          state: expectedCells,
         },
       );
     });
@@ -227,7 +242,7 @@ describe('BoardStatesService', () => {
       jest.spyOn(global.Date, 'now').mockReturnValue(mockNow.getTime());
 
       initialBoardState = await boardStatesService.createOne({
-        gameSessionID: mockGameSession.id,
+        gameSessionID: mockGameSessionID,
       });
     });
 
@@ -244,9 +259,10 @@ describe('BoardStatesService', () => {
         },
       );
 
-      const initialID = initialBoardState._id.toString();
       const deletedBoardState =
-        await boardStatesService.deleteOneByGameSessionID(mockGameSession.id);
+        (await boardStatesService.deleteOneByGameSessionID(
+          mockGameSessionID,
+        )) as BoardStateDocument;
 
       expectHydratedDocumentToMatch<BoardState>(
         deletedBoardState, // force formatting
@@ -255,9 +271,8 @@ describe('BoardStatesService', () => {
         },
       );
 
-      const emptyResult = await boardStatesService.findOneByGameSessionID(
-        mockGameSession.id,
-      );
+      const emptyResult =
+        await boardStatesService.findOneByGameSessionID(mockGameSessionID);
       expect(emptyResult).toBeNull();
     });
   });
