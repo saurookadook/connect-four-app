@@ -28,6 +28,9 @@ export const mockThirdPlayer: MockUnregisteredPlayer = {
   updatedAt: mockNow,
 };
 
+export const mockPlayerOneID = mockFirstPlayer.playerID;
+export const mockPlayerTwoID = mockSecondPlayer.playerID;
+
 export function createPlayerWithHashedPassword(
   unregisteredPlayer: MockUnregisteredPlayer,
 ): Player {

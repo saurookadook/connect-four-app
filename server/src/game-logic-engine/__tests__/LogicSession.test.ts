@@ -1,12 +1,10 @@
 import { randomUUID } from 'node:crypto';
 
+import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
 import { BOARD_COLS, BOARD_ROWS } from '../constants';
 import { LogicSession } from '..';
 
 describe('LogicSession', () => {
-  const mockPlayerOneID = randomUUID();
-  const mockPlayerTwoID = randomUUID();
-
   describe('constructor', () => {
     test('should initialize with empty board', () => {
       const session = new LogicSession({
@@ -28,8 +26,8 @@ describe('LogicSession', () => {
       for (let i = 0; i < BOARD_COLS; i++) {
         for (let j = 0; j < BOARD_ROWS; j++) {
           expect(gameBoardState[i][j]).toEqual({
-            state: null,
-            column: i,
+            cellState: null,
+            col: i,
             row: j,
           });
         }

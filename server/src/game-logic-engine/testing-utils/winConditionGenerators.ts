@@ -1,20 +1,21 @@
-import { PlayerColor } from '../constants';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 import { LogicSession } from '..';
 
 export function populateBoardWithOneMoveTilWin(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
   ];
 
   populateBoardWithMoves({
@@ -46,17 +47,17 @@ export function populateBoardWithDescendingSlopeDiagonalWinOne(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [0, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -88,17 +89,17 @@ export function populateBoardWithDescendingSlopeDiagonalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [1, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -130,17 +131,17 @@ export function populateBoardWithDescendingSlopeDiagonalWinThree(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -172,17 +173,17 @@ export function populateBoardWithDescendingSlopeDiagonalWinFour(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [0, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
+    [0, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [3, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -214,17 +215,17 @@ export function populateBoardWithAscendingSlopeDiagonalWinOne(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [4, PlayerColor.RED],
-    [5, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [6, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -256,17 +257,17 @@ export function populateBoardWithAscendingSlopeDiagonalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [4, PlayerColor.RED],
-    [5, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [5, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -298,17 +299,17 @@ export function populateBoardWithAscendingSlopeDiagonalWinThree(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [5, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [3, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [4, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -340,17 +341,17 @@ export function populateBoardWithAscendingSlopeDiagonalWinFour(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [6, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [4, PlayerColor.RED],
-    [5, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [5, PlayerColor.RED],
-    [6, PlayerColor.BLACK],
-    [6, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
+    [6, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -381,13 +382,13 @@ export function populateBoardWithVerticalWin(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [3, PlayerColor.RED],
-    [1, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
-    [0, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
-    [2, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
+    [3, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [3, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -418,13 +419,13 @@ export function populateBoardWithHorizontalWinOne(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [1, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [0, PlayerColor.RED],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [0, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -455,13 +456,13 @@ export function populateBoardWithHorizontalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [0, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -492,13 +493,13 @@ export function populateBoardWithHorizontalWinThree(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [0, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -529,13 +530,13 @@ export function populateBoardWithHorizontalWinFour(
   logicSessionRef: LogicSession,
 ): void {
   const movesTuples: MoveTuple[] = [
-    [0, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [1, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [2, PlayerColor.RED],
-    [4, PlayerColor.BLACK],
-    [3, PlayerColor.RED],
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
   ];
 
   populateBoardWithMoves({
@@ -581,8 +582,8 @@ export const winningConditionGeneratorFuncs = [
  * ```
  */
 
-/** @description Tuple of `[columnIndex, PlayerColor]` */
-export type MoveTuple = [number, PlayerColor];
+/** @description Tuple of `[columnIndex, PlayerID]` */
+export type MoveTuple = [number, PlayerDTO['playerID']];
 
 export function populateBoardWithMoves({
   logicSessionRef,
@@ -591,10 +592,10 @@ export function populateBoardWithMoves({
   logicSessionRef: LogicSession;
   moves: MoveTuple[];
 }) {
-  moves.forEach(([columnIndex, playerColor]) => {
+  moves.forEach(([columnIndex, playerID]) => {
     logicSessionRef.board.updateBoardState({
       columnIndex,
-      playerColor,
+      playerID,
     });
   });
 }

@@ -48,22 +48,30 @@ export class LogicSession {
     playerID,
   }: {
     column: number;
-    playerID: UUID;
+    playerID: PlayerID;
   }): GameBoard {
+    this.validatePlayerID(playerID);
+
     return this.#board.updateBoardState({
       columnIndex: column,
       playerID: playerID,
     });
   }
 
-  getPlayerColorByID(playerID: UUID): PlayerColor {
+  getPlayerColorByID(playerID: PlayerID): PlayerColor {
     switch (playerID) {
       case this.#playerOneID:
         return PlayerColor.RED;
       case this.#playerTwoID:
         return PlayerColor.BLACK;
       default:
-        throw new Error(`Unknown playerID: '${playerID}'`);
+        throw new Error(`Unknown player color for playerID: '${playerID}'`);
+    }
+  }
+
+  validatePlayerID(playerID: PlayerID) {
+    if (playerID !== this.#playerOneID && playerID !== this.#playerTwoID) {
+      throw new Error(`Unknown playerID: '${playerID}'`);
     }
   }
 

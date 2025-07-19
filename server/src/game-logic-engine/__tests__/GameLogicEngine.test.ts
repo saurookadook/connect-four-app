@@ -1,5 +1,4 @@
-import { UUID, randomUUID } from 'crypto';
-
+import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
 import { GameSessionStatus } from '../constants';
 import {
   populateBoardWithOneMoveTilWin,
@@ -9,8 +8,6 @@ import {
 import { GameLogicEngine, LogicSession } from '..';
 
 describe('GameLogicEngine', () => {
-  const mockPlayerOneID: UUID = randomUUID();
-  const mockPlayerTwoID: UUID = randomUUID();
   let gameEngine: GameLogicEngine;
 
   beforeEach(() => {

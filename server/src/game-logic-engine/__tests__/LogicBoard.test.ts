@@ -1,11 +1,8 @@
-import { randomUUID, type UUID } from 'node:crypto';
-
+import { mockPlayerOneID } from '@/__mocks__/playerMocks';
 import { BOARD_COLS, BOARD_ROWS } from '../constants';
 import { LogicBoard } from '..';
 
 describe('Board', () => {
-  const mockPlayerOneID: UUID = randomUUID();
-  const mockPlayerTwoID: UUID = randomUUID();
   let testLogicBoard: LogicBoard;
 
   describe("'updateBoardState' method", () => {
@@ -40,9 +37,9 @@ describe('Board', () => {
 
         row.forEach((cell, rowIndex) => {
           expect(cell).toEqual({
-            column: colIndex,
+            cellState: null,
+            col: colIndex,
             row: rowIndex,
-            state: null,
           });
         });
       });
