@@ -1,7 +1,7 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
 import { PLAYER_DETAILS_LS_KEY } from '@/pages/GameSession/constants';
-import { safeParseJson } from '@/utils';
+import { safeParseJSON } from '@/utils';
 import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
 
 export type PlayerStateSlice = {
@@ -12,7 +12,7 @@ export type PlayerStateSlice = {
 // TODO: maybe use `sessionStorage` instead?
 function getInitialPlayerStateFromLocalStorage(): PlayerStateSlice {
   const storedPlayerDetails = window.localStorage.getItem(PLAYER_DETAILS_LS_KEY);
-  const parsedDetails = safeParseJson(storedPlayerDetails) as Record<string, any>;
+  const parsedDetails = safeParseJSON(storedPlayerDetails) as Record<string, any>;
 
   return {
     playerID: parsedDetails?.playerID ?? null,
