@@ -1,6 +1,5 @@
-import * as uuid from 'uuid';
-
 import type { PlayerID } from '@/types/main';
+import { isUUID } from '@connect-four-app/shared';
 import { GameBoard, GameSessionStatus, PlayerColor } from './constants';
 import { LogicBoard } from './';
 
@@ -76,8 +75,7 @@ export class LogicSession {
   }
 
   set activePlayer(playerID: unknown) {
-    // TODO: should use `isUUID` type guard
-    if (typeof playerID !== 'string' || !playerID) {
+    if (!isUUID(playerID)) {
       throw new Error(
         `Invalid player ID: '${String(playerID)}' (type '${typeof playerID}')`,
       );
@@ -105,7 +103,7 @@ export class LogicSession {
   }
 
   set playerOneID(playerID: unknown) {
-    if (!uuid.validate(playerID)) {
+    if (!isUUID(playerID)) {
       throw new TypeError(`Invalid argument: 'playerID' must be a valid UUID`);
     }
 
@@ -117,7 +115,7 @@ export class LogicSession {
   }
 
   set playerTwoID(playerID: unknown) {
-    if (!uuid.validate(playerID)) {
+    if (!isUUID(playerID)) {
       throw new TypeError(`Invalid argument: 'playerID' must be a valid UUID`);
     }
 
