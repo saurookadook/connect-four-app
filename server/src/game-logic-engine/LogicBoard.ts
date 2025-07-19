@@ -1,21 +1,21 @@
+import { PlayerDTO } from '@/player/dtos/player.dto';
 import {
-  BOARD_COLS,
+  BOARD_COLS, // force formatting
   BOARD_ROWS,
-  Cell,
+  BoardCell,
   GameBoard,
-  PlayerColor,
 } from './constants';
 
 export class LogicBoard {
   gameBoardState: GameBoard;
-  lastUpdatedCell: Cell | null;
+  lastUpdatedCell: BoardCell | null;
 
   constructor({
     gameBoardState,
     lastUpdatedCell,
   }: {
     gameBoardState?: GameBoard;
-    lastUpdatedCell?: Cell | null;
+    lastUpdatedCell?: BoardCell | null;
   } = {}) {
     // TODO: `gameBoardState` seems like an odd variable name; maybe it should accept something
     // like `PlayeyMoves[]` and construct the board from that?
@@ -25,10 +25,10 @@ export class LogicBoard {
 
   updateBoardState({
     columnIndex,
-    playerColor,
+    playerID,
   }: {
     columnIndex: number;
-    playerColor: PlayerColor;
+    playerID: PlayerDTO['playerID'];
   }): GameBoard {
     if (columnIndex < 0 || columnIndex >= BOARD_COLS) {
       throw new Error(
@@ -37,13 +37,15 @@ export class LogicBoard {
     }
 
     const columnCells = this.gameBoardState[columnIndex];
-    const rowIndex = columnCells.findLastIndex((cell) => cell.state === null);
+    const rowIndex = columnCells.findLastIndex(
+      (cell) => cell.cellState === null,
+    );
 
     if (rowIndex === -1) {
       throw new Error(`Column ${columnIndex} is full`);
     }
 
-    this.gameBoardState[columnIndex][rowIndex].state = playerColor;
+    this.gameBoardState[columnIndex][rowIndex].cellState = playerID;
     this.lastUpdatedCell = this.gameBoardState[columnIndex][rowIndex];
 
     return this.gameBoardState;
@@ -61,8 +63,8 @@ export class LogicBoard {
       emptyBoard[i] = [];
       for (let j = 0; j < BOARD_ROWS; j++) {
         emptyBoard[i][j] = {
-          state: null,
-          column: i,
+          cellState: null,
+          col: i,
           row: j,
         };
       }

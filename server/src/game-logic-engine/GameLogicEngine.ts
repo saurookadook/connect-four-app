@@ -4,6 +4,7 @@ import { inspect } from 'node:util';
 import { GameSessionStatus, PlayerColor } from './constants';
 import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export class GameLogicEngine {
   #validatorFuncs: ValidatorFunc[];
@@ -56,7 +57,7 @@ export class GameLogicEngine {
     return sessionRef;
   }
 
-  checkForWin(board: LogicBoard, activePlayer: PlayerColor): boolean {
+  checkForWin(board: LogicBoard, activePlayer: PlayerDTO['playerID']): boolean {
     const lastUpdatedCell = board.lastUpdatedCell;
 
     if (lastUpdatedCell == null) return false;
@@ -64,7 +65,7 @@ export class GameLogicEngine {
     const activePlayerHasWon = this.#validatorFuncs.some((validatorFunc) => {
       return validatorFunc(
         board.gameBoardState, // force formatting
-        lastUpdatedCell.column,
+        lastUpdatedCell.col,
         lastUpdatedCell.row,
         activePlayer,
       );

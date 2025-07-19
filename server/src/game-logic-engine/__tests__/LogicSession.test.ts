@@ -1,7 +1,6 @@
-import { randomUUID } from 'crypto';
-import { inspect } from 'util';
+import { randomUUID } from 'node:crypto';
 
-import { BOARD_COLS, BOARD_ROWS, PlayerColor } from '../constants';
+import { BOARD_COLS, BOARD_ROWS } from '../constants';
 import { LogicSession } from '..';
 
 describe('LogicSession', () => {
@@ -58,19 +57,21 @@ describe('LogicSession', () => {
       } = session;
 
       session.updateBoard({ column: columnOne, playerID: mockPlayerOneID });
-      expect(gameBoardState[columnOne].at(-1)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnOne].at(-1)!.cellState).toBe(mockPlayerOneID);
       session.updateBoard({ column: columnOne, playerID: mockPlayerTwoID });
-      expect(gameBoardState[columnOne].at(-2)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnOne].at(-2)!.cellState).toBe(mockPlayerTwoID);
 
       session.updateBoard({ column: columnTwo, playerID: mockPlayerOneID });
-      expect(gameBoardState[columnTwo].at(-1)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnTwo].at(-1)!.cellState).toBe(mockPlayerOneID);
       session.updateBoard({ column: columnThree, playerID: mockPlayerTwoID });
-      expect(gameBoardState[columnThree].at(-1)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnThree].at(-1)!.cellState).toBe(
+        mockPlayerTwoID,
+      );
 
       session.updateBoard({ column: columnTwo, playerID: mockPlayerOneID });
-      expect(gameBoardState[columnTwo].at(-2)!.state).toBe(PlayerColor.RED);
+      expect(gameBoardState[columnTwo].at(-2)!.cellState).toBe(mockPlayerOneID);
       session.updateBoard({ column: columnTwo, playerID: mockPlayerTwoID });
-      expect(gameBoardState[columnTwo].at(-3)!.state).toBe(PlayerColor.BLACK);
+      expect(gameBoardState[columnTwo].at(-3)!.cellState).toBe(mockPlayerTwoID);
     });
 
     test('should throw error for invalid column', () => {

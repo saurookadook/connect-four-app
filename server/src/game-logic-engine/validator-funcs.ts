@@ -1,27 +1,27 @@
 import {
-  BOARD_COLS,
+  BOARD_COLS, // force formatting
   BOARD_ROWS,
   GameBoard,
-  PlayerColor,
 } from '@/game-logic-engine/constants';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export type ValidatorFunc = (
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerColor: PlayerColor,
+  playerID: PlayerDTO['playerID'],
 ) => boolean;
 
 export function checkVerticalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerColor: PlayerColor,
+  playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
   let connectedCount = 0;
 
-  localLogger(`checkVerticalWin for ${playerColor}`, loggingEnabled);
+  localLogger(`checkVerticalWin for ${playerID}`, loggingEnabled);
   for (let row = rowStart; row <= rowStart + 3; row++) {
     localLogger(
       `---- Checking vertical => col: ${colStart} | row: ${row}`,
@@ -33,7 +33,7 @@ export function checkVerticalWin(
         boardState, // force formatting
         colIndex: colStart,
         rowIndex: row,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -47,7 +47,7 @@ export function checkDescendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerColor: PlayerColor,
+  playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
   let descOpen = true;
@@ -55,7 +55,7 @@ export function checkDescendingSlopeDiagonalWin(
   let connectedCount = 0;
 
   localLogger(
-    `checkDescendingSlopeDiagonalWin for ${playerColor}`,
+    `checkDescendingSlopeDiagonalWin for ${playerID}`,
     loggingEnabled,
   );
   for (let offset = 0; offset < 4; offset++) {
@@ -69,7 +69,7 @@ export function checkDescendingSlopeDiagonalWin(
         boardState, // force formatting
         colIndex: colStart - offset,
         rowIndex: rowStart - offset,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -87,7 +87,7 @@ export function checkDescendingSlopeDiagonalWin(
         boardState, // force formatting
         colIndex: colStart + offset,
         rowIndex: rowStart + offset,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -107,17 +107,14 @@ export function checkAscendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerColor: PlayerColor,
+  playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
   let descOpen = true;
   let ascOpen = true;
   let connectedCount = 0;
 
-  localLogger(
-    `checkAscendingSlopeDiagonalWin for ${playerColor}`,
-    loggingEnabled,
-  );
+  localLogger(`checkAscendingSlopeDiagonalWin for ${playerID}`, loggingEnabled);
   for (let offset = 0; offset < 4; offset++) {
     localLogger(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
@@ -129,7 +126,7 @@ export function checkAscendingSlopeDiagonalWin(
         boardState, // force formatting
         colIndex: colStart - offset,
         rowIndex: rowStart + offset,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -147,7 +144,7 @@ export function checkAscendingSlopeDiagonalWin(
         boardState, // force formatting
         colIndex: colStart + offset,
         rowIndex: rowStart - offset,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -167,14 +164,14 @@ export function checkHorizontalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerColor: PlayerColor,
+  playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
   let descOpen = true;
   let ascOpen = true;
   let connectedCount = 0;
 
-  localLogger(`checkHorizontalWin for ${playerColor}`, loggingEnabled);
+  localLogger(`checkHorizontalWin for ${playerID}`, loggingEnabled);
   for (let offset = 0; offset < 4; offset++) {
     localLogger(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart}`,
@@ -186,7 +183,7 @@ export function checkHorizontalWin(
         boardState,
         colIndex: colStart - offset,
         rowIndex: rowStart,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -204,7 +201,7 @@ export function checkHorizontalWin(
         boardState,
         colIndex: colStart + offset,
         rowIndex: rowStart,
-        playerColor,
+        playerID,
       })
     ) {
       connectedCount += 1;
@@ -239,16 +236,16 @@ function playerHasCell({
   boardState, // force formatting
   colIndex,
   rowIndex,
-  playerColor,
+  playerID,
 }: {
   boardState: GameBoard;
   colIndex: number;
   rowIndex: number;
-  playerColor: PlayerColor;
+  playerID: PlayerDTO['playerID'];
 }): boolean {
   return (
     !isBeyondBoardBounds(colIndex, rowIndex) &&
-    boardState[colIndex][rowIndex].state === playerColor
+    boardState[colIndex][rowIndex].cellState === playerID
   );
 }
 

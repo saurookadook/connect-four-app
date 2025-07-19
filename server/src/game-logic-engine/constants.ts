@@ -1,20 +1,14 @@
 import { GameSessionStatus } from '@/constants/game';
+import { BoardCell } from '@/types/main';
 
-export { GameSessionStatus };
+export { GameSessionStatus, type BoardCell };
 
 export enum PlayerColor {
   RED = 'RED',
   BLACK = 'BLACK',
 }
 
-export type CellState = PlayerColor | null;
-export interface Cell {
-  state: CellState;
-  row: number;
-  column: number;
-}
-
-export type BoardColumns = Cell[];
+export type BoardColumns = BoardCell[];
 export type GameBoard = BoardColumns[];
 
 export const BOARD_ROWS = 6;
