@@ -1,4 +1,5 @@
-import { BOARD_COLS, BOARD_ROWS, PlayerColor } from '../constants';
+import { mockPlayerOneID } from '@/__mocks__/playerMocks';
+import { BOARD_COLS, BOARD_ROWS } from '../constants';
 import { LogicBoard } from '..';
 
 describe('Board', () => {
@@ -11,17 +12,17 @@ describe('Board', () => {
       const targetColIndex = 4;
 
       expect(
-        testLogicBoard.gameBoardState[targetColIndex].at(-1)?.state,
+        testLogicBoard.gameBoardState[targetColIndex].at(-1)?.cellState,
       ).toBeNull();
 
       testLogicBoard.updateBoardState({
         columnIndex: targetColIndex,
-        playerColor: PlayerColor.RED,
+        playerID: mockPlayerOneID,
       });
 
-      expect(testLogicBoard.gameBoardState[targetColIndex].at(-1)?.state).toBe(
-        PlayerColor.RED,
-      );
+      expect(
+        testLogicBoard.gameBoardState[targetColIndex].at(-1)?.cellState,
+      ).toBe(mockPlayerOneID);
     });
   });
 
@@ -36,9 +37,9 @@ describe('Board', () => {
 
         row.forEach((cell, rowIndex) => {
           expect(cell).toEqual({
-            column: colIndex,
+            cellState: null,
+            col: colIndex,
             row: rowIndex,
-            state: null,
           });
         });
       });

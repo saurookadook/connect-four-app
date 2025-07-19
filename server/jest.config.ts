@@ -4,6 +4,7 @@ export default {
   // coveragePathIgnorePatterns: ['/dist/', '/node_modules/', '**/*.d.ts'],
   detectOpenHandles: true,
   forceExit: true,
+  globalSetup: '<rootDir>/jest-global-setup.ts',
   moduleFileExtensions: ['js', 'json', 'ts'],
   moduleNameMapper: {
     '@/(.*)': '<rootDir>/src/$1',

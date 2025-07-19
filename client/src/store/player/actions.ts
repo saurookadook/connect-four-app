@@ -72,7 +72,7 @@ async function handleAuthRequest({
     if (!response.ok) {
       throw new Error(
         response.statusText ||
-          `Unkonwn error handling auth request to '${requestPath}'`,
+          `Unknown error handling auth request to '${requestPath}'`,
       );
     }
 

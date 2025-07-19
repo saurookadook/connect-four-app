@@ -1,8 +1,9 @@
 import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
-import { GameSessionStatus, PlayerMove } from '@/constants/game';
+import { GameSessionStatus } from '@/constants/game';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
+import { PlayerMove } from '@/types/main';
 
 @Exclude()
 export class GameSessionDTO extends BaseDTO {

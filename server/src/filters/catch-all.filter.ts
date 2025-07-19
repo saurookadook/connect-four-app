@@ -22,7 +22,7 @@ export class CatchAllFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const errorMessage =
-      exception instanceof Error ? exception.message : 'Unkonwn error';
+      exception instanceof Error ? exception.message : 'Unknown error';
 
     const responseBody = {
       message: errorMessage,

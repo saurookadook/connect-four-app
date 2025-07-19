@@ -1,11 +1,8 @@
-import { FlatRecord, HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { GameSessionStatus } from '@/constants';
 import { GameSessionDTO } from '@/game-engine/dtos/game-session.dto';
-import {
-  GameSession,
-  GameSessionDocument,
-} from '@/game-engine/schemas/game-session.schema';
+import { GameSession } from '@/game-engine/schemas/game-session.schema';
 import { mockNow } from './commonMocks';
 
 const commonDefaults = {
@@ -15,7 +12,7 @@ const commonDefaults = {
   updatedAt: mockNow,
 };
 
-type GameSessionDocumentMock = Pick<
+export type GameSessionDocumentMock = Pick<
   HydratedDocument<GameSession>,
   | '_id'
   | 'playerOneID'
@@ -27,18 +24,14 @@ type GameSessionDocumentMock = Pick<
   | '__v'
 >;
 
-type OptionalCommonDefaults = Partial<
+export type OptionalDocumentMockArgs = Partial<
   Pick<
     HydratedDocument<GameSession>,
-    'createdAt' | 'moves' | 'status' | 'updatedAt'
+    '_id' | 'createdAt' | 'moves' | 'status' | 'updatedAt' | '__v'
   >
 >;
 
-type OptionalDocumentArgs = Partial<
-  Pick<HydratedDocument<GameSession>, '_id' | '__v'>
->;
-
-type RequiredDocumentArgs = Pick<
+export type RequiredDocumentMockArgs = Pick<
   HydratedDocument<GameSession>,
   'playerOneID' | 'playerTwoID'
 >;
@@ -46,7 +39,7 @@ type RequiredDocumentArgs = Pick<
 // TODO: this still isn't raising errors like it should when the 'args' includes
 // additional properties other than what is defined in the types
 export function createNewGameSessionDocumentMock(
-  args: RequiredDocumentArgs & OptionalDocumentArgs & OptionalCommonDefaults,
+  args: RequiredDocumentMockArgs & OptionalDocumentMockArgs,
 ): GameSessionDocumentMock {
   const { _id, __v, ...rest } = args;
   return {
@@ -57,10 +50,31 @@ export function createNewGameSessionDocumentMock(
   };
 }
 
-// TODO: need to fix types in this to be clearer like it is for above function
+// prettier-ignore
+export type GameSessionMock =
+  { id?: GameSessionDTO['id'] } &
+  Pick<
+    GameSessionDTO,
+    | 'playerOneID' // force formatting
+    | 'playerTwoID'
+    | 'moves'
+    | 'status'
+    | 'createdAt'
+    | 'updatedAt'
+  >;
+
+export type OptionalMockArgs = Partial<
+  Pick<GameSessionDTO, 'id' | 'createdAt' | 'moves' | 'status' | 'updatedAt'>
+>;
+
+export type RequiredMockArgs = Pick<
+  GameSessionDTO,
+  'playerOneID' | 'playerTwoID'
+>;
+
 export function createNewGameSessionMock(
-  args: Partial<GameSessionDTO>,
-): Partial<GameSessionDTO> {
+  args: RequiredMockArgs & OptionalMockArgs,
+): GameSessionMock {
   return {
     ...commonDefaults,
     ...args,

@@ -13,12 +13,12 @@ import {
 import { WebSocket, Server } from 'ws';
 
 import {
-  PlayerMove,
   MAKE_MOVE,
   RESOLVED_MOVE,
   START_GAME,
   SEND_GAME_SESSION,
 } from '@/constants';
+import { PlayerMove } from '@/types/main';
 import { GameEngineService } from '../game-engine.service';
 
 // TODO: better way to handle this?

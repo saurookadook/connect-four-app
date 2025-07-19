@@ -1,6 +1,5 @@
-import { UUID, randomUUID } from 'crypto';
-
-import { GameSessionStatus, PlayerColor } from '../constants';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
+import { GameSessionStatus } from '../constants';
 import {
   populateBoardWithOneMoveTilWin,
   populateBoardWithDescendingSlopeDiagonalWinOne,
@@ -9,8 +8,6 @@ import {
 import { GameLogicEngine, LogicSession } from '..';
 
 describe('GameLogicEngine', () => {
-  const mockPlayerOneID: UUID = randomUUID();
-  const mockPlayerTwoID: UUID = randomUUID();
   let gameEngine: GameLogicEngine;
 
   beforeEach(() => {
@@ -47,8 +44,8 @@ describe('GameLogicEngine', () => {
       } = logicSession;
       const targetColIndex = 3;
 
-      expect(gameBoardState[targetColIndex].at(-1)?.state).toBeNull();
-      expect(logicSession.activePlayer).toBe(PlayerColor.RED);
+      expect(gameBoardState[targetColIndex].at(-1)?.cellState).toBeNull();
+      expect(logicSession.activePlayer).toBe(mockPlayerOneID);
 
       gameEngine.handleMove({
         columnIndex: targetColIndex,
@@ -56,10 +53,10 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(gameBoardState[targetColIndex].at(-1)?.state).toBe(
-        PlayerColor.RED,
+      expect(gameBoardState[targetColIndex].at(-1)?.cellState).toBe(
+        mockPlayerOneID,
       );
-      expect(logicSession.activePlayer).toBe(PlayerColor.BLACK);
+      expect(logicSession.activePlayer).toBe(mockPlayerTwoID);
 
       gameEngine.handleMove({
         columnIndex: targetColIndex,
@@ -67,10 +64,10 @@ describe('GameLogicEngine', () => {
         sessionRef: logicSession,
       });
 
-      expect(gameBoardState[targetColIndex].at(-2)?.state).toBe(
-        PlayerColor.BLACK,
+      expect(gameBoardState[targetColIndex].at(-2)?.cellState).toBe(
+        mockPlayerTwoID,
       );
-      expect(logicSession.activePlayer).toBe(PlayerColor.RED);
+      expect(logicSession.activePlayer).toBe(mockPlayerOneID);
     });
 
     test("updates board state with winning move for 'sessionRef'", () => {
@@ -85,9 +82,9 @@ describe('GameLogicEngine', () => {
       });
 
       expect(
-        logicSession.board.gameBoardState[targetColIndex].at(-4)?.state,
-      ).toBe(PlayerColor.RED);
-      expect(logicSession.activePlayer).toBe(PlayerColor.RED);
+        logicSession.board.gameBoardState[targetColIndex].at(-4)?.cellState,
+      ).toBe(mockPlayerOneID);
+      expect(logicSession.activePlayer).toBe(mockPlayerOneID);
     });
   });
 
@@ -105,23 +102,23 @@ describe('GameLogicEngine', () => {
       test('simple case', () => {
         logicSession.board.updateBoardState({
           columnIndex: 3,
-          playerColor: PlayerColor.RED,
+          playerID: mockPlayerOneID,
         });
         logicSession.board.updateBoardState({
           columnIndex: 2,
-          playerColor: PlayerColor.BLACK,
+          playerID: mockPlayerTwoID,
         });
         logicSession.board.updateBoardState({
           columnIndex: 3,
-          playerColor: PlayerColor.RED,
+          playerID: mockPlayerOneID,
         });
         logicSession.board.updateBoardState({
           columnIndex: 3,
-          playerColor: PlayerColor.BLACK,
+          playerID: mockPlayerTwoID,
         });
         logicSession.board.updateBoardState({
           columnIndex: 4,
-          playerColor: PlayerColor.RED,
+          playerID: mockPlayerOneID,
         });
 
         expect(
@@ -172,7 +169,7 @@ describe('GameLogicEngine', () => {
       gameEngine.endGame(logicSession);
 
       expect(logicSession.status).toBe(GameSessionStatus.COMPLETED);
-      expect(logicSession.activePlayer).toBe(PlayerColor.RED);
+      expect(logicSession.activePlayer).toBe(mockPlayerOneID);
     });
   });
 });
