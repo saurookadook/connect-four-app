@@ -1,30 +1,77 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import {
   BoardStateDTO,
   CreateBoardStateDTO,
+  GameSessionDTO,
   UpdateBoardStateDTO,
-} from './dtos/board-states.dto';
+} from '@/game-engine/dtos';
 import {
   BoardState,
   BoardStateDocument,
+  GameSession,
   NullableBoardStateDocument,
-} from './schemas/board-states.schema';
+} from '@/game-engine/schemas';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 
 @Injectable()
 export class BoardStatesService {
   constructor(
     @InjectModel(BoardState.name)
     private boardStateModel: Model<BoardStateDocument>,
+    private readonly gameSessionsService: GameSessionsService,
   ) {}
 
-  async createOne(boardState: CreateBoardStateDTO) {}
+  async createOne(
+    boardState: CreateBoardStateDTO,
+  ): Promise<BoardStateDocument> {
+    await this._validateGameSession(boardState.gameSessionID);
 
-  async findOneByGameSessionID(gameSessionID: BoardStateDTO['id']) {}
+    const createdBoardState = new this.boardStateModel(boardState);
+    return createdBoardState.save();
+  }
 
-  async updateOne(id: string, boardState: UpdateBoardStateDTO) {}
+  async findOneByGameSessionID(
+    gameSessionID: GameSessionDTO['id'],
+  ): Promise<NullableBoardStateDocument> {
+    await this._validateGameSession(gameSessionID);
 
-  async deleteOneByGameSessionID(gameSessionID: BoardStateDTO['id']) {}
+    return await this.boardStateModel
+      .findOne({ gameSessionID: gameSessionID })
+      .exec();
+  }
+
+  async updateOne(
+    id: string,
+    boardState: UpdateBoardStateDTO,
+  ): Promise<NullableBoardStateDocument> {
+    if (boardState.gameSessionID != null) {
+      await this._validateGameSession(boardState.gameSessionID);
+    }
+
+    return await this.boardStateModel
+      .findByIdAndUpdate(id, boardState, { new: true })
+      .exec();
+  }
+
+  async deleteOneByGameSessionID(
+    gameSessionID: GameSessionDTO['id'],
+  ): Promise<NullableBoardStateDocument> {
+    return await this.boardStateModel
+      .findOneAndDelete({ gameSessionID: gameSessionID })
+      .exec();
+  }
+
+  async _validateGameSession(gameSessionID: GameSessionDTO['id']) {
+    const foundGameSession =
+      await this.gameSessionsService.findOneById(gameSessionID);
+
+    if (foundGameSession == null) {
+      throw new NotFoundException(
+        `[BoardStatesService._validateGameSession] Game Session with ID '${gameSessionID}' not found`,
+      );
+    }
+  }
 }
