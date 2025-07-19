@@ -1,4 +1,3 @@
-import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
