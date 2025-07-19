@@ -4,7 +4,6 @@ export function isObject(val: unknown) {
   return typeof val === 'object' && val != null && !Array.isArray(val);
 }
 
-// @ts-expect-error: TODO: fix types
 function handleAssignment({ assignmentTarget, targetValue }) {
   return isObject(targetValue) // force formatting
     ? deeplyMerge(assignmentTarget || {}, targetValue)
@@ -19,10 +18,10 @@ function handleAssignment({ assignmentTarget, targetValue }) {
  * @param source
  * @returns Original target object with source recursively merged into it.
  */
-export function deeplyMerge<T extends IObject = IObject, S extends IObject = IObject>(
-  target: T,
-  source: S,
-): T {
+export function deeplyMerge<
+  T extends IObject = IObject,
+  S extends IObject = IObject,
+>(target: T, source: S): T {
   if (!isObject(target)) {
     throw new TypeError("[deeplyMerge] : argument 'target' must be an object!");
   }

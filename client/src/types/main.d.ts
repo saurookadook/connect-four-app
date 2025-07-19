@@ -1,6 +1,6 @@
 import { AppDispatch } from '@/store';
 
-export type Nullable<T> = T | null;
+export type * from '@connect-four-app/shared';
 
 export type BoundThis = {
   name: string;

@@ -1,12 +1,12 @@
-import { UUID } from 'node:crypto';
 import { Exclude, Expose } from 'class-transformer';
 
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
+import type { PlayerID } from '@/types/main';
 
 @Exclude()
 export class PlayerDTO extends BaseDTO {
   @Expose()
-  playerID: UUID;
+  playerID: PlayerID;
 
   @Expose()
   username: string;
@@ -27,7 +27,7 @@ export class CreatePlayerDTO {
   username: PlayerDTO['username'];
 
   @Expose()
-  password: string;
+  password: PlayerDTO['password'];
 
   @Expose()
   email?: PlayerDTO['email'];

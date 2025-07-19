@@ -1,14 +1,15 @@
-import { UUID } from 'node:crypto';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
+
+import type { PlayerID } from '@/types/main';
 
 @Schema()
 export class Player {
   @Prop({
     required: true,
-    type: String,
+    type: Types.UUID,
   })
-  playerID: UUID;
+  playerID: PlayerID;
 
   @Prop({
     required: true,

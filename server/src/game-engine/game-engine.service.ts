@@ -20,18 +20,7 @@ export class GameEngineService {
     @InjectConnection() private dbConn: Connection,
     private readonly boardStatesService: BoardStatesService,
     private readonly gameSessionsService: GameSessionsService,
-  ) {
-    // void this.dbConn.collection('board_states').insertOne({
-    //   gameSessionID: new Types.ObjectId(),
-    //   createdAt: new Date(),
-    //   updatedAt: new Date(),
-    // });
-    void this.dbConn.model(BoardState.name).insertOne({
-      gameSessionID: new Types.ObjectId(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
+  ) {}
 
   // TODO: maybe this should do the following?
   // - get or create game_sessions record from DB

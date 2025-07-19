@@ -1,12 +1,8 @@
-import {
-  // randomUUID,
-  UUID,
-} from 'node:crypto';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 import { GameSessionStatus } from '@constants/game';
-import { PlayerMove } from '@/types/main';
+import type { PlayerID, PlayerMove } from '@/types/main';
 
 @Schema({
   // @ts-expect-error: This is the documented way to add an enum validator [https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum()]
@@ -18,20 +14,21 @@ class Game_Session {
 
   @Prop({
     required: true,
-    // type: randomUUID
+    type: Types.UUID,
   })
-  playerOneID: UUID;
+  playerOneID: PlayerID;
 
   @Prop({
     required: true,
-    // type: randomUUID
+    type: Types.UUID,
   })
-  playerTwoID: UUID;
+  playerTwoID: PlayerID;
 
   @Prop({
     default: null,
+    type: Types.UUID,
   })
-  winner: UUID;
+  winner: PlayerID;
 
   @Prop({ default: [], required: true })
   moves: PlayerMove[];

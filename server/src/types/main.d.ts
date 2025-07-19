@@ -1,24 +1,12 @@
 import { Types } from 'mongoose';
 
+import { type PlayerID } from '@connect-four-app/shared';
 import { PlayerDTO } from '@/player/dtos/player.dto';
 
-export type BoardCell = {
-  cellState: PlayerDetails['playerID'] | null;
-  col: number;
-  row: number;
-};
+export type { BoardCell, PlayerID, PlayerMove } from '@connect-four-app/shared';
 
 export type PlayerDetails = {
-  playerID: PlayerDTO['playerID'];
+  playerID: PlayerID;
   playerObjectID: Types.ObjectId;
   username: PlayerDTO['username'];
-};
-
-export type PlayerMove = {
-  columnIndex: number;
-  /** @note String representation of Mongo `ObjectId` */
-  gameSessionID: string;
-  playerID: PlayerDTO['playerID'];
-  /** @todo Need to change this to `number` */
-  timestamp: Date;
 };

@@ -43,6 +43,7 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/require-await': 'warn',
+      '@typescript-eslint/restrict-template-expressions': 'warn'
     },
   },
 );

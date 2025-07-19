@@ -1,11 +1,7 @@
-import { UUID } from 'node:crypto';
-import * as uuid from 'uuid';
-
-import { PlayerDTO } from '@/player/dtos/player.dto';
+import type { PlayerID } from '@/types/main';
+import { isUUID } from '@connect-four-app/shared';
 import { GameBoard, GameSessionStatus, PlayerColor } from './constants';
 import { LogicBoard } from './';
-
-type PlayerID = PlayerDTO['playerID'];
 
 export class LogicSession {
   #activePlayer: PlayerID;
@@ -42,7 +38,6 @@ export class LogicSession {
         : this.#playerOneID;
   }
 
-  // TODO: maybe this is unnecessary?
   updateBoard({
     column, // force formatting
     playerID,
@@ -80,8 +75,7 @@ export class LogicSession {
   }
 
   set activePlayer(playerID: unknown) {
-    // TODO: should use `isUUID` type guard
-    if (typeof playerID !== 'string' || !playerID) {
+    if (!isUUID(playerID)) {
       throw new Error(
         `Invalid player ID: '${String(playerID)}' (type '${typeof playerID}')`,
       );
@@ -104,28 +98,28 @@ export class LogicSession {
     this.#board = boardValue;
   }
 
-  get playerOneID(): UUID {
+  get playerOneID(): PlayerID {
     return this.#playerOneID;
   }
 
-  set playerOneID(playerID: UUID) {
-    if (!uuid.validate(playerID)) {
+  set playerOneID(playerID: unknown) {
+    if (!isUUID(playerID)) {
       throw new TypeError(`Invalid argument: 'playerID' must be a valid UUID`);
     }
 
-    this.#playerOneID = playerID;
+    this.#playerOneID = playerID as PlayerID;
   }
 
-  get playerTwoID(): UUID {
+  get playerTwoID(): PlayerID {
     return this.#playerTwoID;
   }
 
-  set playerTwoID(playerID: UUID) {
-    if (!uuid.validate(playerID)) {
+  set playerTwoID(playerID: unknown) {
+    if (!isUUID(playerID)) {
       throw new TypeError(`Invalid argument: 'playerID' must be a valid UUID`);
     }
 
-    this.#playerTwoID = playerID;
+    this.#playerTwoID = playerID as PlayerID;
   }
 
   get status(): GameSessionStatus {

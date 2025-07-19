@@ -2,7 +2,7 @@
  * @param maybeStringifiedObject
  * @returns If successful, returns parsed object. Otherwise, returns `null`.
  */
-export function safeParseJson(
+export function safeParseJSON(
   maybeStringifiedObject: unknown,
 ): Record<string, any> | Array<any> | null {
   try {
@@ -10,7 +10,7 @@ export function safeParseJson(
     return JSON.parse(maybeStringifiedObject);
   } catch (error) {
     console.error(
-      `[safeParseJson] Failed to parse '${maybeStringifiedObject}' (type ${typeof maybeStringifiedObject})`,
+      `[safeParseJSON] Failed to parse '${maybeStringifiedObject}' (type ${typeof maybeStringifiedObject})`,
       { cause: error },
     );
     return null;
