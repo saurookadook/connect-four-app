@@ -1,5 +1,6 @@
 {
   "name": "@connect-four-app/shared",
+  "version": "0.0.0",
   "type": "module",
   "types": "dist/esm/index.d.ts",
   "browser": "dist/esm/index.js",
