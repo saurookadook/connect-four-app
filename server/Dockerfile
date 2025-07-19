@@ -6,8 +6,10 @@ ENV yarn='corepack yarn'
 WORKDIR /opt/connect-four-app/
 COPY .env .yarnrc.yml package.json yarn.lock /opt/connect-four-app/
 COPY server/ /opt/connect-four-app/server/
+COPY shared/ /opt/connect-four-app/shared/
 RUN corepack enable
 RUN corepack use yarn@$YARN_VERSION
+RUN $yarn shared:base build
 RUN $yarn server:base build
 
 FROM server-dev-base AS server-dev

@@ -18,6 +18,7 @@
     "test:e2e": "test --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@connect-four-app/shared": "workspace:*",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
