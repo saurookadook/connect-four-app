@@ -24,7 +24,6 @@ import {
 } from '../schemas/game-session.schema';
 import { GameSessionsModule } from './game-sessions.module';
 import { GameSessionsService } from './game-sessions.service';
-import { inspect } from 'node:util';
 
 describe('GameSessionsController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
