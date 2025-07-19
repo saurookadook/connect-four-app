@@ -4,6 +4,7 @@ const fullW = process.stdout.columns;
 const halfW = Math.floor(fullW / 2);
 
 export default function (globalConfig, projectConfig) {
+  console.log('\n');
   console.log(
     ' running Jest global setup... '.padStart(halfW, '?').padEnd(fullW, '?'),
   );
@@ -11,9 +12,8 @@ export default function (globalConfig, projectConfig) {
   //   globalConfig,
   //   projectConfig,
   // });
-  // console.log('?'.repeat(fullW));
 
-  globalThis.inspect = inspect;
+  global.inspect = inspect;
 
   console.log(
     ' Jest global setup completed! '.padStart(halfW, '?').padEnd(fullW, '?'),
