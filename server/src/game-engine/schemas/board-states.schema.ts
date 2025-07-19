@@ -1,30 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-import {
-  GameSession,
-  GameSessionDocument,
-} from '@/game-engine/schemas/game-session.schema';
-import { BOARD_COLS, BOARD_ROWS } from '@/game-logic-engine/constants';
+import { LogicBoard } from '@/game-logic-engine';
 import { BoardCell } from '@/types/main';
-
-export function createEmptyBoard() {
-  const board: BoardCell[][] = [];
-
-  for (let i = 0; i < BOARD_COLS; i++) {
-    board[i] = [];
-
-    for (let j = 0; j < BOARD_ROWS; j++) {
-      board[i][j] = {
-        cellState: null,
-        col: i,
-        row: j,
-      };
-    }
-  }
-
-  return board;
-}
 
 export const BOARD_STATES_TTL_SECONDS = 7200;
 
@@ -40,7 +18,7 @@ class Board_State {
   gameSessionID: Types.ObjectId;
 
   @Prop({
-    default: createEmptyBoard(),
+    default: LogicBoard.createEmptyBoardState(),
   })
   state: BoardCell[][];
 
