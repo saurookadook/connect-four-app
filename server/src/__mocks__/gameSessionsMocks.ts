@@ -12,17 +12,19 @@ const commonDefaults = {
   updatedAt: mockNow,
 };
 
-export type GameSessionDocumentMock = Pick<
-  HydratedDocument<GameSession>,
-  | '_id'
-  | 'playerOneID'
-  | 'playerTwoID'
-  | 'moves'
-  | 'status'
-  | 'createdAt'
-  | 'updatedAt'
-  | '__v'
->;
+// prettier-ignore
+export type GameSessionDocumentMock =
+  { _id?: HydratedDocument<GameSession>['_id']; } &
+  Pick<
+    HydratedDocument<GameSession>,
+    | 'playerOneID'
+    | 'playerTwoID'
+    | 'moves'
+    | 'status'
+    | 'createdAt'
+    | 'updatedAt'
+    | '__v'
+  >;
 
 export type OptionalDocumentMockArgs = Partial<
   Pick<
@@ -45,7 +47,6 @@ export function createNewGameSessionDocumentMock(
   return {
     ...commonDefaults,
     ...rest,
-    _id: _id ?? new Types.ObjectId(),
     __v: __v ?? 0,
   };
 }

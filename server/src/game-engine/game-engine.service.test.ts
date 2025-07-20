@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
-import { Connection, Model } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 
 import { BOARD_ROWS, GameSessionStatus } from '@connect-four-app/shared';
 import {
@@ -12,7 +12,11 @@ import {
   createNewGameSessionDocumentMock, // force formatting
   type GameSessionDocumentMock,
 } from '@/__mocks__/gameSessionsMocks';
-import { mockPlayerOneID, mockPlayers } from '@/__mocks__/playerMocks';
+import {
+  mockPlayers,
+  mockPlayerOneID,
+  mockPlayerTwoID,
+} from '@/__mocks__/playerMocks';
 import {
   BOARD_STATE_MODEL_TOKEN,
   GAME_SESSION_MODEL_TOKEN,
@@ -73,11 +77,6 @@ describe('GameEngineService', () => {
     ]);
   });
 
-  beforeEach(async () => {
-    await gameSessionModel.deleteMany({}).exec();
-    jest.clearAllTimers();
-  });
-
   afterAll(async () => {
     await boardStateModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
@@ -87,7 +86,170 @@ describe('GameEngineService', () => {
   });
 
   describe("'startGame' method", () => {
-    // TODO
+    beforeEach(async () => {
+      await boardStateModel.deleteMany({}).exec();
+      await gameSessionModel.deleteMany({}).exec();
+      jest.clearAllTimers();
+    });
+
+    it('creates new game session and board state documents', async () => {
+      const emptyGameSessionResult = await gameSessionModel
+        .findOne({
+          playerOneID: mockPlayerOneID,
+          playerTwoID: mockPlayerTwoID,
+        })
+        .exec();
+      expect(emptyGameSessionResult).toBeNull();
+
+      const emptyBoardStateResult = await boardStateModel.find({}).exec();
+      expect(emptyBoardStateResult).toEqual([]);
+
+      const newGameSession = await gameEngineService.startGame({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const newBoardState = (await boardStatesService.findOneByGameSessionID(
+        newGameSession.id,
+      )) as BoardStateDocument;
+
+      const mockGameSessionDocument = createNewGameSessionDocumentMock({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const mockBoardStateDocument = createBoardStateDocumentMock(
+        newGameSession.id,
+      );
+
+      expectHydratedDocumentToMatch<BoardState>(
+        newBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+        },
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        newGameSession, // force formatting
+        {
+          ...mockGameSessionDocument,
+        },
+      );
+    });
+
+    it('finds existing game session document and creates new board state document', async () => {
+      const initialGameSessionDocument = await gameSessionsService.createOne({
+        playerOneID: mockFirstPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+      const mockGameSessionDocument = createNewGameSessionDocumentMock({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+
+      const initialGameSessionResult = (await gameSessionModel
+        .findById(initialGameSessionDocument.id)
+        .exec()) as GameSessionDocument;
+      expect(initialGameSessionResult).not.toBeNull();
+      expectHydratedDocumentToMatch<GameSession>(
+        initialGameSessionResult, // force formatting
+        {
+          ...mockGameSessionDocument,
+        },
+      );
+
+      const emptyBoardStateResult = await boardStateModel.find({}).exec();
+      expect(emptyBoardStateResult).toEqual([]);
+
+      const mockGameSessionID = initialGameSessionDocument._id.toJSON();
+      const mockBoardStateDocument =
+        createBoardStateDocumentMock(mockGameSessionID);
+
+      const foundGameSession = await gameEngineService.startGame({
+        gameSessionID: mockGameSessionID,
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+
+      const newBoardState = (await boardStatesService.findOneByGameSessionID(
+        foundGameSession.id,
+      )) as BoardStateDocument;
+
+      expectHydratedDocumentToMatch<BoardState>(
+        newBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+        },
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        foundGameSession, // force formatting
+        {
+          ...mockGameSessionDocument,
+        },
+      );
+    });
+
+    it('finds existing game session and board state documents', async () => {
+      const initialGameSessionDocument = await gameSessionsService.createOne({
+        playerOneID: mockFirstPlayer.playerID,
+        playerTwoID: mockSecondPlayer.playerID,
+      });
+      const mockGameSessionID = initialGameSessionDocument._id.toJSON();
+      const initialBoardStateDocument = await boardStatesService.createOne({
+        gameSessionID: mockGameSessionID,
+      });
+
+      const mockGameSessionDocument = createNewGameSessionDocumentMock({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const mockBoardStateDocument =
+        createBoardStateDocumentMock(mockGameSessionID);
+
+      const initialGameSessionResult = (await gameSessionModel
+        .findOne({
+          playerOneID: mockPlayerOneID,
+          playerTwoID: mockPlayerTwoID,
+        })
+        .exec()) as GameSessionDocument;
+      expect(initialGameSessionResult).not.toBeNull();
+      expectHydratedDocumentToMatch<GameSession>(
+        initialGameSessionResult, // force formatting
+        {
+          ...mockGameSessionDocument,
+        },
+      );
+
+      const initialBoardStateResult = (await boardStateModel
+        .findById(initialBoardStateDocument.id)
+        .exec()) as BoardStateDocument;
+      expect(initialBoardStateResult).not.toBeNull();
+      expectHydratedDocumentToMatch<BoardState>(
+        initialBoardStateResult, // force formatting
+        {
+          ...mockBoardStateDocument,
+        },
+      );
+
+      const foundGameSession = await gameEngineService.startGame({
+        gameSessionID: mockGameSessionID,
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const foundBoardState = (await boardStatesService.findOneByGameSessionID(
+        foundGameSession.id,
+      )) as BoardStateDocument;
+
+      expectHydratedDocumentToMatch<GameSession>(
+        foundGameSession, // force formatting
+        {
+          ...mockGameSessionDocument,
+        },
+      );
+      expectHydratedDocumentToMatch<BoardState>(
+        foundBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+        },
+      );
+    });
   });
 
   describe("'handlePlayerMove' method", () => {
@@ -120,15 +282,77 @@ describe('GameEngineService', () => {
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
       const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
 
-      const updatedGameSession = await gameEngineService.handlePlayerMove({
-        columnIndex: 2,
+      const expectedCells = Array.from(initialBoardStateDocument.state);
+      const colIndex = 2;
+      let rowIndex = BOARD_ROWS - 1;
+      let move = {
+        columnIndex: colIndex,
         gameSessionID: mockGameSessionID,
         playerID: mockPlayerOneID,
         timestamp: nowPlus30Seconds,
-      });
+      };
+      expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
 
-      const expectedCells = Array.from(initialBoardStateDocument.state);
-      const lastRowIndex = BOARD_ROWS - 1;
+      let updatedGameSession = (await gameEngineService.handlePlayerMove({
+        ...move,
+      })) as GameSessionDocument;
+
+      let updatedBoardState = (await boardStatesService.findOneByGameSessionID(
+        mockGameSessionID,
+      )) as BoardStateDocument;
+
+      expect(updatedBoardState.state[colIndex][rowIndex]).toEqual(
+        expectedCells[colIndex][rowIndex],
+      );
+      expectHydratedDocumentToMatch<BoardState>(
+        updatedBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+          state: expectedCells,
+        },
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        updatedGameSession, // force formatting
+        {
+          ...initialGameSessionDocument,
+          moves: [...initialGameSessionDocument.moves, move],
+        },
+      );
+
+      rowIndex -= 1;
+      move = {
+        columnIndex: colIndex,
+        gameSessionID: mockGameSessionID,
+        playerID: mockPlayerTwoID,
+        timestamp: nowPlus1Minute,
+      };
+      expectedCells[colIndex][rowIndex].cellState = mockPlayerTwoID;
+
+      updatedGameSession = (await gameEngineService.handlePlayerMove({
+        ...move,
+      })) as GameSessionDocument;
+
+      updatedBoardState = (await boardStatesService.findOneByGameSessionID(
+        mockGameSessionID,
+      )) as BoardStateDocument;
+
+      expect(updatedBoardState.state[colIndex][rowIndex]).toEqual(
+        expectedCells[colIndex][rowIndex],
+      );
+      expectHydratedDocumentToMatch<BoardState>(
+        updatedBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+          state: expectedCells,
+        },
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        updatedGameSession, // force formatting
+        {
+          ...initialGameSessionDocument,
+          moves: [...initialGameSessionDocument.moves, move],
+        },
+      );
     });
   });
 });

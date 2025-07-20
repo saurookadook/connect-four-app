@@ -14,6 +14,7 @@ import {
 } from '@/game-engine/schemas';
 import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionsService } from './sessions/game-sessions.service';
+
 @Injectable()
 export class GameEngineService {
   constructor(
@@ -22,10 +23,10 @@ export class GameEngineService {
     private readonly gameSessionsService: GameSessionsService,
   ) {}
 
-  // TODO: maybe this should do the following?
-  // - get or create game_sessions record from DB
-  // - get or create board_states record from DB
-  // - populate board_state with moves from game_sessions record
+  /**
+   * @note If `gameSessionID` is defined, will attempt to find a game session document.
+   * If `gameSessionID` isn't defined, then a new document will be created.
+   */
   async startGame({
     gameSessionID,
     playerOneID,
@@ -43,13 +44,27 @@ export class GameEngineService {
       );
     }
 
-    return (
-      foundGame ??
-      (await this.gameSessionsService.createOne({
+    // TODO: handle mismatch between `foundGame` and playerIDs
+
+    if (foundGame == null) {
+      foundGame = await this.gameSessionsService.createOne({
         playerOneID,
         playerTwoID,
-      }))
-    );
+      });
+    }
+
+    const foundBoardState =
+      await this.boardStatesService.findOneByGameSessionID(foundGame.id);
+
+    if (foundBoardState == null) {
+      await this.boardStatesService.createOne({
+        gameSessionID: foundGame.id,
+      });
+    }
+
+    // TODO: populate BoardState with moves from GameSession
+
+    return foundGame;
   }
 
   async handlePlayerMove(
