@@ -2,6 +2,10 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model, Types } from 'mongoose';
 
+import {
+  createBoardStateDocumentMock,
+  type BoardStateDocumentMock,
+} from '@/__mocks__/boardStatesMocks';
 import { mockNow } from '@/__mocks__/commonMocks';
 import {
   createNewGameSessionMock,
@@ -22,35 +26,13 @@ import {
 } from '@/game-engine/schemas';
 import { GameSessionsModule } from '@/game-engine/sessions/game-sessions.module';
 import { BOARD_ROWS } from '@/game-logic-engine/constants';
-import { LogicBoard } from '@/game-logic-engine';
 import { Player } from '@/player/schemas/player.schema';
 import { PlayerMove } from '@/types/main';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
-
 import { BoardStatesModule } from './board-states.module';
 import { BoardStatesService } from './board-states.service';
 
 const [mockFirstPlayer, mockSecondPlayer] = mockPlayers;
-
-type BoardStateDocumentMock = {
-  gameSessionID: Types.ObjectId;
-  state: ReturnType<typeof LogicBoard.createEmptyBoardState>;
-  createdAt: Date;
-  updatedAt: Date;
-  __v: number;
-};
-
-const createBoardStateDocumentMock = (
-  gameSessionID: string,
-): BoardStateDocumentMock => {
-  return {
-    gameSessionID: new Types.ObjectId(gameSessionID),
-    state: LogicBoard.createEmptyBoardState(),
-    createdAt: mockNow,
-    updatedAt: mockNow,
-    __v: 0,
-  };
-};
 
 describe('BoardStatesService', () => {
   let mongoConnection: Connection;
