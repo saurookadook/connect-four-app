@@ -1,5 +1,4 @@
-// TODO: move to `common` workspace
-type Nullable<T> = T | null;
+import type { Nullable } from '@connect-four-app/shared';
 
 class WebSocketManager {
   #BASE_WS_CONNECTION_URL: string | URL;
@@ -88,5 +87,5 @@ class WebSocketManager {
 const wsManager = new WebSocketManager();
 
 export { wsManager };
-export * from '@connect-four-app/shared';
+
 export * from './safeFetch';

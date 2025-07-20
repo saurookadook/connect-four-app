@@ -1,14 +1,14 @@
 import { randomUUID, type UUID } from 'crypto';
 
-import { GameSessionStatus } from '@/types/main.d';
+import { GameSessionStatus, type PlayerID } from '@connect-four-app/shared';
 import { mockPlayers } from './playerMocks';
 
 export type GameSessionMock = {
   /** @todo This should be a MongoDB `ObjectId` */
   id: string;
   moves: Record<string, unknown>[];
-  playerOneID: UUID;
-  playerTwoID: UUID;
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
   status: GameSessionStatus;
 };
 
@@ -24,7 +24,7 @@ const playerCombinations = [
 export function createMockGameSession({
   id,
   ...args
-}: { id?: UUID | string } & Partial<GameSessionMock>) {
+}: { id?: string } & Partial<GameSessionMock>) {
   const { playerOneID, playerTwoID } = (function () {
     if (args.playerOneID == null && args.playerTwoID == null) {
       const [firstPlayerCombination] = playerCombinations[0];
@@ -54,7 +54,7 @@ export function createMockGameSession({
 export const unstartedGameSessionsMock: GameSessionMock[] = playerCombinations.map(
   ([playerOneID, playerTwoID]) => {
     return {
-      id: randomUUID(),
+      id: randomUUID(), // TODO: should be Mongo `ObjectId`
       moves: [],
       playerOneID,
       playerTwoID,

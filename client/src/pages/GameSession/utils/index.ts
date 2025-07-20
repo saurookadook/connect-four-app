@@ -1,8 +1,8 @@
 import {
-  GameBoard, // force formatting
+  BOARD_COLS, // force formatting
   BOARD_ROWS,
-  BOARD_COLS,
-} from '@/pages/GameSession/constants';
+  type GameBoard,
+} from '@connect-four-app/shared';
 
 export function createEmptyBoard() {
   const emptyBoard: GameBoard = new Array(BOARD_COLS);
@@ -12,8 +12,8 @@ export function createEmptyBoard() {
 
     for (let j = 0; j < BOARD_ROWS; j++) {
       emptyBoard[i][j] = {
-        state: null,
-        column: i,
+        cellState: null,
+        col: i,
         row: j,
       };
     }

@@ -1,6 +1,6 @@
 import { AppDispatch } from '@/store';
 
-export type * from '@connect-four-app/shared';
+export type { SharedTypes } from '@connect-four-app/shared';
 
 export type BoundThis = {
   name: string;

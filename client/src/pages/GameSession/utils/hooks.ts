@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 
+import type { Nullable } from '@connect-four-app/shared';
 import { AppDispatch } from '@/store';
 import { fetchGameSession, setPlayerID } from '@/store/actions';
-import { Nullable, RouterParams } from '@/types/main';
+import { RouterParams } from '@/types/main';
 import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '../constants';
 
 /**
