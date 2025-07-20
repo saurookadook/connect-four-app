@@ -1,6 +1,6 @@
 import { HydratedDocument, Types } from 'mongoose';
 
-import { GameSessionStatus } from '@/constants';
+import { GameSessionStatus } from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos/game-session.dto';
 import { GameSession } from '@/game-engine/schemas/game-session.schema';
 import { mockNow } from './commonMocks';
