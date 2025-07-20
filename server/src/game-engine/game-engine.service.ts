@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 
+import { type PlayerID, type PlayerMove } from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos';
 import {
   BoardState,
@@ -11,9 +12,8 @@ import {
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
-import { GameSessionsService } from './sessions/game-sessions.service';
 import { BoardStatesService } from './board-states/board-states.service';
-
+import { GameSessionsService } from './sessions/game-sessions.service';
 @Injectable()
 export class GameEngineService {
   constructor(
@@ -52,16 +52,13 @@ export class GameEngineService {
     );
   }
 
-  // async handlePlayerMove({
-  //   gameSessionId,
-  //   moveData,
-  // }: {
-  //   gameSessionId: UUID;
-  //   moveData: {
-  //     coordinates: [number, number];
-  //     playerId: UUID;
-  //   };
-  // }): Promise<GameSessionDocument> {
-  //   const gameSession = await this.gameSessionService.findOneById(gameSessionId);
-  // }
+  async handlePlayerMove(
+    playerMove: PlayerMove,
+  ): Promise<NullableGameSessionDocument> {
+    const gameSession = await this.gameSessionsService.findOneById(
+      playerMove.gameSessionID,
+    );
+
+    return gameSession;
+  }
 }

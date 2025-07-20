@@ -2,15 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
 
+import { GameSessionStatus } from '@connect-four-app/shared';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { PlayerModule } from '@/player/player.module';
 import { Player } from '@/player/schemas/player.schema';
 import {
-  GAME_SESSION_MODEL_TOKEN,
+  GAME_SESSION_MODEL_TOKEN, // force formatting
   PLAYER_MODEL_TOKEN,
-  GameSessionStatus,
 } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';

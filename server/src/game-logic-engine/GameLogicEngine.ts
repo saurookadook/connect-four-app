@@ -1,10 +1,9 @@
 import { UUID } from 'node:crypto';
-import { inspect } from 'node:util';
 
-import { GameSessionStatus, PlayerColor } from './constants';
+import { GameSessionStatus, PlayerColor } from '@connect-four-app/shared';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
-import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export class GameLogicEngine {
   #validatorFuncs: ValidatorFunc[];

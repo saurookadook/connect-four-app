@@ -1,4 +1,3 @@
-import { type UUID } from 'node:crypto';
 import { type IncomingMessage } from 'node:http';
 import { inspect } from 'node:util';
 import { Injectable } from '@nestjs/common';
@@ -17,8 +16,9 @@ import {
   RESOLVED_MOVE,
   START_GAME,
   SEND_GAME_SESSION,
-} from '@/constants';
-import { PlayerMove } from '@/types/main';
+  type PlayerID,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import { GameEngineService } from '../game-engine.service';
 
 // TODO: better way to handle this?
@@ -107,8 +107,8 @@ export class GameEventsGateway implements OnGatewayConnection {
     @MessageBody()
     data: {
       gameSessionId?: string;
-      playerOneID: UUID;
-      playerTwoID: UUID;
+      playerOneID: PlayerID;
+      playerTwoID: PlayerID;
     },
   ) {
     this._log(

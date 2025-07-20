@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 
+import type { PlayerID } from '@connect-four-app/shared';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
-import type { PlayerID } from '@/types/main';
 
 @Exclude()
 export class PlayerDTO extends BaseDTO {

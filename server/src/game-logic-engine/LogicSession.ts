@@ -1,6 +1,9 @@
-import type { PlayerID } from '@/types/main';
-import { isUUID } from '@connect-four-app/shared';
-import { GameBoard, GameSessionStatus, PlayerColor } from './constants';
+import { isUUID, type PlayerID } from '@connect-four-app/shared';
+import {
+  GameSessionStatus,
+  PlayerColor,
+  type GameBoard,
+} from '@connect-four-app/shared';
 import { LogicBoard } from './';
 
 export class LogicSession {

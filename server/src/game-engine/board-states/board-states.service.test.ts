@@ -3,6 +3,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model, Types } from 'mongoose';
 
 import {
+  BOARD_ROWS, // force formatting
+  GameSessionStatus,
+  type PlayerMove,
+} from '@connect-four-app/shared';
+import {
   createBoardStateDocumentMock,
   type BoardStateDocumentMock,
 } from '@/__mocks__/boardStatesMocks';
@@ -16,7 +21,6 @@ import {
   BOARD_STATE_MODEL_TOKEN,
   GAME_SESSION_MODEL_TOKEN,
   PLAYER_MODEL_TOKEN,
-  GameSessionStatus,
 } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import {
@@ -25,9 +29,7 @@ import {
   GameSession,
 } from '@/game-engine/schemas';
 import { GameSessionsModule } from '@/game-engine/sessions/game-sessions.module';
-import { BOARD_ROWS } from '@/game-logic-engine/constants';
 import { Player } from '@/player/schemas/player.schema';
-import { PlayerMove } from '@/types/main';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { BoardStatesModule } from './board-states.module';
 import { BoardStatesService } from './board-states.service';

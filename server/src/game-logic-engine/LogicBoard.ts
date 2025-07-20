@@ -1,10 +1,10 @@
-import { PlayerDTO } from '@/player/dtos/player.dto';
 import {
   BOARD_COLS, // force formatting
   BOARD_ROWS,
-  BoardCell,
-  GameBoard,
-} from './constants';
+  type BoardCell,
+  type GameBoard,
+} from '@connect-four-app/shared';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export class LogicBoard {
   gameBoardState: GameBoard;
