@@ -41,6 +41,8 @@ export class BoardStatesService {
     return createdBoardState.save();
   }
 
+  // TODO: add `findOrCreate` method
+
   async findOneByGameSessionID(
     gameSessionID: GameSessionDTO['id'],
   ): Promise<NullableBoardStateDocument> {
@@ -97,6 +99,7 @@ export class BoardStatesService {
     }
 
     let logicSession = this.gameLogicEngine.startGame({
+      moves: gameSessionRef.moves,
       playerOneID: gameSessionRef.playerOneID,
       playerTwoID: gameSessionRef.playerTwoID,
     });

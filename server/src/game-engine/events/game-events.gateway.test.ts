@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
+import { Types } from 'mongoose';
 import ws from 'ws';
 import WSMock from 'jest-websocket-mock';
 
-import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
 import { databaseProviders } from '@/database/database.providers';
 import { GameEngineModule } from '../game-engine.module';
 import { GameEventsGateway, type GameSessionMap } from './game-events.gateway';
 import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
 
 describe('GameEventsGateway', () => {
-  const mockPlayerOneID = mockFirstPlayer.playerID;
-  const mockPlayerTwoID = mockSecondPlayer.playerID;
   const mockGameSession = createNewGameSessionDocumentMock({
+    _id: new Types.ObjectId(),
     playerOneID: mockPlayerOneID,
     playerTwoID: mockPlayerTwoID,
   });
-  const mockGameSessionID = mockGameSession._id.toString();
+  const mockGameSessionID = mockGameSession._id!.toString();
 
   let gateway: GameEventsGateway;
   let activeGameSession: GameSessionMap;
@@ -62,7 +62,7 @@ describe('GameEventsGateway', () => {
 
       const firstMakeMoveEvent = {
         columnIndex: 1,
-        gameSessionID: mockGameSession._id.toString(),
+        gameSessionID: mockGameSessionID,
         playerID: mockPlayerOneID,
         timestamp: firstTimestamp,
       };
@@ -80,7 +80,7 @@ describe('GameEventsGateway', () => {
 
       const secondMakeMoveEvent = {
         columnIndex: 1,
-        gameSessionID: mockGameSession._id.toString(),
+        gameSessionID: mockGameSessionID,
         playerID: mockPlayerTwoID,
         timestamp: secondTimestamp,
       };
