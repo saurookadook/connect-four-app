@@ -256,6 +256,7 @@ describe('GameEngineService', () => {
     let initialGameSessionDocument: GameSessionDocument;
     let initialBoardStateDocument: BoardStateDocument;
     let mockGameSessionID: string;
+    let mockGameSessionDocument: GameSessionDocumentMock;
     let mockBoardStateDocument: BoardStateDocumentMock;
 
     beforeEach(async () => {
@@ -269,6 +270,11 @@ describe('GameEngineService', () => {
       mockGameSessionID = initialGameSessionDocument._id.toJSON();
       initialBoardStateDocument = await boardStatesService.createOne({
         gameSessionID: mockGameSessionID,
+      });
+      mockGameSessionDocument = createNewGameSessionDocumentMock({
+        _id: initialGameSessionDocument._id,
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
       });
       mockBoardStateDocument = createBoardStateDocumentMock(mockGameSessionID);
     });
@@ -291,11 +297,12 @@ describe('GameEngineService', () => {
         playerID: mockPlayerOneID,
         timestamp: nowPlus30Seconds,
       };
+      const sessionMoves = [...mockGameSessionDocument.moves, move];
       expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
 
-      let updatedGameSession = (await gameEngineService.handlePlayerMove({
+      let updatedGameSession = await gameEngineService.handlePlayerMove({
         ...move,
-      })) as GameSessionDocument;
+      });
 
       let updatedBoardState = (await boardStatesService.findOneByGameSessionID(
         mockGameSessionID,
@@ -309,13 +316,15 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           state: expectedCells,
+          __v: mockBoardStateDocument.__v + 1,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
         updatedGameSession, // force formatting
         {
-          ...initialGameSessionDocument,
-          moves: [...initialGameSessionDocument.moves, move],
+          ...mockGameSessionDocument,
+          moves: sessionMoves,
+          __v: mockGameSessionDocument.__v + 1,
         },
       );
 
@@ -326,11 +335,12 @@ describe('GameEngineService', () => {
         playerID: mockPlayerTwoID,
         timestamp: nowPlus1Minute,
       };
+      sessionMoves.push(move);
       expectedCells[colIndex][rowIndex].cellState = mockPlayerTwoID;
 
-      updatedGameSession = (await gameEngineService.handlePlayerMove({
+      updatedGameSession = await gameEngineService.handlePlayerMove({
         ...move,
-      })) as GameSessionDocument;
+      });
 
       updatedBoardState = (await boardStatesService.findOneByGameSessionID(
         mockGameSessionID,
@@ -344,13 +354,15 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           state: expectedCells,
+          __v: mockBoardStateDocument.__v + 2,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
         updatedGameSession, // force formatting
         {
-          ...initialGameSessionDocument,
-          moves: [...initialGameSessionDocument.moves, move],
+          ...mockGameSessionDocument,
+          moves: sessionMoves,
+          __v: mockGameSessionDocument.__v + 2,
         },
       );
     });

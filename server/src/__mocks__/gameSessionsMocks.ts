@@ -43,7 +43,7 @@ export type RequiredDocumentMockArgs = Pick<
 export function createNewGameSessionDocumentMock(
   args: RequiredDocumentMockArgs & OptionalDocumentMockArgs,
 ): GameSessionDocumentMock {
-  const { _id, __v, ...rest } = args;
+  const { __v, ...rest } = args;
   return {
     ...commonDefaults,
     ...rest,

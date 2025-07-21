@@ -1,27 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model, Types } from 'mongoose';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 
-import { type PlayerID, type PlayerMove } from '@connect-four-app/shared';
+import {
+  type PlayerMove, // force formatting
+} from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos';
 import {
-  BoardState,
   BoardStateDocument,
-  NullableBoardStateDocument,
-  GameSession,
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
+import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
 import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionsService } from './sessions/game-sessions.service';
 
 @Injectable()
 export class GameEngineService {
+  #gameLogicEngine: GameLogicEngine;
+
   constructor(
     @InjectConnection() private dbConn: Connection,
     private readonly boardStatesService: BoardStatesService,
     private readonly gameSessionsService: GameSessionsService,
-  ) {}
+  ) {
+    this.#gameLogicEngine = new GameLogicEngine();
+  }
 
   /**
    * @note If `gameSessionID` is defined, will attempt to find a game session document.
@@ -68,12 +72,78 @@ export class GameEngineService {
   }
 
   async handlePlayerMove(
-    playerMove: PlayerMove,
-  ): Promise<NullableGameSessionDocument> {
+    playerMove: PlayerMove, // force formatting
+  ): Promise<GameSessionDocument> {
     const gameSession = await this.gameSessionsService.findOneById(
       playerMove.gameSessionID,
     );
 
+    if (gameSession == null) {
+      throw new NotFoundException(
+        `[GameEngineService.handlePlayerMove] Game Session with ID '${playerMove.gameSessionID}' not found`,
+      );
+    }
+
+    const boardState = await this._findOrCreateBoardState(
+      playerMove.gameSessionID,
+    );
+
+    const logicSession = this._handleMoveLogic(gameSession, playerMove);
+
+    try {
+      boardState.state = logicSession.board.gameBoardState;
+      boardState.updatedAt = playerMove.timestamp;
+      await boardState.save();
+    } catch (error) {
+      throw new Error(
+        `[GameEngineService.handlePlayerMove] : ERROR saving board state - ${error.message}`,
+        { cause: error },
+      );
+    }
+
+    try {
+      gameSession.moves.push(playerMove);
+      gameSession.updatedAt = playerMove.timestamp;
+      await gameSession.save();
+    } catch (error) {
+      throw new Error(
+        `[GameEngineService.handlePlayerMove] : ERROR saving game session - ${error.message}`,
+        { cause: error },
+      );
+    }
+
     return gameSession;
+  }
+
+  async _findOrCreateBoardState(
+    gameSessionID: GameSessionDTO['id'],
+  ): Promise<BoardStateDocument> {
+    let boardState =
+      await this.boardStatesService.findOneByGameSessionID(gameSessionID);
+
+    if (boardState == null) {
+      boardState = await this.boardStatesService.createOne({
+        gameSessionID: gameSessionID,
+      });
+    }
+
+    return boardState;
+  }
+
+  _handleMoveLogic(
+    gameSession: GameSessionDocument,
+    playerMove: PlayerMove,
+  ): LogicSession {
+    const logicSession = this.#gameLogicEngine.startGame({
+      moves: gameSession.moves,
+      playerOneID: gameSession.playerOneID,
+      playerTwoID: gameSession.playerTwoID,
+    });
+
+    return this.#gameLogicEngine.handleMove({
+      columnIndex: playerMove.columnIndex,
+      playerID: playerMove.playerID,
+      sessionRef: logicSession,
+    });
   }
 }

@@ -3,24 +3,30 @@ import {
   BOARD_ROWS,
   type BoardCell,
   type GameBoard,
+  type Nullable,
+  type PlayerID,
 } from '@connect-four-app/shared';
-import { PlayerDTO } from '@/player/dtos/player.dto';
+import { LogicSession } from './LogicSession';
 
 export class LogicBoard {
+  #logicSession: Nullable<LogicSession>;
   gameBoardState: GameBoard;
-  lastUpdatedCell: BoardCell | null;
+  lastUpdatedCell: Nullable<BoardCell>;
 
   constructor({
     gameBoardState,
     lastUpdatedCell,
+    logicSession,
   }: {
     gameBoardState?: GameBoard;
-    lastUpdatedCell?: BoardCell | null;
+    lastUpdatedCell?: BoardCell;
+    logicSession?: LogicSession;
   } = {}) {
     // TODO: `gameBoardState` seems like an odd variable name; maybe it should accept something
     // like `PlayeyMoves[]` and construct the board from that?
     this.gameBoardState = gameBoardState || LogicBoard.createEmptyBoardState();
-    this.lastUpdatedCell = lastUpdatedCell || null;
+    this.lastUpdatedCell = lastUpdatedCell ?? null;
+    this.#logicSession = logicSession ?? null;
   }
 
   updateBoardState({
@@ -28,7 +34,7 @@ export class LogicBoard {
     playerID,
   }: {
     columnIndex: number;
-    playerID: PlayerDTO['playerID'];
+    playerID: PlayerID;
   }): GameBoard {
     if (columnIndex < 0 || columnIndex >= BOARD_COLS) {
       throw new Error(
@@ -71,5 +77,19 @@ export class LogicBoard {
     }
 
     return emptyBoard;
+  }
+
+  get logicSession(): Nullable<LogicSession> {
+    return this.#logicSession;
+  }
+
+  set logicSession(value: unknown) {
+    if (!(value instanceof LogicSession)) {
+      throw new TypeError(
+        `[LogicBoard.logicSession (setter)] : Assigned value must be an instance of 'LogicSession'`,
+      );
+    }
+
+    this.#logicSession = value;
   }
 }
