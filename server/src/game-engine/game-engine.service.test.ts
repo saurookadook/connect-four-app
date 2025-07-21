@@ -104,13 +104,13 @@ describe('GameEngineService', () => {
       const emptyBoardStateResult = await boardStateModel.find({}).exec();
       expect(emptyBoardStateResult).toEqual([]);
 
-      const newGameSession = await gameEngineService.startGame({
+      const {
+        boardState: newBoardState, // force formatting
+        gameSession: newGameSession,
+      } = await gameEngineService.startGame({
         playerOneID: mockPlayerOneID,
         playerTwoID: mockPlayerTwoID,
       });
-      const newBoardState = (await boardStatesService.findOneByGameSessionID(
-        newGameSession.id,
-      )) as BoardStateDocument;
 
       const mockGameSessionDocument = createNewGameSessionDocumentMock({
         playerOneID: mockPlayerOneID,
@@ -162,15 +162,14 @@ describe('GameEngineService', () => {
       const mockBoardStateDocument =
         createBoardStateDocumentMock(mockGameSessionID);
 
-      const foundGameSession = await gameEngineService.startGame({
+      const {
+        boardState: newBoardState, // force formatting
+        gameSession: foundGameSession,
+      } = await gameEngineService.startGame({
         gameSessionID: mockGameSessionID,
         playerOneID: mockPlayerOneID,
         playerTwoID: mockPlayerTwoID,
       });
-
-      const newBoardState = (await boardStatesService.findOneByGameSessionID(
-        foundGameSession.id,
-      )) as BoardStateDocument;
 
       expectHydratedDocumentToMatch<BoardState>(
         newBoardState, // force formatting
@@ -228,14 +227,14 @@ describe('GameEngineService', () => {
         },
       );
 
-      const foundGameSession = await gameEngineService.startGame({
+      const {
+        boardState: foundBoardState, // force formatting
+        gameSession: foundGameSession,
+      } = await gameEngineService.startGame({
         gameSessionID: mockGameSessionID,
         playerOneID: mockPlayerOneID,
         playerTwoID: mockPlayerTwoID,
       });
-      const foundBoardState = (await boardStatesService.findOneByGameSessionID(
-        foundGameSession.id,
-      )) as BoardStateDocument;
 
       expectHydratedDocumentToMatch<GameSession>(
         foundGameSession, // force formatting
@@ -300,13 +299,11 @@ describe('GameEngineService', () => {
       const sessionMoves = [...mockGameSessionDocument.moves, move];
       expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
 
-      let updatedGameSession = await gameEngineService.handlePlayerMove({
+      let result = await gameEngineService.handlePlayerMove({
         ...move,
       });
-
-      let updatedBoardState = (await boardStatesService.findOneByGameSessionID(
-        mockGameSessionID,
-      )) as BoardStateDocument;
+      let updatedBoardState = result.boardState;
+      let updatedGameSession = result.gameSession;
 
       expect(updatedBoardState.cells[colIndex][rowIndex]).toEqual(
         expectedCells[colIndex][rowIndex],
@@ -338,13 +335,11 @@ describe('GameEngineService', () => {
       sessionMoves.push(move);
       expectedCells[colIndex][rowIndex].cellState = mockPlayerTwoID;
 
-      updatedGameSession = await gameEngineService.handlePlayerMove({
+      result = await gameEngineService.handlePlayerMove({
         ...move,
       });
-
-      updatedBoardState = (await boardStatesService.findOneByGameSessionID(
-        mockGameSessionID,
-      )) as BoardStateDocument;
+      updatedBoardState = result.boardState;
+      updatedGameSession = result.gameSession;
 
       expect(updatedBoardState.cells[colIndex][rowIndex]).toEqual(
         expectedCells[colIndex][rowIndex],

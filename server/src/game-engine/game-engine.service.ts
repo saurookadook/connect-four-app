@@ -39,7 +39,10 @@ export class GameEngineService {
     gameSessionID?: GameSessionDTO['id']; // as mongodb.ObjectId
     playerOneID: GameSessionDTO['playerOneID'];
     playerTwoID: GameSessionDTO['playerTwoID'];
-  }): Promise<GameSessionDocument> {
+  }): Promise<{
+    boardState: BoardStateDocument;
+    gameSession: GameSessionDocument;
+  }> {
     let foundGameSession: NullableGameSessionDocument = null;
 
     if (gameSessionID != null) {
@@ -63,23 +66,24 @@ export class GameEngineService {
       playerTwoID: foundGameSession.playerTwoID,
     });
 
-    const foundBoardState =
-      await this.boardStatesService.findOneByGameSessionID(foundGameSession.id);
-
-    if (foundBoardState == null) {
-      await this.boardStatesService.createOne({
-        gameSessionID: foundGameSession.id,
-      });
-    }
+    const foundBoardState = await this._findOrCreateBoardState(
+      foundGameSession.id,
+    );
 
     // TODO: populate BoardState with moves from GameSession
 
-    return foundGameSession;
+    return {
+      boardState: foundBoardState,
+      gameSession: foundGameSession,
+    };
   }
 
   async handlePlayerMove(
     playerMove: PlayerMove, // force formatting
-  ): Promise<GameSessionDocument> {
+  ): Promise<{
+    boardState: BoardStateDocument;
+    gameSession: GameSessionDocument;
+  }> {
     const gameSession = await this.gameSessionsService.findOneById(
       playerMove.gameSessionID,
     );
@@ -118,7 +122,10 @@ export class GameEngineService {
       );
     }
 
-    return gameSession;
+    return {
+      boardState,
+      gameSession,
+    };
   }
 
   async _findOrCreateBoardState(
