@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 
 import type { Nullable } from '@connect-four-app/shared';
+import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { AppDispatch } from '@/store';
 import { fetchGameSession, setPlayerID } from '@/store/actions';
 import { RouterParams } from '@/types/main';
-import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '../constants';
 
 /**
  * @todo Should create a LOAD_GAME action type that will update

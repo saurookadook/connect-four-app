@@ -1,7 +1,5 @@
 import { AppDispatch } from '@/store';
 
-export type { SharedTypes } from '@connect-four-app/shared';
-
 export type BoundThis = {
   name: string;
 };
@@ -9,13 +7,6 @@ export type BoundThis = {
 export type BaseAction = {
   dispatch: AppDispatch;
 };
-
-// connect-four
-export enum GameSessionStatus {
-  ABANDONED = 'ABANDONED',
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-}
 
 export type GameSessionsItem = {
   id: string;

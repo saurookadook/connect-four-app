@@ -1,9 +1,6 @@
 import { useState } from 'react';
 
-import {
-  Cell, // force formatting
-  PlayerColor,
-} from '@/pages/GameSession/constants';
+import { PlayerColor, type BoardCell } from '@connect-four-app/shared';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { setActivePlayer } from '@/store/game-session/actions';
 import { useAppStore } from '@/store';
@@ -16,15 +13,15 @@ export function Board() {
   const { appState, appDispatch } = useAppStore();
   const { gameSession, player } = appState;
 
-  function handleCellClick(cell: Cell) {
-    if (cell.state != null) {
+  function handleCellClick(cell: BoardCell) {
+    if (cell.cellState != null) {
       return;
     }
 
     const message = JSON.stringify({
       event: 'make-move',
       data: {
-        columnIndex: cell.column,
+        columnIndex: cell.col,
         gameSessionID: gameSession.gameSessionID,
         playerID: player.playerID,
         timestamp: Date.now(),
@@ -35,7 +32,10 @@ export function Board() {
 
     setActivePlayer({
       dispatch: appDispatch,
-      player: gameSession.activePlayer === PlayerColor.RED ? PlayerColor.BLACK : PlayerColor.RED,
+      player:
+        gameSession.activePlayer === PlayerColor.RED
+          ? PlayerColor.BLACK
+          : PlayerColor.RED,
     });
   }
 
@@ -45,17 +45,17 @@ export function Board() {
         return column.map((cell) => {
           return (
             <div
-              key={`${cell.column}-${cell.row}`}
+              key={`${cell.col}-${cell.row}`}
               className="cell"
-              id={`cell-${cell.column}-${cell.row}`}
+              id={`cell-${cell.col}-${cell.row}`}
               onClick={() => handleCellClick(cell)}
               // onClick={() => {
               //   const newBoard = [...board];
-              //   newBoard[cell.row][cell.column].state = cell.state === CellState.EMPTY ? CellState.RED : CellState.EMPTY;
+              //   newBoard[cell.row][cell.col].state = cell.state === CellState.EMPTY ? CellState.RED : CellState.EMPTY;
               //   setBoard(newBoard);
               // }}
             >
-              <span>{cell.state}</span>
+              <span>{cell.cellState}</span>
             </div>
           );
         });
