@@ -2,13 +2,16 @@ import { type UUID } from 'node:crypto';
 
 export type Nullable<T> = T | null;
 
-export type PlayerID = UUID;
-
 export type BoardCell = {
   cellState: PlayerID | null;
   col: number;
   row: number;
 };
+
+export type BoardColumns = BoardCell[];
+export type GameBoard = BoardColumns[];
+
+export type PlayerID = UUID;
 
 export type PlayerMove = {
   columnIndex: number;

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-import type { PlayerID } from '@/types/main';
+import type { PlayerID } from '@connect-four-app/shared';
 
 @Schema()
 export class Player {

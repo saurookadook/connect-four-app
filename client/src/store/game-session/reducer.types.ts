@@ -1,17 +1,21 @@
 import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { PlayerColor } from '@/pages/GameSession/constants';
-import { GameSessionStatus } from '@/types/main';
+import {
+  GameSessionStatus, // force formatting
+  PlayerColor,
+  type Nullable,
+  type PlayerID,
+} from '@connect-four-app/shared';
 
 export type GameSessionStateSlice = {
   gameSessionRequestInProgress: boolean;
   activePlayer: PlayerColor;
   /** @note This should be a Mongo `ObjectId` */
-  gameSessionID: string | null;
+  gameSessionID: Nullable<string>;
   /* TODO: fix this type later */
   moves: unknown[];
-  playerOneID: string | null;
-  playerTwoID: string | null;
+  playerOneID: Nullable<PlayerID>;
+  playerTwoID: Nullable<PlayerID>;
   status: GameSessionStatus;
 };
 

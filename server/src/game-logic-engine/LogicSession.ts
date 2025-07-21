@@ -1,6 +1,9 @@
-import type { PlayerID } from '@/types/main';
-import { isUUID } from '@connect-four-app/shared';
-import { GameBoard, GameSessionStatus, PlayerColor } from './constants';
+import { isUUID, PlayerMove, type PlayerID } from '@connect-four-app/shared';
+import {
+  GameSessionStatus,
+  PlayerColor,
+  type GameBoard,
+} from '@connect-four-app/shared';
 import { LogicBoard } from './';
 
 export class LogicSession {
@@ -25,7 +28,10 @@ export class LogicSession {
     status?: GameSessionStatus;
   }) {
     this.#activePlayer = activePlayer ?? playerOneID;
-    this.#board = new LogicBoard({ gameBoardState: boardState });
+    this.#board = new LogicBoard({
+      gameBoardState: boardState,
+      logicSession: this,
+    });
     this.#playerOneID = playerOneID;
     this.#playerTwoID = playerTwoID;
     this.#status = status ?? GameSessionStatus.ACTIVE;
@@ -36,6 +42,23 @@ export class LogicSession {
       this.#activePlayer === this.#playerOneID
         ? this.#playerTwoID
         : this.#playerOneID;
+  }
+
+  populateBoardFromMoves(playerMoves: PlayerMove[]): LogicSession {
+    if (!Array.isArray(playerMoves)) {
+      throw new TypeError(
+        `[LogicSession.populateBoardFromMoves] : Argument 'playerMoves' must be an array. Received '${playerMoves}' (type '${typeof playerMoves}')`,
+      );
+    }
+
+    playerMoves.forEach((move) => {
+      this.updateBoard({
+        column: move.columnIndex,
+        playerID: move.playerID,
+      });
+    });
+
+    return this;
   }
 
   updateBoard({

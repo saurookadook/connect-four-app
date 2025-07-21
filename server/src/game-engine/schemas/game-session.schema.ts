@@ -1,8 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-import { GameSessionStatus } from '@constants/game';
-import type { PlayerID, PlayerMove } from '@/types/main';
+import {
+  GameSessionStatus,
+  type PlayerID,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 
 @Schema({
   // @ts-expect-error: This is the documented way to add an enum validator [https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum()]

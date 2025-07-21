@@ -1,3 +1,5 @@
+import type { BoardCell, PlayerID } from '@connect-four-app/shared';
+
 export enum GameSessionStatus {
   ABANDONED = 'ABANDONED',
   ACTIVE = 'ACTIVE',
@@ -9,6 +11,7 @@ export enum PlayerColor {
   BLACK = 'BLACK',
 }
 
+// TODO: are these still needed?
 export type CellState = PlayerColor | null;
 export interface Cell {
   state: CellState;
@@ -16,7 +19,7 @@ export interface Cell {
   column: number;
 }
 
-export type BoardColumns = Cell[];
+export type BoardColumns = BoardCell[];
 export type GameBoard = BoardColumns[];
 
 export const BOARD_ROWS = 6;

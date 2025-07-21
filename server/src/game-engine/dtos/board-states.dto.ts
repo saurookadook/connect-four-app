@@ -1,7 +1,10 @@
 import { Exclude, Expose } from 'class-transformer';
 
+import {
+  type BoardCell, // force formatting
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
-import { BoardCell, PlayerMove } from '@/types/main';
 
 @Exclude()
 export class BoardStateDTO extends BaseDTO {

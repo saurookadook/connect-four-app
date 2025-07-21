@@ -1,8 +1,11 @@
 import { Exclude, Expose } from 'class-transformer';
 
-import { GameSessionStatus } from '@/constants/game';
+import {
+  GameSessionStatus,
+  type PlayerID,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
-import type { PlayerID, PlayerMove } from '@/types/main';
 
 @Exclude()
 export class GameSessionDTO extends BaseDTO {

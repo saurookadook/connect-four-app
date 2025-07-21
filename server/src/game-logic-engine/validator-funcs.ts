@@ -1,8 +1,8 @@
 import {
   BOARD_COLS, // force formatting
   BOARD_ROWS,
-  GameBoard,
-} from '@/game-logic-engine/constants';
+  type GameBoard,
+} from '@connect-four-app/shared';
 import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export type ValidatorFunc = (

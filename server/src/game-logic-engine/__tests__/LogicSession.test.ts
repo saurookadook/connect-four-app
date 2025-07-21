@@ -6,7 +6,7 @@ import { LogicSession } from '..';
 
 describe('LogicSession', () => {
   describe('constructor', () => {
-    test('should initialize with empty board', () => {
+    it('should initialize with empty board', () => {
       const session = new LogicSession({
         playerOneID: mockPlayerOneID,
         playerTwoID: mockPlayerTwoID,
@@ -35,6 +35,12 @@ describe('LogicSession', () => {
     });
   });
 
+  describe("'populateBoardFromMoves' method", () => {
+    it.skip('should populate board from player moves', () => {
+      // TODO: implement this!
+    });
+  });
+
   describe('updateBoard', () => {
     let session: LogicSession;
 
@@ -45,7 +51,7 @@ describe('LogicSession', () => {
       });
     });
 
-    test('should update board with player color', () => {
+    it('should update board with player ID', () => {
       const columnOne = 0;
       const columnTwo = 1;
       const columnThree = 2;
@@ -72,7 +78,7 @@ describe('LogicSession', () => {
       expect(gameBoardState[columnTwo].at(-3)!.cellState).toBe(mockPlayerTwoID);
     });
 
-    test('should throw error for invalid column', () => {
+    it('should throw error for invalid column', () => {
       const negativeColumnValue = -1;
       expect(() => {
         session.updateBoard({
@@ -90,7 +96,7 @@ describe('LogicSession', () => {
       );
     });
 
-    test('should throw error if column is full', () => {
+    it('should throw error if column is full', () => {
       for (let i = 0; i < BOARD_ROWS; i++) {
         session.updateBoard({
           column: 0,
@@ -103,7 +109,7 @@ describe('LogicSession', () => {
       }).toThrow('Column 0 is full');
     });
 
-    test('should throw error for unknown player ID', () => {
+    it('should throw error for unknown player ID', () => {
       const unknownPlayerID = randomUUID();
       expect(() => {
         session.updateBoard({ column: 0, playerID: unknownPlayerID });

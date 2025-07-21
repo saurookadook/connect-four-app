@@ -1,12 +1,16 @@
 import { UUID } from 'node:crypto';
-import { inspect } from 'node:util';
 
-import { GameSessionStatus, PlayerColor } from './constants';
+import {
+  GameSessionStatus,
+  PlayerColor,
+  type PlayerMove,
+} from '@connect-four-app/shared';
+import { PlayerDTO } from '@/player/dtos/player.dto';
 import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
-import { PlayerDTO } from '@/player/dtos/player.dto';
 
 export class GameLogicEngine {
+  // TODO: maybe this should be static?
   #validatorFuncs: ValidatorFunc[];
 
   constructor() {
@@ -14,17 +18,25 @@ export class GameLogicEngine {
   }
 
   startGame({
+    moves,
     playerOneID, // force formatting
     playerTwoID,
   }: {
+    moves?: PlayerMove[];
     playerOneID: UUID;
     playerTwoID: UUID;
   }): LogicSession {
     try {
-      return new LogicSession({
+      const logicSession = new LogicSession({
         playerOneID,
         playerTwoID,
       });
+
+      if (moves != null) {
+        logicSession.populateBoardFromMoves(moves);
+      }
+
+      return logicSession;
     } catch (error) {
       console.error(
         '[ClientGameEngine.startGame] Encountered ERROR initializing game session: ',

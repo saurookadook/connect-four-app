@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
+import type { BoardCell } from '@connect-four-app/shared';
 import { LogicBoard } from '@/game-logic-engine';
-import { BoardCell } from '@/types/main';
 
 export const BOARD_STATES_TTL_SECONDS = 7200;
 

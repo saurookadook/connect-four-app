@@ -1,15 +1,9 @@
-import { GameSessionStatus } from '@/constants/game';
-import { BoardCell } from '@/types/main';
-
-export { GameSessionStatus, type BoardCell };
-
-export enum PlayerColor {
-  RED = 'RED',
-  BLACK = 'BLACK',
-}
-
-export type BoardColumns = BoardCell[];
-export type GameBoard = BoardColumns[];
-
-export const BOARD_ROWS = 6;
-export const BOARD_COLS = 7;
+export {
+  BOARD_COLS,
+  BOARD_ROWS,
+  GameSessionStatus,
+  PlayerColor,
+  type BoardCell,
+  type BoardColumns,
+  type GameBoard,
+} from '@connect-four-app/shared';

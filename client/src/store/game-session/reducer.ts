@@ -1,6 +1,9 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { GameSessionStatus, PlayerColor } from '@/pages/GameSession/constants';
+import {
+  GameSessionStatus, // force formatting
+  PlayerColor,
+} from '@connect-four-app/shared';
 import {
   REQUEST_GAME_SESSION,
   RESET_GAME,

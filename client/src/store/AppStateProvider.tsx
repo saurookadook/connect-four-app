@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useReducer } from 'react';
 
+import { deeplyMerge } from '@connect-four-app/shared';
 import { AppStateContext, AppDispatchContext } from '@/store/contexts';
 import combinedReducer, { AppState, initialAppState } from '@/store/reducer';
-import { deeplyMerge } from '@/utils';
 
 export function AppStateProvider({
   children,
@@ -15,11 +15,16 @@ export function AppStateProvider({
   const [combinedReducerFunc, combinedInitialState] = combinedReducer;
 
   const recursivelyMergedInitialState = deeplyMerge(combinedInitialState, initialState);
-  const [state, dispatch] = useReducer(combinedReducerFunc, recursivelyMergedInitialState);
+  const [state, dispatch] = useReducer(
+    combinedReducerFunc,
+    recursivelyMergedInitialState,
+  );
 
   return (
     <AppStateContext.Provider value={state as AppState}>
-      <AppDispatchContext.Provider value={dispatch}>{children}</AppDispatchContext.Provider>
+      <AppDispatchContext.Provider value={dispatch}>
+        {children}
+      </AppDispatchContext.Provider>
     </AppStateContext.Provider>
   );
 }

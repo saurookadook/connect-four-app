@@ -1,4 +1,3 @@
-import { UUID } from 'node:crypto';
 import {
   BadRequestException,
   Injectable,
@@ -8,16 +7,17 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { PlayerService } from '@/player/player.service';
+import { type PlayerID } from '@connect-four-app/shared';
 import {
-  CreateGameSessionDTO,
+  CreateGameSessionDTO, // force formatting
   UpdateGameSessionDTO,
-} from '../dtos/game-session.dto';
+} from '@/game-engine/dtos';
 import {
-  GameSession,
+  GameSession, // force formatting
   GameSessionDocument,
   NullableGameSessionDocument,
-} from '../schemas/game-session.schema';
+} from '@/game-engine/schemas';
+import { PlayerService } from '@/player/player.service';
 
 @Injectable()
 export class GameSessionsService {
@@ -39,7 +39,9 @@ export class GameSessionsService {
   }
 
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
-    return await this.gameSessionModel.findById(id).exec();
+    const foundGameSession = await this.gameSessionModel.findById(id).exec();
+
+    return foundGameSession;
   }
 
   async findAll(): Promise<GameSessionDocument[]> {
@@ -50,7 +52,7 @@ export class GameSessionsService {
     return foundGameSessions;
   }
 
-  async findAllForPlayer(playerID: UUID): Promise<GameSessionDocument[]> {
+  async findAllForPlayer(playerID: PlayerID): Promise<GameSessionDocument[]> {
     const foundPlayer = await this.playerService.findOneByPlayerID(playerID);
 
     if (foundPlayer == null) {
@@ -70,25 +72,31 @@ export class GameSessionsService {
     id: string,
     gameSession: UpdateGameSessionDTO,
   ): Promise<NullableGameSessionDocument> {
-    return await this.gameSessionModel
+    const updatedGameSession = await this.gameSessionModel
       .findByIdAndUpdate(id, gameSession, { new: true })
       .exec();
+
+    return updatedGameSession;
   }
 
   async deleteOneById(id: string): Promise<NullableGameSessionDocument> {
-    return this.gameSessionModel.findByIdAndDelete(id).exec();
+    const deletedGameSession = await this.gameSessionModel
+      .findByIdAndDelete(id)
+      .exec();
+
+    return deletedGameSession;
   }
 
   async _validatePlayers({
     playerOneID,
     playerTwoID,
   }: {
-    playerOneID: UUID;
-    playerTwoID: UUID;
+    playerOneID: PlayerID;
+    playerTwoID: PlayerID;
   }): Promise<void> {
     if (playerOneID === playerTwoID) {
       throw new BadRequestException(
-        '[GameSessionsService._validatePlayers] Player IDs must be different.',
+        '[GameSessionsService._validatePlayers] : Player IDs must be different.',
       );
     }
 
@@ -97,7 +105,7 @@ export class GameSessionsService {
 
     if (!playerOneExists) {
       throw new UnauthorizedException(
-        `[GameSessionsService._validatePlayers] Player One with ID '${playerOneID}' does not exist.`,
+        `[GameSessionsService._validatePlayers] : Player One with ID '${playerOneID}' does not exist.`,
       );
     }
 
@@ -106,7 +114,7 @@ export class GameSessionsService {
 
     if (!playerTwoExists) {
       throw new UnauthorizedException(
-        `[GameSessionsService._validatePlayers] Player Two with ID '${playerTwoID}' does not exist.`,
+        `[GameSessionsService._validatePlayers] : Player Two with ID '${playerTwoID}' does not exist.`,
       );
     }
   }

@@ -1,6 +1,6 @@
 import { HydratedDocument, Types } from 'mongoose';
 
-import { GameSessionStatus } from '@/constants';
+import { GameSessionStatus } from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos/game-session.dto';
 import { GameSession } from '@/game-engine/schemas/game-session.schema';
 import { mockNow } from './commonMocks';
@@ -12,17 +12,19 @@ const commonDefaults = {
   updatedAt: mockNow,
 };
 
-export type GameSessionDocumentMock = Pick<
-  HydratedDocument<GameSession>,
-  | '_id'
-  | 'playerOneID'
-  | 'playerTwoID'
-  | 'moves'
-  | 'status'
-  | 'createdAt'
-  | 'updatedAt'
-  | '__v'
->;
+// prettier-ignore
+export type GameSessionDocumentMock =
+  { _id?: HydratedDocument<GameSession>['_id']; } &
+  Pick<
+    HydratedDocument<GameSession>,
+    | 'playerOneID'
+    | 'playerTwoID'
+    | 'moves'
+    | 'status'
+    | 'createdAt'
+    | 'updatedAt'
+    | '__v'
+  >;
 
 export type OptionalDocumentMockArgs = Partial<
   Pick<
@@ -41,11 +43,10 @@ export type RequiredDocumentMockArgs = Pick<
 export function createNewGameSessionDocumentMock(
   args: RequiredDocumentMockArgs & OptionalDocumentMockArgs,
 ): GameSessionDocumentMock {
-  const { _id, __v, ...rest } = args;
+  const { __v, ...rest } = args;
   return {
     ...commonDefaults,
     ...rest,
-    _id: _id ?? new Types.ObjectId(),
     __v: __v ?? 0,
   };
 }

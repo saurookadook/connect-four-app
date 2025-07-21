@@ -6,7 +6,7 @@ export const dateFields = new Set(['createdAt', 'updatedAt']);
 
 export function expectHydratedDocumentToMatch<T>(
   documentUnderTest: HydratedDocument<T>,
-  expected: Partial<T> & { _id?: Types.ObjectId },
+  expected: { _id?: Types.ObjectId; __v?: number } & Partial<T>,
 ): void {
   expect(documentUnderTest).not.toBeNull();
   expect(documentUnderTest).toHaveProperty('_id', expect.any(Types.ObjectId));
