@@ -33,6 +33,8 @@ export class BoardStatesService {
   ): Promise<BoardStateDocument> {
     await this._validateGameSession(boardState.gameSessionID);
 
+    // TODO: populate `state` from `moves`
+
     const { gameSessionID, ...rest } = boardState;
     const createdBoardState = new this.boardStateModel({
       ...rest,
@@ -109,7 +111,7 @@ export class BoardStatesService {
       sessionRef: logicSession,
     });
 
-    boardStateRef.state = logicSession.board.gameBoardState;
+    boardStateRef.cells = logicSession.board.gameBoardState;
   }
 
   async _validateGameSession(

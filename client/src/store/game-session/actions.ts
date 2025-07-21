@@ -1,4 +1,4 @@
-import { PlayerColor } from '@/pages/GameSession/constants';
+import { PlayerColor } from '@connect-four-app/shared';
 import {
   REQUEST_GAME_SESSION,
   RESET_GAME,

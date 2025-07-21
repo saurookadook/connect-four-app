@@ -12,10 +12,7 @@ import userEvent from '@testing-library/user-event';
 
 import { allGameSessionsMock, GameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
-import {
-  GAME_SESSION_LS_KEY,
-  PLAYER_DETAILS_LS_KEY,
-} from '@/pages/GameSession/constants';
+import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { AppStateProvider } from '@/store';
 import { createFetchMock, WithMemoryRouter } from '@/utils/testing';

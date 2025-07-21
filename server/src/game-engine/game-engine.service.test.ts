@@ -288,7 +288,7 @@ describe('GameEngineService', () => {
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
       const nowPlus1Minute = new Date(mockNow.getTime() + 60000);
 
-      const expectedCells = Array.from(initialBoardStateDocument.state);
+      const expectedCells = Array.from(initialBoardStateDocument.cells);
       const colIndex = 2;
       let rowIndex = BOARD_ROWS - 1;
       let move = {
@@ -308,14 +308,14 @@ describe('GameEngineService', () => {
         mockGameSessionID,
       )) as BoardStateDocument;
 
-      expect(updatedBoardState.state[colIndex][rowIndex]).toEqual(
+      expect(updatedBoardState.cells[colIndex][rowIndex]).toEqual(
         expectedCells[colIndex][rowIndex],
       );
       expectHydratedDocumentToMatch<BoardState>(
         updatedBoardState, // force formatting
         {
           ...mockBoardStateDocument,
-          state: expectedCells,
+          cells: expectedCells,
           __v: mockBoardStateDocument.__v + 1,
         },
       );
@@ -346,14 +346,14 @@ describe('GameEngineService', () => {
         mockGameSessionID,
       )) as BoardStateDocument;
 
-      expect(updatedBoardState.state[colIndex][rowIndex]).toEqual(
+      expect(updatedBoardState.cells[colIndex][rowIndex]).toEqual(
         expectedCells[colIndex][rowIndex],
       );
       expectHydratedDocumentToMatch<BoardState>(
         updatedBoardState, // force formatting
         {
           ...mockBoardStateDocument,
-          state: expectedCells,
+          cells: expectedCells,
           __v: mockBoardStateDocument.__v + 2,
         },
       );

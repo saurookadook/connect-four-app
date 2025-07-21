@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 
 import {
-  type BoardCell, // force formatting
+  type GameBoard, // force formatting
   type PlayerMove,
 } from '@connect-four-app/shared';
 import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
@@ -12,7 +12,7 @@ export class BoardStateDTO extends BaseDTO {
   gameSessionID: string;
 
   @Expose()
-  state: BoardCell[][];
+  cells: GameBoard;
 }
 
 @Exclude()
@@ -33,5 +33,5 @@ export class UpdateBoardStateDTO extends PartialBaseDTO {
   move?: PlayerMove;
 
   @Expose()
-  state?: BoardStateDTO['state'];
+  cells?: BoardStateDTO['cells'];
 }
