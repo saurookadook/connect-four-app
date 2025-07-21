@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-import type { BoardCell } from '@connect-four-app/shared';
+import { type GameBoard } from '@connect-four-app/shared';
 import { LogicBoard } from '@/game-logic-engine';
 
 export const BOARD_STATES_TTL_SECONDS = 7200;
@@ -20,7 +20,7 @@ class Board_State {
   @Prop({
     default: LogicBoard.createEmptyBoardState(),
   })
-  state: BoardCell[][];
+  cells: GameBoard;
 
   @Prop({
     default: Date.now,

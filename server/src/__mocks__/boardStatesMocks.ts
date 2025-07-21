@@ -5,7 +5,7 @@ import { mockNow } from './commonMocks';
 
 export type BoardStateDocumentMock = {
   gameSessionID: Types.ObjectId;
-  state: ReturnType<typeof LogicBoard.createEmptyBoardState>;
+  cells: ReturnType<typeof LogicBoard.createEmptyBoardState>;
   createdAt: Date;
   updatedAt: Date;
   __v: number;
@@ -16,7 +16,7 @@ export function createBoardStateDocumentMock(
 ): BoardStateDocumentMock {
   return {
     gameSessionID: new Types.ObjectId(gameSessionID),
-    state: LogicBoard.createEmptyBoardState(),
+    cells: LogicBoard.createEmptyBoardState(),
     createdAt: mockNow,
     updatedAt: mockNow,
     __v: 0,

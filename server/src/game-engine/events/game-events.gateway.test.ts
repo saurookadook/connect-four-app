@@ -57,6 +57,19 @@ describe('GameEventsGateway', () => {
 
   describe('move', () => {
     it('should return passed data', async () => {
+      const warnSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation((...args) => {
+          // Just to make the test output quieter :]
+          return args;
+        });
+      const errorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation((...args) => {
+          // Just to make the test output quieter :]
+          return args;
+        });
+
       const firstTimestamp = new Date();
       const secondTimestamp = new Date(firstTimestamp.getTime() + 2000);
 
@@ -95,6 +108,9 @@ describe('GameEventsGateway', () => {
         // @ts-expect-error: Until I can figure out a better way to mock the client
         activeGameSession?.get(mockPlayerTwoID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondMakeMoveEvent));
+
+      warnSpy.mockRestore();
+      errorSpy.mockRestore();
     });
   });
 });

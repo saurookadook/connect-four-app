@@ -198,7 +198,7 @@ describe('BoardStatesService', () => {
         playerID: mockFirstPlayer.playerID,
         timestamp: nowPlus30Seconds,
       };
-      const expectedCells = Array.from(initialBoardState.state);
+      const expectedCells = Array.from(initialBoardState.cells);
       const lastRowIndex = BOARD_ROWS - 1;
       expectedCells[3][lastRowIndex].cellState = mockFirstPlayer.playerID;
 
@@ -210,14 +210,14 @@ describe('BoardStatesService', () => {
         },
       )) as BoardStateDocument;
 
-      expect(updatedBoardState.state[3][lastRowIndex]).toEqual(
+      expect(updatedBoardState.cells[3][lastRowIndex]).toEqual(
         expectedCells[3][lastRowIndex],
       );
       expectHydratedDocumentToMatch<BoardState>(
         updatedBoardState, // force formatting
         {
           ...mockBoardStateDocument,
-          state: expectedCells,
+          cells: expectedCells,
         },
       );
     });

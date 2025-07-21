@@ -40,35 +40,41 @@ export class GameEngineService {
     playerOneID: GameSessionDTO['playerOneID'];
     playerTwoID: GameSessionDTO['playerTwoID'];
   }): Promise<GameSessionDocument> {
-    let foundGame: NullableGameSessionDocument = null;
+    let foundGameSession: NullableGameSessionDocument = null;
 
     if (gameSessionID != null) {
-      foundGame = await this.gameSessionsService.findOneById(
+      foundGameSession = await this.gameSessionsService.findOneById(
         gameSessionID || '',
       );
     }
 
-    // TODO: handle mismatch between `foundGame` and playerIDs
+    // TODO: handle mismatch between `foundGameSession` and playerIDs
 
-    if (foundGame == null) {
-      foundGame = await this.gameSessionsService.createOne({
+    if (foundGameSession == null) {
+      foundGameSession = await this.gameSessionsService.createOne({
         playerOneID,
         playerTwoID,
       });
     }
 
+    const logicSession = this.#gameLogicEngine.startGame({
+      moves: foundGameSession.moves,
+      playerOneID: foundGameSession.playerOneID,
+      playerTwoID: foundGameSession.playerTwoID,
+    });
+
     const foundBoardState =
-      await this.boardStatesService.findOneByGameSessionID(foundGame.id);
+      await this.boardStatesService.findOneByGameSessionID(foundGameSession.id);
 
     if (foundBoardState == null) {
       await this.boardStatesService.createOne({
-        gameSessionID: foundGame.id,
+        gameSessionID: foundGameSession.id,
       });
     }
 
     // TODO: populate BoardState with moves from GameSession
 
-    return foundGame;
+    return foundGameSession;
   }
 
   async handlePlayerMove(
@@ -91,7 +97,7 @@ export class GameEngineService {
     const logicSession = this._handleMoveLogic(gameSession, playerMove);
 
     try {
-      boardState.state = logicSession.board.gameBoardState;
+      boardState.cells = logicSession.board.gameBoardState;
       boardState.updatedAt = playerMove.timestamp;
       await boardState.save();
     } catch (error) {
