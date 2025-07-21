@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { PlayerColor, type BoardCell } from '@connect-four-app/shared';
+import { MAKE_MOVE, PlayerColor, type BoardCell } from '@connect-four-app/shared';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { setActivePlayer } from '@/store/game-session/actions';
 import { useAppStore } from '@/store';
@@ -19,7 +19,7 @@ export function Board() {
     }
 
     const message = JSON.stringify({
-      event: 'make-move',
+      event: MAKE_MOVE,
       data: {
         columnIndex: cell.col,
         gameSessionID: gameSession.gameSessionID,
