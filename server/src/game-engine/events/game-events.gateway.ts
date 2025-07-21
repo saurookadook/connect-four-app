@@ -14,6 +14,7 @@ import { WebSocket, Server } from 'ws';
 import {
   MAKE_MOVE,
   RESOLVED_MOVE,
+  SEND_MOVE,
   START_GAME,
   SEND_GAME_SESSION,
   type PlayerID,
@@ -121,25 +122,34 @@ export class GameEventsGateway implements OnGatewayConnection {
       '='.repeat(160),
     );
 
-    const newGameSession = await this.gameEngineService.startGame({
+    const { boardState, gameSession } = await this.gameEngineService.startGame({
       playerOneID: data.playerOneID,
       playerTwoID: data.playerTwoID,
     });
 
-    return {
-      event: SEND_GAME_SESSION,
-      data: {
-        id: newGameSession.id,
-        moves: newGameSession.moves,
-        playerOneID: newGameSession.playerOneID,
-        playerTwoID: newGameSession.playerTwoID,
-        status: newGameSession.status,
-      },
-    };
+    const activeGame = this.#activeGamesMap.get(
+      gameSession.id,
+    ) as GameSessionMap;
+
+    activeGame.forEach((client) => {
+      client.send(
+        JSON.stringify({
+          event: SEND_GAME_SESSION,
+          data: {
+            id: gameSession.id,
+            boardCells: boardState.cells,
+            moves: gameSession.moves,
+            playerOneID: gameSession.playerOneID,
+            playerTwoID: gameSession.playerTwoID,
+            status: gameSession.status,
+          },
+        }),
+      );
+    });
   }
 
   @SubscribeMessage(MAKE_MOVE)
-  async onMakeMoveEvent(
+  async onMakeMove(
     @MessageBody() data: PlayerMove, // force formatting
   ): Promise<void> {
     this._log(
@@ -151,15 +161,27 @@ export class GameEventsGateway implements OnGatewayConnection {
       '\n',
       '='.repeat(160),
     );
-    const { columnIndex, gameSessionID, playerID, timestamp } = data;
+
+    const { boardState, gameSession } =
+      await this.gameEngineService.handlePlayerMove(data);
 
     const activeGame = this.#activeGamesMap.get(
-      gameSessionID,
+      gameSession.id,
     ) as GameSessionMap;
 
     activeGame.forEach((client) => {
       client.send(
-        JSON.stringify({ columnIndex, gameSessionID, playerID, timestamp }),
+        JSON.stringify({
+          event: SEND_MOVE,
+          data: {
+            id: gameSession.id,
+            boardCells: boardState.cells,
+            moves: gameSession.moves,
+            playerOneID: gameSession.playerOneID,
+            playerTwoID: gameSession.playerTwoID,
+            status: gameSession.status,
+          },
+        }),
       );
     });
   }

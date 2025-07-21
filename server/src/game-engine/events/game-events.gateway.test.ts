@@ -4,7 +4,11 @@ import { Types } from 'mongoose';
 import ws from 'ws';
 import WSMock from 'jest-websocket-mock';
 
-import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
+import {
+  mockPlayerOneID,
+  mockPlayerTwoID,
+  mockThirdPlayer,
+} from '@/__mocks__/playerMocks';
 import { databaseProviders } from '@/database/database.providers';
 import { GameEngineModule } from '../game-engine.module';
 import { GameEventsGateway, type GameSessionMap } from './game-events.gateway';
@@ -42,34 +46,26 @@ describe('GameEventsGateway', () => {
         send: jest.fn((...args) => args),
       };
     });
-    activeGameSession?.set(
-      mockPlayerOneID,
-      // @ts-expect-error: Until I can figure out a better way to mock the client
-      mockWebSocketClient(),
-    );
 
-    activeGameSession?.set(
-      mockPlayerTwoID,
-      // @ts-expect-error: Until I can figure out a better way to mock the client
-      mockWebSocketClient(),
+    [mockPlayerOneID, mockPlayerTwoID, mockThirdPlayer.playerID].forEach(
+      (playerID) => {
+        activeGameSession?.set(
+          playerID,
+          // @ts-expect-error: Until I can figure out a better way to mock the client
+          mockWebSocketClient(),
+        );
+      },
     );
   });
 
-  describe('move', () => {
-    it('should return passed data', async () => {
-      const warnSpy = jest
-        .spyOn(console, 'warn')
-        .mockImplementation((...args) => {
-          // Just to make the test output quieter :]
-          return args;
-        });
-      const errorSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation((...args) => {
-          // Just to make the test output quieter :]
-          return args;
-        });
+  describe("'onStartGame' method", () => {
+    it.skip('should start game and broadcast results to appropriate clients', async () => {
+      // TODO: implement this :]
+    });
+  });
 
+  describe("'onMakeMove' method", () => {
+    it('should handle the given move and broadcast results of updated data to appropriate clients', async () => {
       const firstTimestamp = new Date();
       const secondTimestamp = new Date(firstTimestamp.getTime() + 2000);
 
@@ -80,7 +76,7 @@ describe('GameEventsGateway', () => {
         timestamp: firstTimestamp,
       };
 
-      await gateway.onMakeMoveEvent(firstMakeMoveEvent);
+      await gateway.onMakeMove(firstMakeMoveEvent);
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
@@ -98,7 +94,7 @@ describe('GameEventsGateway', () => {
         timestamp: secondTimestamp,
       };
 
-      await gateway.onMakeMoveEvent(secondMakeMoveEvent);
+      await gateway.onMakeMove(secondMakeMoveEvent);
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
@@ -108,9 +104,6 @@ describe('GameEventsGateway', () => {
         // @ts-expect-error: Until I can figure out a better way to mock the client
         activeGameSession?.get(mockPlayerTwoID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondMakeMoveEvent));
-
-      warnSpy.mockRestore();
-      errorSpy.mockRestore();
     });
   });
 });
