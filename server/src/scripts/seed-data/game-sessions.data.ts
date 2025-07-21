@@ -1,11 +1,9 @@
-import { type UUID } from 'node:crypto';
-
-import { GameSessionStatus } from '@/constants';
+import { GameSessionStatus, type PlayerID } from '@connect-four-app/shared';
 import { playersSeedData } from './players.data';
 
 export type GameSessionSeed = {
-  playerOneID: UUID;
-  playerTwoID: UUID;
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
   moves: any[];
   status: GameSessionStatus;
 };
