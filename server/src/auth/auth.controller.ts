@@ -1,4 +1,3 @@
-import { inspect } from 'node:util';
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { type Request, type Response } from 'express';
@@ -54,12 +53,6 @@ export class AuthController {
       errorMessage: 'Login failed.',
     });
 
-    req.login({ ...playerDetails }, (err) => {
-      console.warn('!'.repeat(process.stdout.columns));
-      console.error(err);
-      console.warn('!'.repeat(process.stdout.columns));
-    });
-
     // res.cookie(process.env.COOKIE_KEY as string, req.sessionID, {
     //   httpOnly: true,
     //   maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
@@ -67,24 +60,7 @@ export class AuthController {
     //   secure: false,
     //   signed: true,
     // });
-    res.set({
-      Credentials: 'include',
-    });
 
-    // console.log(
-    //   inspect({
-    //     reqCookies: req.cookies,
-    //     reqSession: req.session,
-    //     reqUser: req.user,
-    //     resHeaders: res?.getHeaders(),
-    //   }),
-    //   {
-    //     colors: true,
-    //     compact: false,
-    //     depth: 2,
-    //     showHidden: true,
-    //   },
-    // );
     return playerDetails;
   }
 
@@ -113,6 +89,12 @@ export class AuthController {
     }
 
     req.login(playerDetails, (err) => {
+      if (process.env.NODE_ENV !== 'test' && err != null) {
+        console.warn('!'.repeat(process.stdout.columns));
+        console.error(err);
+        console.warn('!'.repeat(process.stdout.columns));
+      }
+
       if (err) {
         console.error(err);
         throw new Error(`${errorMessage} [REASON] ${err.toString()}`);
