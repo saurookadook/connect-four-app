@@ -107,7 +107,7 @@ export class GameEventsGateway implements OnGatewayConnection {
   async onStartGame(
     @MessageBody()
     data: {
-      gameSessionId?: string;
+      gameSessionID?: string;
       playerOneID: PlayerID;
       playerTwoID: PlayerID;
     },
@@ -115,7 +115,7 @@ export class GameEventsGateway implements OnGatewayConnection {
     this._log(
       '='.repeat(160),
       '\n',
-      `    [GameEventsGateway.onEvent] 'data' received:`,
+      `    [GameEventsGateway.onStartGame] : 'data' received:`,
       '\n',
       { data },
       '\n',
@@ -123,6 +123,7 @@ export class GameEventsGateway implements OnGatewayConnection {
     );
 
     const { boardState, gameSession } = await this.gameEngineService.startGame({
+      gameSessionID: data.gameSessionID,
       playerOneID: data.playerOneID,
       playerTwoID: data.playerTwoID,
     });
