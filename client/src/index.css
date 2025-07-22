@@ -43,7 +43,7 @@ Global
   --yellow-fill-0\.5: rgb(249 219 36 / 0.5);
   --red-fill: #ff0000;
   --red-fill-0\.5: rgb(255 0 0 / 0.5);
-  --black-fill: #ff0000;
+  --black-fill: #000000;
   --black-fill-0\.5: rgb(0 0 0 / 0.5);
 
   --light-gray-edge: rgb(238 238 238 / 0.75);
