@@ -1,20 +1,38 @@
-import { useState } from 'react';
+import classNames from 'classnames';
 
-import { MAKE_MOVE, PlayerColor, type BoardCell } from '@connect-four-app/shared';
-import { createEmptyBoard } from '@/pages/GameSession/utils';
-import { setActivePlayer } from '@/store/game-session/actions';
+import {
+  MAKE_MOVE, // force formatting
+  PlayerColor,
+  type BoardCell,
+} from '@connect-four-app/shared';
+import { canPlayerMakeMove } from '@/pages/GameSession/utils';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
 import './styles.css';
 
+/**
+ * @notes
+ * - need to figure out way to create/render layers correctly
+ *    (i.e. pieces render 'behind' game board)
+ * - should this eventually be rendered with `<canvas>`?
+ */
 export function Board() {
-  const [board, setBoard] = useState(createEmptyBoard());
-
   const { appState, appDispatch } = useAppStore();
   const { gameSession, player } = appState;
 
   function handleCellClick(cell: BoardCell) {
-    if (cell.cellState != null) {
+    if (
+      !canPlayerMakeMove({
+        activePlayer: gameSession.activePlayer,
+        playerID: player.playerID,
+        playerOneID: gameSession.playerOneID,
+        playerTwoID: gameSession.playerTwoID,
+      })
+    ) {
+      // TODO: use something like an Admonition instead
+      console.warn('No cheating! 🤪');
+      return;
+    } else if (cell.cellState != null) {
       return;
     }
 
@@ -29,36 +47,37 @@ export function Board() {
     });
 
     wsManager.getOpenWSConn().send(message);
-
-    setActivePlayer({
-      dispatch: appDispatch,
-      player:
-        gameSession.activePlayer === PlayerColor.RED
-          ? PlayerColor.BLACK
-          : PlayerColor.RED,
-    });
   }
 
   return (
     <div id="board">
-      {board.map((column) => {
-        return column.map((cell) => {
-          return (
-            <div
-              key={`${cell.col}-${cell.row}`}
-              className="cell"
-              id={`cell-${cell.col}-${cell.row}`}
-              onClick={() => handleCellClick(cell)}
-              // onClick={() => {
-              //   const newBoard = [...board];
-              //   newBoard[cell.row][cell.col].state = cell.state === CellState.EMPTY ? CellState.RED : CellState.EMPTY;
-              //   setBoard(newBoard);
-              // }}
-            >
-              <span>{cell.cellState}</span>
-            </div>
-          );
-        });
+      {gameSession.boardCells.map((column, index) => {
+        return (
+          <div key={`col-${index}`} className={`board-col-${index}`}>
+            {column.map((cell) => {
+              return (
+                <div
+                  key={`${cell.col}-${cell.row}`}
+                  className={classNames({
+                    cell: true,
+                    red: cell.cellState === gameSession.playerOneID,
+                    black: cell.cellState === gameSession.playerTwoID,
+                  })}
+                  id={`cell-${cell.col}-${cell.row}`}
+                  onClick={() => handleCellClick(cell)}
+                >
+                  <span
+                    className={classNames({
+                      red: cell.cellState === gameSession.playerOneID,
+                      black: cell.cellState === gameSession.playerTwoID,
+                    })}
+                    data-cell-state={cell.cellState}
+                  ></span>
+                </div>
+              );
+            })}
+          </div>
+        );
       })}
     </div>
   );
