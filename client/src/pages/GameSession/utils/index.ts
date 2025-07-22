@@ -22,4 +22,5 @@ export function createEmptyBoard() {
   return emptyBoard;
 }
 
+export * from './guards';
 export * from './hooks';
