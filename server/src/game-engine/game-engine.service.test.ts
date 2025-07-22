@@ -85,6 +85,7 @@ describe('GameEngineService', () => {
     jest.useRealTimers();
   });
 
+  // TODO: add case that creates and populates new board state with moves from game session
   describe("'startGame' method", () => {
     beforeEach(async () => {
       await boardStateModel.deleteMany({}).exec();

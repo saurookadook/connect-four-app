@@ -70,7 +70,8 @@ export class GameEngineService {
       foundGameSession.id,
     );
 
-    // TODO: populate BoardState with moves from GameSession
+    foundBoardState.cells = logicSession.board.gameBoardState;
+    await foundBoardState.save();
 
     return {
       boardState: foundBoardState,
