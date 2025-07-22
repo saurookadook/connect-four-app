@@ -3,6 +3,8 @@ import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 import {
   GameSessionStatus, // force formatting
   PlayerColor,
+  type PlayerID,
+  type PlayerMove,
 } from '@connect-four-app/shared';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import {
@@ -42,14 +44,45 @@ export const gameSessionRequestInProgress: CombinedGameSessionStateSlice['gameSe
     initialGameSessionStateSlice.gameSessionRequestInProgress,
   ];
 
+function getActivePlayerColor({
+  lastPlayerMove,
+  playerOneID,
+  playerTwoID,
+}: {
+  lastPlayerMove: PlayerMove | undefined;
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
+}) {
+  if (lastPlayerMove == null) {
+    return PlayerColor.RED;
+  }
+
+  switch (lastPlayerMove.playerID) {
+    case playerOneID:
+      return PlayerColor.BLACK;
+    case playerTwoID:
+      return PlayerColor.RED;
+    default:
+      throw new Error(
+        `Mismatched playerID in last move - from lastPlayerMove: '${lastPlayerMove.playerID}' || playerOneID: '${playerOneID} || playerTwoID: '${playerTwoID}'`,
+      );
+  }
+}
+
 const activePlayer: CombinedGameSessionStateSlice['activePlayer'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case RESET_GAME:
         return initialGameSessionStateSlice.activePlayer;
+      case START_GAME:
       case UPDATE_GAME_STATE:
       case SET_ACTIVE_PLAYER:
-        return action.payload.gameSession.activePlayer;
+        const { moves, playerOneID, playerTwoID } = action.payload.gameSession;
+        return getActivePlayerColor({
+          lastPlayerMove: moves.at(-1),
+          playerOneID,
+          playerTwoID,
+        });
       default:
         return stateSlice;
     }
@@ -75,9 +108,6 @@ const gameSessionID: CombinedGameSessionStateSlice['gameSessionID'] = [
 
 const boardCells: CombinedGameSessionStateSlice['boardCells'] = [
   (stateSlice, action) => {
-    console.log({
-      action,
-    });
     switch (action.type) {
       case RESET_GAME:
         return initialGameSessionStateSlice.boardCells;
@@ -95,10 +125,10 @@ const moves: CombinedGameSessionStateSlice['moves'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case RESET_GAME:
-        return initialGameSessionStateSlice.moves;
+        return [...initialGameSessionStateSlice.moves];
       case UPDATE_GAME_STATE:
       case SET_GAME_SESSION:
-        return action.payload.gameSession.moves;
+        return [...action.payload.gameSession.moves];
       default:
         return stateSlice;
     }

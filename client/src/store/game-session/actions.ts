@@ -101,12 +101,12 @@ export function startGame({
   });
 }
 
-export function updateBoardCells({
+export function updateGameState({
   dispatch,
   currentActivePlayer,
   gameSessionData,
 }: BaseAction & {
-  currentActivePlayer: PlayerColor;
+  currentActivePlayer?: PlayerColor;
   gameSessionData: Omit<
     GameSessionStateSlice,
     'gameSessionRequestInProgress' | 'activePlayer'

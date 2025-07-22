@@ -3,6 +3,7 @@ import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 import {
   GameSessionStatus, // force formatting
   PlayerColor,
+  PlayerMove,
   type GameBoard,
   type Nullable,
   type PlayerID,
@@ -14,8 +15,7 @@ export type GameSessionStateSlice = {
   /** @note This should be a Mongo `ObjectId` */
   gameSessionID: Nullable<string>;
   boardCells: GameBoard;
-  /* TODO: fix this type later */
-  moves: unknown[];
+  moves: PlayerMove[];
   playerOneID: Nullable<PlayerID>;
   playerTwoID: Nullable<PlayerID>;
   status: GameSessionStatus;
