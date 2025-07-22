@@ -1,6 +1,8 @@
 # connect-four-app
 
-A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built with [NestJS](https://nestjs.com/) and [React](https://react.dev/).
+A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app using [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) and built with [NestJS](https://nestjs.com/) and [React](https://react.dev/).
+
+<img src="/assets/connect-four-app-demo_2025-07-22.gif" alt="Demo of Connect Four application with side-by-side browsers">
 
 ## Getting Started
 
