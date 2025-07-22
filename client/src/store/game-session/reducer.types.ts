@@ -3,6 +3,7 @@ import type CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 import {
   GameSessionStatus, // force formatting
   PlayerColor,
+  type GameBoard,
   type Nullable,
   type PlayerID,
 } from '@connect-four-app/shared';
@@ -12,6 +13,7 @@ export type GameSessionStateSlice = {
   activePlayer: PlayerColor;
   /** @note This should be a Mongo `ObjectId` */
   gameSessionID: Nullable<string>;
+  boardCells: GameBoard;
   /* TODO: fix this type later */
   moves: unknown[];
   playerOneID: Nullable<PlayerID>;
@@ -25,6 +27,7 @@ export type GameSessionPlayerAction = CombineReducers.ReducerAction<{
 
 export type GameSessionGameSessionAction = CombineReducers.ReducerAction<{
   gameSessionID?: GameSessionStateSlice['gameSessionID'];
+  boardCells?: GameSessionStateSlice['boardCells'];
   moves?: GameSessionStateSlice['moves'];
   player?: PlayerColor;
   playerOneID?: GameSessionStateSlice['playerOneID'];
@@ -43,6 +46,10 @@ export type CombinedGameSessionStateSlice = {
   >;
   gameSessionRequestInProgress: CombineReducers.ArgsTuple<
     GameSessionStateSlice['gameSessionRequestInProgress'],
+    GameSessionGameSessionAction
+  >;
+  boardCells: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['boardCells'], // force formatting
     GameSessionGameSessionAction
   >;
   moves: CombineReducers.ArgsTuple<
