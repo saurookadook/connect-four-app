@@ -2,9 +2,11 @@ import { PlayerColor } from '@connect-four-app/shared';
 import {
   REQUEST_GAME_SESSION,
   RESET_GAME,
+  START_GAME,
   SET_ACTIVE_PLAYER,
   SET_GAME_SESSION,
   SET_GAME_SESSION_ID,
+  UPDATE_GAME_STATE,
 } from '@/store';
 import type { BaseAction, BoundThis } from '@/types/main';
 import { safeFetch } from '@/utils/safeFetch';
@@ -78,6 +80,42 @@ export function setGameSession({
     type: SET_GAME_SESSION,
     payload: {
       gameSession: gameSession,
+    },
+  });
+}
+
+export function startGame({
+  dispatch,
+  gameSessionData,
+}: BaseAction & {
+  gameSessionData: Omit<
+    GameSessionStateSlice,
+    'gameSessionRequestInProgress' | 'activePlayer'
+  >;
+}) {
+  return dispatch({
+    type: START_GAME,
+    payload: {
+      gameSession: gameSessionData,
+    },
+  });
+}
+
+export function updateGameState({
+  dispatch,
+  currentActivePlayer,
+  gameSessionData,
+}: BaseAction & {
+  currentActivePlayer?: PlayerColor;
+  gameSessionData: Omit<
+    GameSessionStateSlice,
+    'gameSessionRequestInProgress' | 'activePlayer'
+  >;
+}) {
+  return dispatch({
+    type: UPDATE_GAME_STATE,
+    payload: {
+      gameSession: gameSessionData,
     },
   });
 }

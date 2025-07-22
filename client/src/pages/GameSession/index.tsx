@@ -1,10 +1,20 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import {
+  SEND_GAME_SESSION,
+  SEND_MOVE,
+  START_GAME,
+  PlayerColor,
+  PlayerMove,
+  safeParseJSON,
+  type PlayerID,
+} from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn, FlexRow } from '@/layouts';
 import { Board, DebuggingPanel } from '@/pages/GameSession/components';
 import { useLoadGame } from '@/pages/GameSession/utils/hooks';
+import { startGame, updateGameState } from '@/store/actions';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
 import './styles.css';
@@ -17,8 +27,8 @@ export function GameSession() {
   const {
     gameSession: {
       gameSessionRequestInProgress,
-      activePlayer,
       gameSessionID,
+      activePlayer,
       playerOneID,
       playerTwoID,
     },
@@ -27,27 +37,43 @@ export function GameSession() {
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
-      console.log(
-        '    [wsMessageHandler] Receiving message!     '
-          .padStart(60, '-')
-          .padEnd(120, '-'),
-        '\n',
-        { event, eventData: event.data },
-        '\n',
-        '-'.repeat(120),
-      );
-      const messageData = (() => {
-        try {
-          return JSON.parse(event.data);
-        } catch {
-          return event.data;
-        }
-      })();
-      // setReceiveMessage({ dispatch: appDispatch, receivedMessage: messageData });
+      // TODO: make `safeParseJSON` generic
+      const messageData = safeParseJSON(event.data) as { event: string; data: any };
+      // console.log(
+      //   '    [wsMessageHandler] Receiving message!     '
+      //     .padStart(60, '-')
+      //     .padEnd(120, '-'),
+      //   '\n',
+      //   { event, messageData },
+      //   '\n',
+      //   '-'.repeat(120),
+      // );
+
+      if (messageData == null) {
+        console.error(
+          `Encountered ERROR parsing message data: ${event.data} (type '${typeof event.data}')`,
+        );
+      }
+
+      switch (messageData.event) {
+        case SEND_GAME_SESSION:
+          startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
+          break;
+        case SEND_MOVE:
+          updateGameState({
+            dispatch: appDispatch,
+            gameSessionData: messageData.data,
+          });
+          break;
+        default:
+          console.log(
+            `[GameSession - wsMessageHandler] No 'case' for event '${messageData.event}'`,
+          );
+      }
+
       setWsData((prevData) => [...prevData, messageData]);
     },
-    [],
-    // [appDispatch],
+    [appDispatch],
   );
 
   useLoadGame({
@@ -63,6 +89,28 @@ export function GameSession() {
     }
 
     wsManager.initializeConnection({ gameSessionID, playerID });
+
+    // NOTE: this _might_ be unnecessary...?
+    // or maybe the interval can be abstracted into a method as part of the WebSocketManager
+    const initInterval = setInterval(() => {
+      if (wsManager.getOpenWSConn().readyState !== wsManager.getOpenWSConn().OPEN) {
+        return;
+      }
+
+      wsManager.getOpenWSConn().send(
+        JSON.stringify({
+          event: START_GAME,
+          data: {
+            gameSessionID: gameSessionID,
+            playerOneID: playerOneID,
+            playerTwoID: playerTwoID,
+          },
+        }),
+      );
+
+      clearInterval(initInterval);
+    }, 250);
+
     wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
 
     return () => {
@@ -73,7 +121,7 @@ export function GameSession() {
 
   return (
     <section id="game-session">
-      <h2>{`🔴 ⚫ Connect Four 🔴 ⚫`}</h2>
+      <h2>{`🔴 ⚫ Connect Four: Current Game 🔴 ⚫`}</h2>
 
       <DebuggingPanel // force formatting
         gameSessionID={gameSessionID}
@@ -89,10 +137,13 @@ export function GameSession() {
               <b>Players</b>
             </span>
             {[playerOneID, playerTwoID].map((playerID, index) => {
+              const suffix =
+                index === 0 ? `One (${PlayerColor.RED})` : `Two (${PlayerColor.BLACK})`;
+
               return (
                 playerID != null && (
                   <Fragment key={playerID}>
-                    <dt>{`Player ${index === 0 ? 'One' : 'Two'}`}</dt>
+                    <dt>{`Player ${suffix}`}</dt>
                     <dd>{playerID}</dd>
                   </Fragment>
                 )

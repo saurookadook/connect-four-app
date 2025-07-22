@@ -19,9 +19,12 @@ dl {
 Global
 ****************************************************************/
 :root {
-  background-color: #242424;
+  --initial-bg-color: #242424;
+  --initial-text-color: rgba(255, 255, 255, 0.87);
+
+  background-color: var(--initial-bg-color);
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--initial-text-color);
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   font-synthesis: none;
   font-weight: 400;
@@ -43,7 +46,7 @@ Global
   --yellow-fill-0\.5: rgb(249 219 36 / 0.5);
   --red-fill: #ff0000;
   --red-fill-0\.5: rgb(255 0 0 / 0.5);
-  --black-fill: #ff0000;
+  --black-fill: #000000;
   --black-fill-0\.5: rgb(0 0 0 / 0.5);
 
   --light-gray-edge: rgb(238 238 238 / 0.75);

@@ -1,4 +1,5 @@
 import { FlexRow } from '@/layouts';
+import './styles.css';
 
 export function DebuggingPanel({
   gameSessionID,

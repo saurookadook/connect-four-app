@@ -1,6 +1,15 @@
 # connect-four-app
 
-A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built with [NestJS](https://nestjs.com/) and [React](https://react.dev/).
+A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built using:
+
+- [NestJS](https://nestjs.com/)
+- [React](https://react.dev/)
+- [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [Docker](https://www.docker.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [NGINX](https://nginx.org/en/docs/)
+
+<img src="/assets/connect-four-app-demo_2025-07-22.gif" alt="Demo of Connect Four application with side-by-side browsers">
 
 ## Getting Started
 

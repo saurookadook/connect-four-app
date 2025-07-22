@@ -1,3 +1,5 @@
+/* TODO: not sure why z-indices don't really work? */
+
 #board {
     border: 0.5rem solid var(--blue-darker-fill);
     border-radius: 0.5rem;
@@ -6,6 +8,20 @@
     grid-template-rows: repeat(6, 1fr);
     height: 100%;
     min-width: 34rem;
+    z-index: 1;
+
+    &,
+    & [class*="board-col-"],
+    & .cell,
+    & span {
+        position: relative;
+    }
+
+    & [class*="board-col-"] {
+        /* grid-column: 6 / 1; */
+        grid-row: 1 / 7;
+        z-index: 2
+    }
 
     & [id^="cell-"] {
         /* background: radial-gradient(circle at center, #000 50%, #333 50%, #eee 75%, #333 75%); */
@@ -29,10 +45,21 @@
         height: auto;
         justify-content: center;
         min-width: calc(100% / 7);
+        z-index: 4;
 
         & span {
-            height: 100%;
-            width: 100%;
+            border-radius: 50%;
+            height: calc(100% - 0.875rem);
+            width: calc(100% - 0.875rem);
+            z-index: 3;
+
+            &.red {
+                background: var(--red-fill);
+            }
+
+            &.black {
+                background: var(--black-fill);
+            }
         }
     }
 }

@@ -1,0 +1,22 @@
+#ws-event-log {
+    overflow: scroll;
+    width: 50%;
+
+    & pre,
+    & code {
+        color: var(--initial-text-color);
+    }
+
+    /* DEBUGGING DISPLAYED JSON */
+    & pre {
+        background-color: #282C34;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 1rem;
+
+        & code {
+            display: block;
+            text-align: left;
+        }
+    }
+}

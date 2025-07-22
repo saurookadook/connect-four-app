@@ -1,11 +1,11 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { safeParseJSON } from '@connect-four-app/shared';
+import { safeParseJSON, type PlayerID } from '@connect-four-app/shared';
 import { PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
 
 export type PlayerStateSlice = {
-  playerID: string | null;
+  playerID: PlayerID | null;
   username: string | null;
 };
 
