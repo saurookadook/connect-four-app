@@ -24,6 +24,7 @@
     "build:tsup": "rimraf dist && tsup ./src/index.ts"
   },
   "dependencies": {
+    "loglevel": "^1.9.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "vite": "^7.0.5",
