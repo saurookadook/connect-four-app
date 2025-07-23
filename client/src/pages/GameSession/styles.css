@@ -12,21 +12,6 @@ section#game-session {
         height: 100%;
         flex-shrink: 0;
     }
-
-    & .game-session-details {
-        align-self: center;
-        border: 1px solid #123456;
-        border-radius: 0.25rem;
-        /* margin: 0 auto 0.5rem; */
-        max-width: fit-content;
-        padding: 0.5rem;
-        position: sticky;
-        text-align: left;
-
-        & > span {
-            display: block;
-        }
-    }
 }
 
 #game-details {

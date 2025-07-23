@@ -1,15 +1,49 @@
-#ws-event-log {
-    overflow: scroll;
-    width: 50%;
+/* DEBUGGING DISPLAYED JSON */
+#debug-panel {
+    align-items: unset;
+    border: 2px solid var(--blue-darker-fill);
+    justify-content: space-around;
+    margin-bottom: 1rem;
+    max-height: 10rem;
+    overflow: auto;
 
+    & .game-session-details {
+        align-self: flex-start;
+        border: 1px solid #123456;
+        border-radius: 0.25rem;
+        /* margin: 0 auto 0.5rem; */
+        max-width: fit-content;
+        position: sticky;
+        text-align: left;
+
+        &,
+        & > .code-block {
+            padding: 0.5rem;
+        }
+
+        & > span {
+            display: block;
+        }
+    }
+
+    & #ws-event-log {
+        overflow: scroll;
+        width: 50%;
+    }
+
+    & .code-block,
     & pre,
     & code {
+        background-color: #282C34;
         color: var(--initial-text-color);
     }
 
-    /* DEBUGGING DISPLAYED JSON */
+    & .code-block pre {
+        margin: 0;
+        padding: 0;
+    }
+
     & pre {
-        background-color: #282C34;
         margin-right: auto;
         margin-left: auto;
         padding: 1rem;
