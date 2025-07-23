@@ -14,6 +14,12 @@ const config: ViteConfig = {
   build: {
     manifest: true,
   },
+  define: {
+    'import.meta.env.APP_DOMAIN': JSON.stringify(process.env.APP_DOMAIN),
+    'import.meta.env.LOG_LEVEL': JSON.stringify(process.env.LOG_LEVEL),
+    'import.meta.env.COOKIE_KEY': JSON.stringify(process.env.COOKIE_KEY),
+  },
+  envDir: './',
   plugins: [react()],
   resolve: {
     alias: {
