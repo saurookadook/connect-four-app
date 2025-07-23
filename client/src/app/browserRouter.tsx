@@ -1,8 +1,10 @@
 import {
   createBrowserRouter, // force formatting
+  redirect,
   type RouteObject,
 } from 'react-router-dom';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { Root } from '@/layouts';
 import {
   AccountPortal,
@@ -12,6 +14,8 @@ import {
   Login,
   Register,
 } from '@/pages';
+
+const logger = sharedLog.getLogger('browserRouter');
 
 /**
  * @note possibilities for implementing protected/public routes
@@ -65,6 +69,14 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'GameSession',
         element: <GameSession />,
+        loader: async ({ params }) => {
+          if (
+            params['gameSessionID'] == null ||
+            params['gameSessionID'] == ':gameSessionID'
+          ) {
+            return redirect('/game-sessions-history');
+          }
+        },
       },
       {
         // TODO: add dynamic path component? Better name than `subPage`?
@@ -72,6 +84,11 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'Account',
         element: <AccountPortal />,
+        loader: async ({ params }) => {
+          if (params['subPage'] == null || params['subPage'] == ':subPage') {
+            return redirect('/account/details');
+          }
+        },
       },
     ],
   },
