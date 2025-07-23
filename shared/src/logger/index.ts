@@ -22,7 +22,7 @@ function getLevelName(levelValue: number): LogLevelNames {
 
 const originalFactory = log.methodFactory;
 
-log.methodFactory = function (methodName, logLevel, loggerName) {
+log.methodFactory = function (methodName, logLevel, loggerName = 'root') {
   const rawMethod = originalFactory(methodName, logLevel, loggerName);
 
   const levelName = getLevelName(logLevel);
@@ -30,12 +30,25 @@ log.methodFactory = function (methodName, logLevel, loggerName) {
   return function (...args) {
     const [message, ...rest] = args;
     rawMethod(
-      `[${loggerName.toString()} - ${levelName}] : ${message}`,
+      `[${loggerName.toString()} - ${levelName.toString()}] : ${message}`,
       ...rest,
     );
   };
 };
 
+const ENV_LOG_LEVEL: string = (function () {
+  if (typeof process === 'undefined') {
+    return 'debug';
+  }
+
+  return (process.env.LOG_LEVEL || '').toLowerCase();
+})();
+
 log.rebuild();
+log.setDefaultLevel(
+  ENV_LOG_LEVEL.toUpperCase() in log.levels
+    ? (ENV_LOG_LEVEL as log.LogLevelDesc)
+    : 'silent',
+);
 
 export { log };
