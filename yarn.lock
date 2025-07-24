@@ -1087,6 +1087,7 @@ __metadata:
     typescript-eslint: "npm:^8.26.1"
     vite: "npm:^6.3.1"
     vitest: "npm:^3.1.4"
+    vitest-websocket-mock: "npm:^0.5.0"
   languageName: unknown
   linkType: soft
 
@@ -5584,7 +5585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/utils@npm:3.2.4":
+"@vitest/utils@npm:3.2.4, @vitest/utils@npm:^3.0.0":
   version: 3.2.4
   resolution: "@vitest/utils@npm:3.2.4"
   dependencies:
@@ -11981,7 +11982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mock-socket@npm:^9.3.0":
+"mock-socket@npm:^9.2.1, mock-socket@npm:^9.3.0":
   version: 9.3.1
   resolution: "mock-socket@npm:9.3.1"
   checksum: 10c0/0c53baa4acca12ed1ff9bddfdd4bc0cabe0fc96a3ed25a42a00d23b7a111eb6edfc2b44d93aef9a0c93a4a000b4d2d8dcff028488cd2a1e9cc416477ee341ce0
@@ -16069,6 +16070,18 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/95fb7f393adc2d2428e0e033ed4ea599323118f645415c35db3df40bd2c5a2962b0b4c967f35cfb80ca04efb1eb51bdb5f4b63529bb5f9aa3603d9fbeb50543f
+  languageName: node
+  linkType: hard
+
+"vitest-websocket-mock@npm:^0.5.0":
+  version: 0.5.0
+  resolution: "vitest-websocket-mock@npm:0.5.0"
+  dependencies:
+    "@vitest/utils": "npm:^3.0.0"
+    mock-socket: "npm:^9.2.1"
+  peerDependencies:
+    vitest: ">=3"
+  checksum: 10c0/d55061d41344b4c922ef3caca72fbaa3c090949c89d496d59ecba4cc12c67daca07c06875a0103af057ad8550da1f3255273baafbc5fd7f1a0166cd00a52fa31
   languageName: node
   linkType: hard
 
