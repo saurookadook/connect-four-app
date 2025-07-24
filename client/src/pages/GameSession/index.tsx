@@ -82,45 +82,10 @@ export function GameSession() {
   useLoadGame({
     dispatch: appDispatch,
     params,
-    gameSessionID,
+    gameSession: appState.gameSession,
     playerID,
+    wsMessageHandler,
   });
-
-  useEffect(() => {
-    if (gameSessionID == null || playerID == null || wsManager.ws != null) {
-      return;
-    }
-
-    wsManager.initializeConnection({ gameSessionID, playerID });
-
-    // NOTE: this _might_ be unnecessary...?
-    // or maybe the interval can be abstracted into a method as part of the WebSocketManager
-    const initInterval = setInterval(() => {
-      if (wsManager.getOpenWSConn().readyState !== wsManager.getOpenWSConn().OPEN) {
-        return;
-      }
-
-      wsManager.getOpenWSConn().send(
-        JSON.stringify({
-          event: START_GAME,
-          data: {
-            gameSessionID: gameSessionID,
-            playerOneID: playerOneID,
-            playerTwoID: playerTwoID,
-          },
-        }),
-      );
-
-      clearInterval(initInterval);
-    }, 250);
-
-    wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
-
-    return () => {
-      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
-      wsManager.closeWSConn();
-    };
-  }, [gameSessionID, playerID, wsMessageHandler]);
 
   return (
     <section id="game-session">

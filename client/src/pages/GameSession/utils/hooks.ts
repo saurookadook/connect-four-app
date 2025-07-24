@@ -1,27 +1,36 @@
 import { useEffect } from 'react';
 
-import { sharedLog, type Nullable } from '@connect-four-app/shared';
+import {
+  START_GAME,
+  sharedLog,
+  type Nullable,
+  type PlayerID,
+} from '@connect-four-app/shared';
 import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
+import { type GameSessionStateSlice } from '@/store/game-session/reducer.types';
+import { setPlayerID } from '@/store/actions';
 import { AppDispatch } from '@/store';
-import { fetchGameSession, setPlayerID } from '@/store/actions';
 import { RouterParams } from '@/types/main';
+import { wsManager } from '@/utils';
 
 const logger = sharedLog.getLogger(useLoadGame.name);
 
-/**
- * @todo Might be able to remove this hook?
- */
 export function useLoadGame({
   dispatch, // force formatting
   params,
-  gameSessionID,
+  gameSession,
   playerID,
+  wsMessageHandler,
 }: {
   dispatch: AppDispatch;
   params: RouterParams;
-  gameSessionID: string | null;
-  playerID: string | null;
+  gameSession: GameSessionStateSlice;
+  playerID: Nullable<PlayerID>;
+  wsMessageHandler: (event: MessageEvent) => void;
 }) {
+  const { gameSessionID, playerOneID, playerTwoID } = gameSession || {};
+
+  // TODO: this should probably live in a separate `useLoadPlayer` hook
   useEffect(() => {
     if (playerID != null) {
       return;
@@ -37,33 +46,60 @@ export function useLoadGame({
   }, [dispatch, playerID]);
 
   useEffect(() => {
-    if (isCurrentGameSessionLoaded(gameSessionID, params)) {
+    if (
+      params.gameSessionID == null ||
+      playerID == null ||
+      isCurrentGameSessionLoaded({ gameSession, params, playerID })
+    ) {
       return;
     }
 
-    if (typeof params.gameSessionID === 'string') {
-      // TODO: should this just send a START_GAME event through the websocket?
-      fetchGameSession({ dispatch, gameSessionID: params.gameSessionID });
-    } else {
-      logger.warn("Parameter 'gameSessionID' missing from params object!");
-    }
+    wsManager.initializeConnection({ gameSessionID: params.gameSessionID, playerID });
 
-    // const storedGameSession = window.localStorage.getItem(GAME_SESSION_LS_KEY);
+    // NOTE: this _might_ be unnecessary...?
+    // or maybe the interval can be abstracted into a method as part of the WebSocketManager
+    const initInterval = setInterval(() => {
+      if (wsManager.getOpenWSConn().readyState !== wsManager.getOpenWSConn().OPEN) {
+        return;
+      }
 
-    // if (storedGameSession != null) {
-    //   const parsedDetails = JSON.parse(storedGameSession);
-    //   setGameSessionID({ dispatch, gameSessionID: parsedDetails.id });
-    // }
-  }, [dispatch, params, gameSessionID]);
+      wsManager.getOpenWSConn().send(
+        JSON.stringify({
+          event: START_GAME,
+          data: {
+            gameSessionID: params.gameSessionID,
+            playerOneID: playerOneID,
+            playerTwoID: playerTwoID,
+          },
+        }),
+      );
+
+      clearInterval(initInterval);
+    }, 250);
+
+    wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
+
+    return () => {
+      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
+      wsManager.closeWSConn();
+    };
+  }, [gameSessionID, playerID, wsMessageHandler]);
 }
 
-function isCurrentGameSessionLoaded(
-  gameSessionID: Nullable<string>,
-  params: RouterParams,
-) {
+function isCurrentGameSessionLoaded({
+  gameSession,
+  params,
+  playerID,
+}: {
+  gameSession: GameSessionStateSlice;
+  params: RouterParams;
+  playerID: Nullable<PlayerID>;
+}) {
   return (
-    gameSessionID != null &&
+    playerID != null &&
+    wsManager.ws == null &&
+    gameSession.gameSessionID != null &&
     params.gameSessionID != null &&
-    params.gameSessionID === gameSessionID
+    params.gameSessionID === gameSession.gameSessionID
   );
 }
