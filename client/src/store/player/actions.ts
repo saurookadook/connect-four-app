@@ -1,6 +1,9 @@
+import { sharedLog } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { type BaseAction } from '@/types/main';
 import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
+
+const logger = sharedLog.getLogger('playerActions');
 
 type AuthResponseData = {
   message: string;
@@ -77,7 +80,7 @@ async function handleAuthRequest({
 
     responseData = await response.json();
   } catch (error) {
-    console.error(errorMessage, error);
+    logger.error(errorMessage, error);
     responseData = {
       error,
       message: errorMessage,

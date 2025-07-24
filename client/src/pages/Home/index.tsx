@@ -4,17 +4,10 @@ import { ViteReactHeader } from '@/components';
 export function Home() {
   const [count, setCount] = useState(0);
 
-  function handleCounterClick(event: React.MouseEvent<HTMLButtonElement>) {
-    console.log(
-      '    handleCounterClick    '.padStart(60, '?').padEnd(120, '?'),
-      '\n',
-      { event },
-      '\n',
-      '?'.repeat(120),
-    );
-
+  function handleCounterClick(
+    event: React.MouseEvent<HTMLButtonElement>, // force formatting
+  ) {
     const newCount = count + 1;
-    // ws.send(JSON.stringify({ count: newCount }));
     setCount(newCount);
   }
 

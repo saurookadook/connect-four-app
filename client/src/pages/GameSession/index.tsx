@@ -7,6 +7,7 @@ import {
   START_GAME,
   PlayerColor,
   PlayerMove,
+  sharedLog,
   safeParseJSON,
   type PlayerID,
 } from '@connect-four-app/shared';
@@ -18,6 +19,8 @@ import { startGame, updateGameState } from '@/store/actions';
 import { useAppStore } from '@/store';
 import { wsManager } from '@/utils';
 import './styles.css';
+
+const logger = sharedLog.getLogger(GameSession.name);
 
 export function GameSession() {
   const { appState, appDispatch } = useAppStore();
@@ -39,7 +42,7 @@ export function GameSession() {
     (event: MessageEvent) => {
       // TODO: make `safeParseJSON` generic
       const messageData = safeParseJSON(event.data) as { event: string; data: any };
-      // console.log(
+      // logger.log(
       //   '    [wsMessageHandler] Receiving message!     '
       //     .padStart(60, '-')
       //     .padEnd(120, '-'),
@@ -50,7 +53,7 @@ export function GameSession() {
       // );
 
       if (messageData == null) {
-        console.error(
+        logger.error(
           `Encountered ERROR parsing message data: ${event.data} (type '${typeof event.data}')`,
         );
       }
@@ -66,7 +69,7 @@ export function GameSession() {
           });
           break;
         default:
-          console.log(
+          logger.log(
             `[GameSession - wsMessageHandler] No 'case' for event '${messageData.event}'`,
           );
       }

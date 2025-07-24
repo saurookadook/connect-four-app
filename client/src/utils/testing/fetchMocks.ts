@@ -1,9 +1,12 @@
 /* eslint-disable no-case-declarations */
 import { vi } from 'vitest';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { allGameSessionsMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { BASE_API_SERVER_URL } from '@/constants';
+
+const logger = sharedLog.getLogger('fetchMocks');
 
 const originalFetch = global.fetch;
 
@@ -14,7 +17,7 @@ function findPlayerByUsernameAndPassword(username: string, password: string) {
 }
 
 function handleGetRequest(url: string, options: RequestInit) {
-  // console.log({
+  // logger.log({
   //   name: 'handleGetRequest',
   //   url,
   //   options,
@@ -129,7 +132,7 @@ function resolveWithResult(data: unknown, status: number) {
 
 export function createFetchMock() {
   const mockFetch = vi.fn((url: RequestInfo | URL, options?: RequestInit) => {
-    // console.log({
+    // logger.log({
     //   name: 'createFetchMock - mockFetch',
     //   url,
     //   options,

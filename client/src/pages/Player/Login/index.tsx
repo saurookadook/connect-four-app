@@ -1,11 +1,14 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { FlexColumn } from '@/layouts';
 import { useAppStore } from '@/store';
 import { logInPlayer } from '@/store/actions';
 import { BaseInput } from '../components';
 import { getFormData } from '../utils';
+
+const logger = sharedLog.getLogger(Login.name);
 
 // 🔒 🔓
 export function Login() {
@@ -29,7 +32,7 @@ export function Login() {
       password: password.value,
     }).then((actionResult) => {
       if (actionResult.statusCode >= 400) {
-        console.error(`Login failed: ${actionResult.message}`);
+        logger.error(`Login failed: ${actionResult.message}`);
         return;
       }
 

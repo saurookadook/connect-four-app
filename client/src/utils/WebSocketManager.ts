@@ -1,7 +1,10 @@
 import {
   safeParseJSON, // force formatting
+  sharedLog,
   type Nullable,
 } from '@connect-four-app/shared';
+
+const logger = sharedLog.getLogger('WebSocketManager');
 
 class WebSocketManager {
   #BASE_WS_CONNECTION_URL: string | URL;
@@ -30,26 +33,26 @@ class WebSocketManager {
       const wsConn = this.getOpenWSConn();
 
       wsConn.addEventListener('open', (event) => {
-        console.log(
+        logger.log(
           '    [WebSocket] Opening WebSocket connection    '
             .padStart(60, '-')
             .padEnd(120, '-'),
+          '\n',
+          { event },
+          '\n',
         );
-        console.log('\n');
-        console.log({ event });
-        console.log('\n');
       });
 
       wsConn.addEventListener('message', (event) => {
-        console.log(
+        logger.log(
           '    [WebSocket] Receiving message!     '.padStart(60, '-').padEnd(120, '-'),
+          '\n',
+          { event, eventData: safeParseJSON(event.data) },
+          '\n',
         );
-        console.log('\n');
-        console.log({ event, eventData: safeParseJSON(event.data) });
-        console.log('\n');
       });
     } catch (error: unknown) {
-      console.error('ERROR creating WebSocket instance', error);
+      logger.error('ERROR creating WebSocket instance', error);
     }
 
     return this;
@@ -72,7 +75,7 @@ class WebSocketManager {
       (this.#ws.readyState === this.#ws.OPEN ||
         this.#ws.readyState === this.#ws.CONNECTING)
     ) {
-      console.log(
+      logger.log(
         '    [WebSocket] Closing WebSocket connection    '
           .padStart(60, '-')
           .padEnd(120, '-'),
