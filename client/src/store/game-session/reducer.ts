@@ -3,6 +3,7 @@ import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 import {
   GameSessionStatus, // force formatting
   PlayerColor,
+  sharedLog,
   type PlayerID,
   type PlayerMove,
 } from '@connect-four-app/shared';
@@ -17,6 +18,8 @@ import {
   UPDATE_GAME_STATE,
 } from '@/store';
 import { CombinedGameSessionStateSlice } from './reducer.types';
+
+const logger = sharedLog.getLogger('gameSessionReducer');
 
 export const initialGameSessionStateSlice = {
   gameSessionRequestInProgress: false,
@@ -36,6 +39,7 @@ export const gameSessionRequestInProgress: CombinedGameSessionStateSlice['gameSe
         case REQUEST_GAME_SESSION:
           return true;
         case SET_GAME_SESSION:
+        case START_GAME:
           return false;
         default:
           return stateSlice;
@@ -98,6 +102,7 @@ const gameSessionID: CombinedGameSessionStateSlice['gameSessionID'] = [
       case SET_GAME_SESSION_ID:
         return action.payload.gameSession.gameSessionID;
       case SET_GAME_SESSION:
+      case START_GAME:
         return action.payload.gameSession.id;
       default:
         return stateSlice;
@@ -128,6 +133,7 @@ const moves: CombinedGameSessionStateSlice['moves'] = [
         return [...initialGameSessionStateSlice.moves];
       case UPDATE_GAME_STATE:
       case SET_GAME_SESSION:
+      case START_GAME:
         return [...action.payload.gameSession.moves];
       default:
         return stateSlice;
@@ -142,6 +148,7 @@ const playerOneID: CombinedGameSessionStateSlice['playerOneID'] = [
       case RESET_GAME:
         return initialGameSessionStateSlice.playerOneID;
       case SET_GAME_SESSION:
+      case START_GAME:
         return action.payload.gameSession.playerOneID;
       default:
         return stateSlice;
@@ -156,6 +163,7 @@ const playerTwoID: CombinedGameSessionStateSlice['playerTwoID'] = [
       case RESET_GAME:
         return initialGameSessionStateSlice.playerTwoID;
       case SET_GAME_SESSION:
+      case START_GAME:
         return action.payload.gameSession.playerTwoID;
       default:
         return stateSlice;
@@ -171,6 +179,7 @@ const status: CombinedGameSessionStateSlice['status'] = [
         return initialGameSessionStateSlice.status;
       case UPDATE_GAME_STATE:
       case SET_GAME_SESSION:
+      case START_GAME:
         return action.payload.gameSession.status;
       default:
         return stateSlice;

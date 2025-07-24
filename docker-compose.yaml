@@ -20,8 +20,6 @@ services:
       - ./client:/opt/connect-four-app/client
       - ./shared:/opt/connect-four-app/shared
       - ./.env:/opt/connect-four-app/client/.env
-      - ./.env:/opt/connect-four-app/.env
-      - ./.env.test:/opt/connect-four-app/.env.test
       - ./package.json:/opt/connect-four-app/package.json
       - ./yarn.lock:/opt/connect-four-app/yarn.lock
       - /opt/connect-four-app/node_modules
@@ -73,8 +71,6 @@ services:
       - ./shared:/opt/connect-four-app/shared
       - ./.env:/opt/connect-four-app/server/.env
       - ./.env.test:/opt/connect-four-app/server/.env.test
-      - ./.env:/opt/connect-four-app/.env
-      - ./.env.test:/opt/connect-four-app/.env.test
       - ./package.json:/opt/connect-four-app/package.json
       - ./yarn.lock:/opt/connect-four-app/yarn.lock
       - /opt/connect-four-app/node_modules
