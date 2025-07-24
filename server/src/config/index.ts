@@ -1,5 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 
+import { sharedLog } from '@connect-four-app/shared';
+
+const logger = sharedLog.getLogger('config');
+
 const safeSetInt = (val: unknown, fallback: number): number =>
   typeof val === 'string' ? parseInt(val, 10) : fallback;
 
@@ -8,7 +12,7 @@ export function buildConnectionURI(configService: ConfigService) {
   const port = configService.get('database.port');
   const dbName = configService.get('database.dbName');
 
-  // console.log(`Connection URI parts: `, { host, port, dbName });
+  // logger.log(`Connection URI parts: `, { host, port, dbName });
   return `mongodb://${host}:${port}/${dbName}`;
 }
 

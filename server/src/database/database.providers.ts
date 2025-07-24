@@ -2,8 +2,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Collection, Connection } from 'mongoose';
 
+import { sharedLog } from '@connect-four-app/shared';
 import baseConfig, { buildConnectionURI } from '@/config';
 import { BOARD_STATES_TTL_SECONDS } from '@/game-engine/schemas/board-states.schema';
+
+const logger = sharedLog.getLogger('databaseProviders');
 
 async function initSpecialCollections(mongoConn: Connection) {
   const boardStatesCollName = 'board_states';
@@ -51,13 +54,12 @@ export const databaseProviders = [
       onConnectionCreate: (connection: Connection) => {
         connection.on('open', (...args) => {
           void initSpecialCollections(connection).catch((reason) => {
-            console.log(
-              ' ERROR in initSpecialCollections '
-                .padStart(100, '=')
-                .padEnd(200, '='),
+            logger.log(
+              // prettier-ignore
+              `${'='.repeat(8)} ERROR in initSpecialCollections `.padEnd(200, '='),
             );
-            console.error(reason);
-            console.log('='.repeat(200));
+            logger.error(reason);
+            logger.log('='.repeat(200));
           });
         });
 

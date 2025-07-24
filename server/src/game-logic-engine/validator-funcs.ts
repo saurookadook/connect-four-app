@@ -1,6 +1,7 @@
 import {
   BOARD_COLS, // force formatting
   BOARD_ROWS,
+  sharedLog,
   type GameBoard,
 } from '@connect-four-app/shared';
 import { PlayerDTO } from '@/player/dtos/player.dto';
@@ -19,17 +20,17 @@ export function checkVerticalWin(
   playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
+  const logger = sharedLog.getLogger(checkVerticalWin.name);
+  if (!loggingEnabled) logger.setLevel('silent');
+
   let connectedCount = 0;
 
-  localLogger(`checkVerticalWin for ${playerID}`, loggingEnabled);
+  logger.debug(`checkVerticalWin for ${playerID}`);
   for (let row = rowStart; row <= rowStart + 3; row++) {
-    localLogger(
-      `---- Checking vertical => col: ${colStart} | row: ${row}`,
-      loggingEnabled,
-    );
+    logger.debug(`---- Checking vertical => col: ${colStart} | row: ${row}`);
 
     if (
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart,
         rowIndex: row,
@@ -50,22 +51,21 @@ export function checkDescendingSlopeDiagonalWin(
   playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
+  const logger = sharedLog.getLogger(checkDescendingSlopeDiagonalWin.name);
+  if (!loggingEnabled) logger.setLevel('silent');
+
   let descOpen = true;
   let ascOpen = true;
   let connectedCount = 0;
 
-  localLogger(
-    `checkDescendingSlopeDiagonalWin for ${playerID}`,
-    loggingEnabled,
-  );
+  logger.debug(`checkDescendingSlopeDiagonalWin for ${playerID}`);
   for (let offset = 0; offset < 4; offset++) {
-    localLogger(
+    logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
-      loggingEnabled,
     );
     if (
       descOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart - offset,
         rowIndex: rowStart - offset,
@@ -77,13 +77,12 @@ export function checkDescendingSlopeDiagonalWin(
       descOpen = false;
     }
 
-    localLogger(
+    logger.debug(
       `---- Checking asc => col: ${colStart + offset} | row: ${rowStart + offset}`,
-      loggingEnabled,
     );
     if (
       ascOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart + offset,
         rowIndex: rowStart + offset,
@@ -110,19 +109,21 @@ export function checkAscendingSlopeDiagonalWin(
   playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
+  const logger = sharedLog.getLogger(checkAscendingSlopeDiagonalWin.name);
+  if (!loggingEnabled) logger.setLevel('silent');
+
   let descOpen = true;
   let ascOpen = true;
   let connectedCount = 0;
 
-  localLogger(`checkAscendingSlopeDiagonalWin for ${playerID}`, loggingEnabled);
+  logger.debug(`checkAscendingSlopeDiagonalWin for ${playerID}`);
   for (let offset = 0; offset < 4; offset++) {
-    localLogger(
+    logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
-      loggingEnabled,
     );
     if (
       descOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart - offset,
         rowIndex: rowStart + offset,
@@ -134,13 +135,12 @@ export function checkAscendingSlopeDiagonalWin(
       descOpen = false;
     }
 
-    localLogger(
+    logger.debug(
       `---- Checking asc => col: ${colStart + offset} | row: ${rowStart + offset}`,
-      loggingEnabled,
     );
     if (
       ascOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart + offset,
         rowIndex: rowStart - offset,
@@ -167,19 +167,21 @@ export function checkHorizontalWin(
   playerID: PlayerDTO['playerID'],
   loggingEnabled = false,
 ): boolean {
+  const logger = sharedLog.getLogger(checkHorizontalWin.name);
+  if (!loggingEnabled) logger.setLevel('silent');
+
   let descOpen = true;
   let ascOpen = true;
   let connectedCount = 0;
 
-  localLogger(`checkHorizontalWin for ${playerID}`, loggingEnabled);
+  logger.debug(`checkHorizontalWin for ${playerID}`);
   for (let offset = 0; offset < 4; offset++) {
-    localLogger(
+    logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart}`,
-      loggingEnabled,
     );
     if (
       descOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState,
         colIndex: colStart - offset,
         rowIndex: rowStart,
@@ -191,13 +193,12 @@ export function checkHorizontalWin(
       descOpen = false;
     }
 
-    localLogger(
+    logger.debug(
       `---- Checking asc => col: ${colStart + offset} | row: ${rowStart}`,
-      loggingEnabled,
     );
     if (
       ascOpen &&
-      playerHasCell({
+      cellIsOccupiedByPlayer({
         boardState,
         colIndex: colStart + offset,
         rowIndex: rowStart,
@@ -232,7 +233,7 @@ export function isBeyondBoardBounds(
 }
 
 // TODO: better name...?
-function playerHasCell({
+function cellIsOccupiedByPlayer({
   boardState, // force formatting
   colIndex,
   rowIndex,
@@ -251,12 +252,6 @@ function playerHasCell({
 
 function playerHasWon(connectedCount: number): boolean {
   return connectedCount >= 4;
-}
-
-function localLogger(message: string, shouldLog = false) {
-  if (shouldLog) {
-    console.log(message);
-  }
 }
 
 export default validatorFuncs;
