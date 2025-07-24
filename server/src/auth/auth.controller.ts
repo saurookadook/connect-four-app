@@ -2,6 +2,7 @@ import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { type Request, type Response } from 'express';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { PlayerDetails } from '@/types/main';
 import {
   AuthenticationRequestDTO,
@@ -10,6 +11,8 @@ import {
 } from './dtos/auth.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { AuthenticationService } from './authentication.service';
+
+const logger = sharedLog.getLogger('AuthController');
 
 @Controller('auth')
 export class AuthController {
@@ -82,7 +85,7 @@ export class AuthController {
     errorMessage: string;
   }) {
     if (typeof req.login !== 'function') {
-      console.warn(
+      logger.warn(
         `[AuthController._handlePassportLogin] 'req.login' is not of type 'function'; type is '${typeof req.login}'`,
       );
       return;
@@ -90,13 +93,13 @@ export class AuthController {
 
     req.login(playerDetails, (err) => {
       if (process.env.NODE_ENV !== 'test' && err != null) {
-        console.warn('!'.repeat(process.stdout.columns));
-        console.error(err);
-        console.warn('!'.repeat(process.stdout.columns));
+        logger.warn('!'.repeat(process.stdout.columns));
+        logger.error(err);
+        logger.warn('!'.repeat(process.stdout.columns));
       }
 
       if (err) {
-        console.error(err);
+        logger.error(err);
         throw new Error(`${errorMessage} [REASON] ${err.toString()}`);
       }
       // should this redirect somewhere?

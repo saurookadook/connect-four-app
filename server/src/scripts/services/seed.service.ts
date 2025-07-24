@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { AuthenticationService } from '@/auth/authentication.service';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 import { PlayerService } from '@/player/player.service';
 import { GameSessionSeed, PlayerSeed } from '@/scripts/seed-data';
+
+const logger = sharedLog.getLogger('SeedService');
 
 @Injectable()
 export class SeedService {
@@ -16,7 +19,7 @@ export class SeedService {
   async seedGameSessions(
     gameSessionsSeedData: GameSessionSeed[],
   ): Promise<void> {
-    console.log(
+    logger.log(
       '    Seeding game sessions data...    '
         .padStart(120, '=')
         .padEnd(200, '='),
@@ -29,19 +32,19 @@ export class SeedService {
     await Promise.allSettled(createGameSessionPromises).then((results) =>
       results.forEach((result, index) => {
         if (result.status === 'rejected') {
-          console.error(
+          logger.error(
             `!!!!!!!!    Error seeding game session data: ${result.reason}`,
           );
         } else {
           const { playerOneID, playerTwoID } = gameSessionsSeedData[index];
-          console.log(
+          logger.log(
             `-------- Game session for '${playerOneID}' vs '${playerTwoID}' seeded successfully!`,
           );
         }
       }),
     );
 
-    console.log(
+    logger.log(
       '    Finished seeding game sessions data!    '
         .padStart(120, '=')
         .padEnd(200, '='),
@@ -49,7 +52,7 @@ export class SeedService {
   }
 
   async seedPlayers(playersSeedData: PlayerSeed[]): Promise<void> {
-    console.log(
+    logger.log(
       '    Seeding players data...    '.padStart(120, '=').padEnd(200, '='),
     );
 
@@ -66,18 +69,18 @@ export class SeedService {
     await Promise.allSettled(createPlayerPromises).then((results) =>
       results.forEach((result, index) => {
         if (result.status === 'rejected') {
-          console.error(
+          logger.error(
             `!!!!!!!!    Error seeding player data: ${result.reason}`,
           );
         } else {
-          console.log(
+          logger.log(
             `-------- Player '${playersSeedData[index].username}' seeded successfully!`,
           );
         }
       }),
     );
 
-    console.log(
+    logger.log(
       '    Finished seeding players data!    '
         .padStart(120, '=')
         .padEnd(200, '='),

@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 
-import type { Nullable } from '@connect-four-app/shared';
+import { sharedLog, type Nullable } from '@connect-four-app/shared';
 import { GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { AppDispatch } from '@/store';
 import { fetchGameSession, setPlayerID } from '@/store/actions';
 import { RouterParams } from '@/types/main';
 
+const logger = sharedLog.getLogger(useLoadGame.name);
+
 /**
- * @todo Should create a LOAD_GAME action type that will update
- * both state slices accordingly
+ * @todo Might be able to remove this hook?
  */
 export function useLoadGame({
   dispatch, // force formatting
@@ -40,15 +41,11 @@ export function useLoadGame({
       return;
     }
 
-    console.log({
-      name: 'loadGame',
-      params,
-    });
-
     if (typeof params.gameSessionID === 'string') {
+      // TODO: should this just send a START_GAME event through the websocket?
       fetchGameSession({ dispatch, gameSessionID: params.gameSessionID });
     } else {
-      console.warn("Parameter 'gameSessionID' missing from params object!");
+      logger.warn("Parameter 'gameSessionID' missing from params object!");
     }
 
     // const storedGameSession = window.localStorage.getItem(GAME_SESSION_LS_KEY);

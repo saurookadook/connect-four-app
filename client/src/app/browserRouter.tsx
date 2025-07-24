@@ -1,8 +1,10 @@
 import {
   createBrowserRouter, // force formatting
+  redirect,
   type RouteObject,
 } from 'react-router-dom';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { Root } from '@/layouts';
 import {
   AccountPortal,
@@ -12,6 +14,14 @@ import {
   Login,
   Register,
 } from '@/pages';
+
+const logger = sharedLog.getLogger('browserRouter');
+
+export const navItemsLabels = {
+  HOME: 'Home',
+  GAME_SESSIONS_HISTORY: 'Game Sessions History',
+  ACCOUNT: 'Account',
+};
 
 /**
  * @note possibilities for implementing protected/public routes
@@ -36,7 +46,7 @@ export const routerConfig: RouteObject[] = [
       {
         path: 'home',
         // @ts-expect-error: I hope this is just temporarily missing
-        label: 'Home',
+        label: navItemsLabels.HOME,
         element: <Home />,
       },
       // {
@@ -57,7 +67,7 @@ export const routerConfig: RouteObject[] = [
       {
         path: 'game-sessions-history',
         // @ts-expect-error: I hope this is just temporarily missing
-        label: 'Game Sessions History',
+        label: navItemsLabels.GAME_SESSIONS_HISTORY,
         element: <GameSessionsHistory />,
       },
       {
@@ -65,13 +75,26 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: 'GameSession',
         element: <GameSession />,
+        loader: async ({ params }) => {
+          if (
+            params['gameSessionID'] == null ||
+            params['gameSessionID'] == ':gameSessionID'
+          ) {
+            return redirect('/game-sessions-history');
+          }
+        },
       },
       {
         // TODO: add dynamic path component? Better name than `subPage`?
         path: 'account/:subPage',
         // @ts-expect-error: I hope this is just temporarily missing
-        label: 'Account',
+        label: navItemsLabels.ACCOUNT,
         element: <AccountPortal />,
+        loader: async ({ params }) => {
+          if (params['subPage'] == null || params['subPage'] == ':subPage') {
+            return redirect('/account/details');
+          }
+        },
       },
     ],
   },

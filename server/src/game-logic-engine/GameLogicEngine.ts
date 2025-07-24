@@ -3,11 +3,14 @@ import { UUID } from 'node:crypto';
 import {
   GameSessionStatus,
   PlayerColor,
+  sharedLog,
   type PlayerMove,
 } from '@connect-four-app/shared';
 import { PlayerDTO } from '@/player/dtos/player.dto';
 import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
+
+const logger = sharedLog.getLogger('GameLogicEngine');
 
 export class GameLogicEngine {
   // TODO: maybe this should be static?
@@ -38,7 +41,7 @@ export class GameLogicEngine {
 
       return logicSession;
     } catch (error) {
-      console.error(
+      logger.error(
         '[ClientGameEngine.startGame] Encountered ERROR initializing game session: ',
         error,
       );

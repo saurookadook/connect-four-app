@@ -1,11 +1,14 @@
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { FlexColumn } from '@/layouts';
 import { useAppStore } from '@/store';
 import { registerNewPlayer } from '@/store/actions';
 import { BaseInput } from '../components';
 import { getFormData } from '../utils';
+
+const logger = sharedLog.getLogger(Register.name);
 
 // 🔒 🔓
 export function Register() {
@@ -37,7 +40,7 @@ export function Register() {
       password: password.value,
     }).then((actionResult) => {
       if (actionResult.statusCode >= 400) {
-        console.error(`Registration failed: ${actionResult.message}`);
+        logger.error(`Registration failed: ${actionResult.message}`);
         return;
       }
 

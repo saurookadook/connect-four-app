@@ -30,7 +30,7 @@ export function Board() {
       })
     ) {
       // TODO: use something like an Admonition instead
-      console.warn('No cheating! 🤪');
+      window.alert('No cheating! 🤪');
       return;
     } else if (cell.cellState != null) {
       return;

@@ -1,7 +1,10 @@
 import { Command, CommandRunner } from 'nest-commander';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { allGameSessionsSeedData } from '@/scripts/seed-data';
 import { SeedService } from '@/scripts/services/seed.service';
+
+const logger = sharedLog.getLogger('SeedGameSessionsCommand');
 
 @Command({
   name: 'seed_game_sessions',
@@ -13,9 +16,9 @@ export class SeedGameSessionsCommand extends CommandRunner {
   }
 
   async run(): Promise<void> {
-    console.log('\n');
+    logger.log('\n');
     await this.seedService.seedGameSessions(allGameSessionsSeedData);
-    console.log('\n');
+    logger.log('\n');
 
     process.exitCode = 0;
   }

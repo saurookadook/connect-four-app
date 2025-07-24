@@ -1,8 +1,8 @@
+import { sharedLog } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL } from '@/constants';
+import { type BoundThis } from '@/types/main';
 
-type BoundThis = {
-  name: string;
-};
+const logger = sharedLog.getLogger(safeFetch.name);
 
 export async function safeFetch(
   this: BoundThis,
@@ -42,7 +42,7 @@ export async function safeFetch(
     responseData = await response.json();
   } catch (error) {
     const _error: Error = error instanceof Error ? error : new Error();
-    console.error(_error);
+    logger.error(_error);
     throw new Error(`[${funcName}] ${_error.message}`, { cause: error });
   }
 
