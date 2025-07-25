@@ -23,6 +23,5 @@
     "strictBindCallApply": false,
     "strictNullChecks": true,
     "target": "ES2023"
-  },
-  "include": ["src", "./tsup.config.ts"]
+  }
 }
