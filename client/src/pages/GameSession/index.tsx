@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -9,6 +9,7 @@ import {
   PlayerMove,
   sharedLog,
   safeParseJSON,
+  type BaseWebSocketMessageEvent,
   type PlayerID,
 } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
@@ -40,8 +41,7 @@ export function GameSession() {
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
-      // TODO: make `safeParseJSON` generic
-      const messageData = safeParseJSON(event.data) as { event: string; data: any };
+      const messageData = safeParseJSON<BaseWebSocketMessageEvent>(event.data);
       // logger.log(
       //   '    [wsMessageHandler] Receiving message!     '
       //     .padStart(60, '-')
@@ -56,6 +56,7 @@ export function GameSession() {
         logger.error(
           `Encountered ERROR parsing message data: ${event.data} (type '${typeof event.data}')`,
         );
+        return;
       }
 
       switch (messageData.event) {
