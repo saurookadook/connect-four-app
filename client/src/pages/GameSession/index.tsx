@@ -1,16 +1,13 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
   SEND_GAME_SESSION,
   SEND_MOVE,
-  START_GAME,
   PlayerColor,
-  PlayerMove,
   sharedLog,
   safeParseJSON,
   type BaseWebSocketMessageEvent,
-  type PlayerID,
 } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn, FlexRow } from '@/layouts';
@@ -18,7 +15,6 @@ import { Board, DebuggingPanel } from '@/pages/GameSession/components';
 import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import { startGame, updateGameState } from '@/store/actions';
 import { useAppStore } from '@/store';
-import { wsManager } from '@/utils';
 import './styles.css';
 
 const logger = sharedLog.getLogger(GameSession.name);
