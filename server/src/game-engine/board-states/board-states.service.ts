@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
+import { GameLogicEngine } from '@connect-four-app/shared';
 import {
   CreateBoardStateDTO, // force formatting
   GameSessionDTO,
@@ -14,7 +15,6 @@ import {
   GameSessionDocument,
 } from '@/game-engine/schemas';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
-import { GameLogicEngine } from '@/game-logic-engine';
 
 @Injectable()
 export class BoardStatesService {

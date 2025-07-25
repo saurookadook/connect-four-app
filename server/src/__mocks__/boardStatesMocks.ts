@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-import { LogicBoard } from '@/game-logic-engine';
+import { LogicBoard } from '@connect-four-app/shared';
 import { mockNow } from './commonMocks';
 
 export type BoardStateDocumentMock = {
