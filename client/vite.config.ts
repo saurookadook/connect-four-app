@@ -1,12 +1,24 @@
 /// <reference types="vitest/config" />
 import path from 'path';
-import { defineConfig, type UserConfig } from 'vite';
+import { defineConfig, type LogLevel, type UserConfig } from 'vite';
 import type { InlineConfig } from 'vitest/node';
 import react from '@vitejs/plugin-react';
 
 const __dirname = path.resolve();
 
-const { SERVER_PORT } = process.env;
+enum ViteLogLevels {
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  SILENT = 'silent',
+}
+
+const { LOG_LEVEL, SERVER_PORT } = process.env;
+
+const configLogLevel =
+  LOG_LEVEL in ViteLogLevels // force formatting
+    ? (LOG_LEVEL as LogLevel)
+    : 'info';
 
 type ViteConfig = UserConfig & { test: InlineConfig };
 
@@ -14,12 +26,14 @@ const config: ViteConfig = {
   build: {
     manifest: true,
   },
+  clearScreen: false,
   define: {
     'import.meta.env.APP_DOMAIN': JSON.stringify(process.env.APP_DOMAIN),
     'import.meta.env.LOG_LEVEL': JSON.stringify(process.env.LOG_LEVEL),
     'import.meta.env.COOKIE_KEY': JSON.stringify(process.env.COOKIE_KEY),
   },
   envDir: './',
+  logLevel: configLogLevel,
   plugins: [react()],
   resolve: {
     alias: {
