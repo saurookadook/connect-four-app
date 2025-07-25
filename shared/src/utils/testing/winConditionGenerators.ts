@@ -2,6 +2,26 @@ import { LogicSession } from '@/game-logic-engine';
 import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
 import { type PlayerID } from '@/types/main';
 
+/**
+ * @note Winning move is Red @ columnIndex 0
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ R │ R │   │   │   │   │   │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ R │ R │ B │   │   │   │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │ B │ B │ B │ R │   │   │   │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
 export function populateBoardWithOneMoveTilWin(
   logicSessionRef: LogicSession,
 ): void {

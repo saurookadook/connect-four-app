@@ -20,8 +20,10 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "yarn build:tsup",
-    "build:tsup": "rimraf dist && tsup --tsconfig tsconfig.build.json ./src/index.ts",
+    "build": "yarn build:tsup-dev",
+    "build:prod": "yarn build:tsup-prod",
+    "build:tsup-dev": "rimraf dist && tsup --tsconfig tsconfig.dev.json ./src/index.ts",
+    "build:tsup-prod": "rimraf dist && tsup --tsconfig tsconfig.build.json ./src/index.ts",
     "test": "jest"
   },
   "dependencies": {

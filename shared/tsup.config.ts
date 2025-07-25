@@ -19,12 +19,14 @@ const sharedConfig: Options = {
   //             return { js: '.mjs', dts: '.d.mts' };
   //     }
   // },
-  sourcemap: true,
+  sourcemap: 'inline',
+  // sourcemap: true,
   /**
    * This option fixes a weird bug with resolution of default exports
    * @see {@link https://github.com/egoist/tsup/issues/572#issuecomment-1927105408 | tsup/issues/572}
    */
   splitting: true,
+  tsconfig: './tsconfig.build.json',
 };
 
 function buildTsupConfig(options = {}): Options {
