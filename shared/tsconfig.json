@@ -1,28 +1,7 @@
 {
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
-    "declaration": true,
-    "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "forceConsistentCasingInFileNames": true,
-    "incremental": false,
-    "isolatedModules": true,
-    "module": "commonjs",
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "noImplicitAny": false,
-    "outDir": "./dist",
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "removeComments": true,
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strictBindCallApply": false,
-    "strictNullChecks": true,
-    "target": "ES2023"
-  },
-  "include": ["src", "./tsup.config.ts"]
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.build.json" },
+    { "path": "./tsconfig.test.json" }
+  ]
 }

@@ -1,11 +1,11 @@
-import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
-import { GameSessionStatus } from '../constants';
+import { GameSessionStatus } from '@/constants';
+import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
 import {
   populateBoardWithOneMoveTilWin,
   populateBoardWithDescendingSlopeDiagonalWinOne,
   winningConditionGeneratorFuncs,
-} from '../testing-utils/winConditionGenerators';
-import { GameLogicEngine, LogicSession } from '..';
+} from '@/utils/testing/winConditionGenerators';
 
 describe('GameLogicEngine', () => {
   let gameEngine: GameLogicEngine;

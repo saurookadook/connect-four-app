@@ -1,5 +1,5 @@
-import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
-import { PlayerDTO } from '@/player/dtos/player.dto';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
+import { PlayerID } from '@/types/main';
 import { LogicSession } from '..';
 
 export function populateBoardWithOneMoveTilWin(
@@ -583,7 +583,7 @@ export const winningConditionGeneratorFuncs = [
  */
 
 /** @description Tuple of `[columnIndex, PlayerID]` */
-export type MoveTuple = [number, PlayerDTO['playerID']];
+export type MoveTuple = [number, PlayerID];
 
 export function populateBoardWithMoves({
   logicSessionRef,

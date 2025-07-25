@@ -3,6 +3,8 @@ import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 
 import {
+  GameLogicEngine,
+  LogicSession,
   type PlayerMove, // force formatting
 } from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos';
@@ -11,7 +13,6 @@ import {
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
-import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
 import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionsService } from './sessions/game-sessions.service';
 

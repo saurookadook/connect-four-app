@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 
-import { mockPlayerOneID, mockPlayerTwoID } from '@/__mocks__/playerMocks';
-import { BOARD_COLS, BOARD_ROWS } from '../constants';
-import { LogicSession } from '..';
+import { BOARD_COLS, BOARD_ROWS } from '@/constants';
+import { LogicSession } from '@/game-logic-engine';
+import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
 
 describe('LogicSession', () => {
   describe('constructor', () => {

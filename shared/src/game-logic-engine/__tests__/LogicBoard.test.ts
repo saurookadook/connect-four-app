@@ -1,6 +1,6 @@
-import { mockPlayerOneID } from '@/__mocks__/playerMocks';
-import { BOARD_COLS, BOARD_ROWS } from '../constants';
-import { LogicBoard } from '..';
+import { BOARD_COLS, BOARD_ROWS } from '@/constants';
+import { LogicBoard } from '@/game-logic-engine';
+import { mockPlayerOneID } from '@/mocks';
 
 describe('Board', () => {
   let testLogicBoard: LogicBoard;
