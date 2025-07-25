@@ -12,8 +12,8 @@ class WebSocketManager {
   #playerID: string;
   #ws: Nullable<WebSocket>;
 
-  constructor(connectionURL?: string | URL) {
-    this.#BASE_WS_CONNECTION_URL = connectionURL ?? 'ws://localhost:8090/connect-ws';
+  constructor(connectionURL: string | URL = 'ws://localhost:8090/connect-ws') {
+    this.#BASE_WS_CONNECTION_URL = connectionURL;
     this.#playerID = '';
     this.#gameSessionID = '';
     this.#ws = null;
@@ -92,4 +92,5 @@ class WebSocketManager {
 
 const wsManager = new WebSocketManager();
 
+export { WebSocketManager };
 export default wsManager;
