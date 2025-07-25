@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "yarn build:tsup",
-    "build:tsup": "rimraf dist && tsup ./src/index.ts",
+    "build:tsup": "rimraf dist && tsup --tsconfig tsconfig.build.json ./src/index.ts",
     "test": "jest"
   },
   "dependencies": {
