@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 
 import {
   GameSessionStatus,
+  type Nullable,
   type PlayerID,
   type PlayerMove,
 } from '@connect-four-app/shared';
@@ -31,7 +32,7 @@ class Game_Session {
     default: null,
     type: Types.UUID,
   })
-  winner: PlayerID;
+  winner: Nullable<PlayerID>;
 
   @Prop({ default: [], required: true })
   moves: PlayerMove[];

@@ -33,6 +33,12 @@ export class CreateGameSessionDTO {
 
   @Expose()
   playerTwoID: GameSessionDTO['playerTwoID'];
+
+  @Expose()
+  moves?: GameSessionDTO['moves'];
+
+  @Expose()
+  status?: GameSessionDTO['status'];
 }
 
 @Exclude()
