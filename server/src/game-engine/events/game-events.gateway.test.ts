@@ -7,8 +7,14 @@ import WSMock from 'jest-websocket-mock';
 
 import {
   BOARD_ROWS,
-  GameSessionStatus,
   SEND_MOVE,
+  LogicSession,
+  GameLogicEngine,
+  GameSessionStatus,
+  moveTuplesByGenerator,
+  populateBoardWithMoves,
+  populateBoardWithOneMoveTilWin,
+  type PlayerMove,
 } from '@connect-four-app/shared';
 import { createBoardStateDocumentMock } from '@/__mocks__/boardStatesMocks';
 import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
@@ -24,7 +30,12 @@ import {
 } from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
 import { BoardStatesService } from '@/game-engine/board-states/board-states.service';
-import { BoardState, GameSession } from '@/game-engine/schemas';
+import {
+  BoardState,
+  BoardStateDocument,
+  GameSession,
+  GameSessionDocument,
+} from '@/game-engine/schemas';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 import { GameEngineModule } from '@/game-engine/game-engine.module';
 import { Player } from '@/player/schemas/player.schema';
@@ -103,6 +114,10 @@ describe('GameEventsGateway', () => {
         );
       },
     );
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   afterAll(async () => {
@@ -201,28 +216,71 @@ describe('GameEventsGateway', () => {
     });
 
     it('should handle a winning move and broadcast results of updated data to appropriate clients', async () => {
+      /* START TEST SETUP */
       // TODO: populate board with winning state minus one move
+      const moveTuples =
+        moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
+      const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
+        (moveTuple) => {
+          const [columnIndex, playerID] = moveTuple;
+          return {
+            columnIndex: columnIndex,
+            gameSessionID: mockGameSessionID,
+            playerID: playerID,
+            timestamp: new Date(),
+          };
+        },
+      );
 
-      const gameSessionDocument =
-        await gameSessionsService.findOneById(mockGameSessionID);
-      const boardStateDocument =
+      const testGameSessionDocument = (await gameSessionsService.updateOne(
+        mockGameSessionID,
+        {
+          moves: playerMovesFromTuples,
+        },
+      )) as GameSessionDocument;
+
+      let logicSession: LogicSession = new GameLogicEngine().startGame({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      logicSession = populateBoardWithMoves({
+        logicSessionRef: logicSession,
+        moves: moveTuples,
+      });
+
+      let testBoardStateDocument =
         await boardStatesService.findOneByGameSessionID(mockGameSessionID);
+      testBoardStateDocument = (await boardStatesService.updateOne(
+        testBoardStateDocument!._id.toJSON(),
+        {
+          gameSessionID: mockGameSessionID,
+          cells: logicSession.board.gameBoardState,
+        },
+      )) as BoardStateDocument;
 
-      await gateway.onMakeMove({
-        columnIndex: 1,
+      const expectedCells = Array.from(testBoardStateDocument.cells);
+      const colIndex = 0;
+      const rowIndex = BOARD_ROWS - 4;
+      const winningMove = {
+        columnIndex: 0,
         gameSessionID: mockGameSessionID,
         playerID: mockPlayerOneID,
         timestamp: new Date(),
-      });
+      };
+      expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
+      const expectedMoves = [...testGameSessionDocument.moves, winningMove];
+      /* END TEST SETUP */
+
+      await gateway.onMakeMove({ ...winningMove });
 
       const winningSendMoveEvent = {
         event: SEND_MOVE,
         data: {
           id: mockGameSessionID,
-          boardCells: boardStateDocument?.cells,
-          moves: gameSessionDocument?.moves,
-          playerOneID: gameSessionDocument?.playerOneID,
-          playerTwoID: gameSessionDocument?.playerTwoID,
+          boardCells: expectedCells,
+          moves: expectedMoves,
+          playerOneID: testGameSessionDocument?.playerOneID,
+          playerTwoID: testGameSessionDocument?.playerTwoID,
           status: GameSessionStatus.COMPLETED,
         },
       };
