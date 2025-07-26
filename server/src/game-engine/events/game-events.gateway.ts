@@ -70,41 +70,6 @@ export class GameEventsGateway implements OnGatewayConnection {
     activeGame.set(incomingPlayerID, client);
   }
 
-  // TODO: just temp for testing with frontend
-  @SubscribeMessage('broadcast-test')
-  onBroadcastTestEvent(@MessageBody('message') message: string) {
-    logger.debug(
-      '='.repeat(160),
-      '\n',
-      `    [GameEventsGateway.onTestEvent] Message received: '${message}'`,
-      '\n',
-      inspect(
-        { clients: this.server.clients },
-        { colors: true, compact: false, depth: 1, showHidden: true },
-      ),
-      '\n',
-      '='.repeat(160),
-    );
-
-    this.server.clients.forEach((client, socket, wsSet) => {
-      logger.debug(
-        '?'.repeat(160),
-        '\n',
-        `    [GameEventsGateway.onTestEvent] 'clients.forEach' callback`,
-        '\n',
-        inspect(
-          { client, socket, wsSet },
-          { colors: true, compact: false, depth: 1, showHidden: true },
-        ),
-        '\n',
-        '?'.repeat(160),
-      );
-      if (client.readyState === WebSocket.OPEN) {
-        client.send('[server] Hello, world!');
-      }
-    });
-  }
-
   @SubscribeMessage(START_GAME)
   async onStartGame(
     @MessageBody()
@@ -145,6 +110,7 @@ export class GameEventsGateway implements OnGatewayConnection {
             playerOneID: gameSession.playerOneID,
             playerTwoID: gameSession.playerTwoID,
             status: gameSession.status,
+            winner: gameSession.winner,
           },
         }),
       );
@@ -183,6 +149,7 @@ export class GameEventsGateway implements OnGatewayConnection {
             playerOneID: gameSession.playerOneID,
             playerTwoID: gameSession.playerTwoID,
             status: gameSession.status,
+            winner: gameSession.winner,
           },
         }),
       );
@@ -191,5 +158,40 @@ export class GameEventsGateway implements OnGatewayConnection {
 
   get activeGamesMap(): Map<string, GameSessionMap> {
     return this.#activeGamesMap;
+  }
+
+  // TODO: just temp for testing with frontend
+  @SubscribeMessage('broadcast-test')
+  onBroadcastTestEvent(@MessageBody('message') message: string) {
+    logger.debug(
+      '='.repeat(160),
+      '\n',
+      `    [GameEventsGateway.onTestEvent] Message received: '${message}'`,
+      '\n',
+      inspect(
+        { clients: this.server.clients },
+        { colors: true, compact: false, depth: 1, showHidden: true },
+      ),
+      '\n',
+      '='.repeat(160),
+    );
+
+    this.server.clients.forEach((client, socket, wsSet) => {
+      logger.debug(
+        '?'.repeat(160),
+        '\n',
+        `    [GameEventsGateway.onTestEvent] 'clients.forEach' callback`,
+        '\n',
+        inspect(
+          { client, socket, wsSet },
+          { colors: true, compact: false, depth: 1, showHidden: true },
+        ),
+        '\n',
+        '?'.repeat(160),
+      );
+      if (client.readyState === WebSocket.OPEN) {
+        client.send('[server] Hello, world!');
+      }
+    });
   }
 }

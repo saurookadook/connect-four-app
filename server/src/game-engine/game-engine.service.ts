@@ -1,8 +1,13 @@
+import { inspect } from 'node:util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { Connection, Types } from 'mongoose';
 
 import {
+  GameLogicEngine,
+  GameSessionStatus,
+  LogicSession,
+  sharedLog,
   type PlayerMove, // force formatting
 } from '@connect-four-app/shared';
 import { GameSessionDTO } from '@/game-engine/dtos';
@@ -11,9 +16,10 @@ import {
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
-import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
 import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionsService } from './sessions/game-sessions.service';
+
+const logger = sharedLog.getLogger('GameEngineService');
 
 @Injectable()
 export class GameEngineService {
@@ -85,7 +91,7 @@ export class GameEngineService {
     boardState: BoardStateDocument;
     gameSession: GameSessionDocument;
   }> {
-    const gameSession = await this.gameSessionsService.findOneById(
+    let gameSession = await this.gameSessionsService.findOneById(
       playerMove.gameSessionID,
     );
 
@@ -95,16 +101,21 @@ export class GameEngineService {
       );
     }
 
-    const boardState = await this._findOrCreateBoardState(
+    let boardState = await this._findOrCreateBoardState(
       playerMove.gameSessionID,
     );
 
     const logicSession = this._handleMoveLogic(gameSession, playerMove);
 
     try {
-      boardState.cells = logicSession.board.gameBoardState;
-      boardState.updatedAt = playerMove.timestamp;
-      await boardState.save();
+      boardState = (await this.boardStatesService.updateOne(
+        boardState._id.toJSON(),
+        {
+          gameSessionID: boardState.gameSessionID.toJSON(),
+          cells: logicSession.board.gameBoardState,
+          updatedAt: playerMove.timestamp,
+        },
+      )) as BoardStateDocument;
     } catch (error) {
       throw new Error(
         `[GameEngineService.handlePlayerMove] : ERROR saving board state - ${error.message}`,
@@ -114,8 +125,20 @@ export class GameEngineService {
 
     try {
       gameSession.moves.push(playerMove);
-      gameSession.updatedAt = playerMove.timestamp;
-      await gameSession.save();
+      const updateFields = {
+        moves: gameSession.moves,
+        status: logicSession.status,
+        winner:
+          logicSession.status === GameSessionStatus.COMPLETED
+            ? logicSession.activePlayer
+            : null,
+        updatedAt: new Date(playerMove.timestamp),
+      };
+
+      gameSession = (await this.gameSessionsService.updateOne(
+        gameSession._id.toJSON(),
+        updateFields,
+      )) as GameSessionDocument;
     } catch (error) {
       throw new Error(
         `[GameEngineService.handlePlayerMove] : ERROR saving game session - ${error.message}`,

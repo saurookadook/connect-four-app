@@ -19,6 +19,7 @@ export type GameSessionStateSlice = {
   playerOneID: Nullable<PlayerID>;
   playerTwoID: Nullable<PlayerID>;
   status: GameSessionStatus;
+  winner: Nullable<PlayerID>;
 };
 
 export type GameSessionPlayerAction = CombineReducers.ReducerAction<{
@@ -33,6 +34,7 @@ export type GameSessionGameSessionAction = CombineReducers.ReducerAction<{
   playerOneID?: GameSessionStateSlice['playerOneID'];
   playerTwoID?: GameSessionStateSlice['playerTwoID'];
   status?: GameSessionStateSlice['status'];
+  winner?: GameSessionStateSlice['winner'];
 }>;
 
 export type CombinedGameSessionStateSlice = {
@@ -66,6 +68,10 @@ export type CombinedGameSessionStateSlice = {
   >;
   status: CombineReducers.ArgsTuple<
     GameSessionStateSlice['status'], // force formatting
+    GameSessionGameSessionAction
+  >;
+  winner: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['winner'], // force formatting
     GameSessionGameSessionAction
   >;
 };

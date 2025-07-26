@@ -1,3 +1,7 @@
+import { useState } from 'react';
+
+import { safeParseJSON } from '@connect-four-app/shared';
+import { DEBUG_LS_KEY } from '@/constants';
 import { FlexRow } from '@/layouts';
 import { useAppStore } from '@/store';
 import './styles.css';
@@ -12,33 +16,49 @@ export function DebuggingPanel({
   playerID: string | null;
   wsData: unknown[];
 }) {
+  const debugEnabled = safeParseJSON<boolean>(
+    window.localStorage.getItem(DEBUG_LS_KEY),
+  );
+
+  const [shouldDisplay, setShouldDisplay] = useState(debugEnabled);
+
+  // @ts-expect-error
+  window.__cfToggleDebug = () => {
+    const newValue = !shouldDisplay;
+    window.localStorage.setItem(DEBUG_LS_KEY, String(newValue));
+    setShouldDisplay(newValue);
+  };
+
   const { appState } = useAppStore();
 
   return (
-    <FlexRow id="debug-panel">
-      <div className="game-session-details">
-        {gameSessionID != null && (
-          <span>
-            <b>Game Session ID</b>: {gameSessionID}
-          </span>
-        )}
-        {playerID != null && (
-          <span>
-            <b>Player ID</b>: {playerID}
-          </span>
-        )}
+    shouldDisplay && (
+      <FlexRow id="debug-panel">
+        <div className="game-session-details">
+          {gameSessionID != null && (
+            <span>
+              <b>Game Session ID</b>: {gameSessionID}
+            </span>
+          )}
+          {playerID != null && (
+            <span>
+              <b>Player ID</b>: {playerID}
+            </span>
+          )}
 
-        <CollapsibleCodeBlock data={appState} />
-      </div>
+          <CollapsibleCodeBlock data={appState} />
+        </div>
 
-      <div id="ws-event-log">
-        <h3>WebSocket Event Log</h3>
-        <SimpleCodeBlock data={wsData} />
-      </div>
-    </FlexRow>
+        <div id="ws-event-log">
+          <h3>WebSocket Event Log</h3>
+          <SimpleCodeBlock data={wsData} />
+        </div>
+      </FlexRow>
+    )
   );
 }
 
+// TODO: all of this stuff below should probably live elsewhere
 type DivProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement

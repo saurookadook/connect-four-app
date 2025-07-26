@@ -2,7 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 
-import { BOARD_ROWS, GameSessionStatus } from '@connect-four-app/shared';
+import {
+  BOARD_ROWS,
+  GameLogicEngine,
+  GameSessionStatus,
+  LogicSession,
+  moveTuplesByGenerator,
+  populateBoardWithMoves,
+  populateBoardWithOneMoveTilWin,
+  sharedLog,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import {
   createBoardStateDocumentMock,
   type BoardStateDocumentMock,
@@ -40,6 +50,8 @@ import { GameEngineService } from './game-engine.service';
 
 const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
 
+const logger = sharedLog.getLogger('GameEngineService__tests');
+
 describe('GameEngineService', () => {
   let mongoConnection: Connection;
   let boardStateModel: Model<BoardState>;
@@ -75,6 +87,12 @@ describe('GameEngineService', () => {
       mockSecondPlayer,
       mockThirdPlayer,
     ]);
+  });
+
+  afterEach(async () => {
+    await boardStateModel.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
+    jest.clearAllTimers();
   });
 
   afterAll(async () => {
@@ -280,6 +298,7 @@ describe('GameEngineService', () => {
     });
 
     afterEach(async () => {
+      await boardStateModel.deleteMany({}).exec();
       await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
@@ -314,7 +333,6 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           cells: expectedCells,
-          __v: mockBoardStateDocument.__v + 1,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
@@ -322,7 +340,6 @@ describe('GameEngineService', () => {
         {
           ...mockGameSessionDocument,
           moves: sessionMoves,
-          __v: mockGameSessionDocument.__v + 1,
         },
       );
 
@@ -350,7 +367,6 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           cells: expectedCells,
-          __v: mockBoardStateDocument.__v + 2,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
@@ -358,9 +374,123 @@ describe('GameEngineService', () => {
         {
           ...mockGameSessionDocument,
           moves: sessionMoves,
-          __v: mockGameSessionDocument.__v + 2,
+        },
+      );
+    });
+
+    it.skip('should prevent move from player who moved last', async () => {
+      expect('implement me').toBe(false);
+    });
+
+    it('should handle winning move', async () => {
+      /* START TEST SETUP */
+      let testGameSessionDocument = await gameSessionsService.createOne({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+
+      const moveTuples =
+        moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
+      const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
+        (moveTuple) => {
+          const [columnIndex, playerID] = moveTuple;
+          return {
+            columnIndex: columnIndex,
+            gameSessionID: testGameSessionID,
+            playerID: playerID,
+            timestamp: new Date(),
+          };
+        },
+      );
+
+      testGameSessionDocument = (await gameSessionsService.updateOne(
+        testGameSessionID,
+        {
+          moves: playerMovesFromTuples,
+        },
+      )) as GameSessionDocument;
+
+      let logicSession: LogicSession = new GameLogicEngine().startGame({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      logicSession = populateBoardWithMoves({
+        logicSessionRef: logicSession,
+        moves: moveTuples,
+      });
+
+      const testBoardStateDocument = await boardStatesService.createOne({
+        gameSessionID: testGameSessionID,
+      });
+      const populatedBoardState = await boardStatesService.updateOne(
+        testBoardStateDocument._id.toJSON(),
+        {
+          gameSessionID: testGameSessionID,
+          cells: logicSession.board.gameBoardState,
+        },
+      );
+
+      const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
+      const expectedCells = Array.from(logicSession.board.gameBoardState);
+      const colIndex = 0;
+      const rowIndex = BOARD_ROWS - 4;
+      const move = {
+        columnIndex: colIndex,
+        gameSessionID: testGameSessionID,
+        playerID: mockPlayerOneID,
+        timestamp: nowPlus30Seconds,
+      };
+      expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
+      const expectedMoves = [...testGameSessionDocument.moves, move];
+      /* END TEST SETUP */
+
+      const result = await gameEngineService.handlePlayerMove({
+        ...move,
+      });
+      const updatedBoardState = result.boardState;
+      const updatedGameSession = result.gameSession;
+
+      expect(updatedBoardState.cells[colIndex][rowIndex].cellState).toEqual(
+        mockPlayerOneID,
+      );
+      expectHydratedDocumentToMatch<BoardState>(
+        updatedBoardState, // force formatting
+        {
+          _id: testBoardStateDocument._id,
+          gameSessionID: testBoardStateDocument.gameSessionID,
+          cells: expectedCells,
+          createdAt: testBoardStateDocument.createdAt,
+          updatedAt: testBoardStateDocument.updatedAt,
+        },
+      );
+      expect(updatedGameSession.moves.length).toEqual(expectedMoves.length);
+      expectHydratedDocumentToMatch<GameSession>(
+        updatedGameSession, // force formatting
+        {
+          _id: testGameSessionDocument._id,
+          playerOneID: testGameSessionDocument.playerOneID,
+          playerTwoID: testGameSessionDocument.playerTwoID,
+          moves: expectedMoves,
+          status: GameSessionStatus.COMPLETED,
+          winner: mockPlayerOneID,
+          createdAt: testGameSessionDocument.createdAt,
+          updatedAt: testGameSessionDocument.updatedAt,
         },
       );
     });
   });
 });
+
+// NOTE: for debugging :]
+// logicSession.board.gameBoardState.forEach((c, i) => {
+//   c.forEach((r, j) => {
+//     const pbsCell = populatedBoardState!.cells[i][j];
+//     logger.log(
+//       '\n',
+//       `Value at (c: ${i}, r: ${j})\n`,
+//       `==== for 'logicSession' : ${r.cellState}`,
+//       `==== for 'populatedBoardState' : ${pbsCell.cellState}`,
+//     );
+//   });
+// });

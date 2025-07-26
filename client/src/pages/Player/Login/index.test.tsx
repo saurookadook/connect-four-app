@@ -2,12 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { mockFirstPlayer } from '@/__mocks__/playerMocks';
 import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
 import {
   expectLoginFormToBeCorrectAndVisible, // force formatting
   getInput,
 } from '../testUtils';
+import { Login } from '.';
+
+const logger = sharedLog.getLogger(Login.name);
 
 function LoginWithRouter() {
   return <WithMemoryRouter initialEntries={['/account/login']} />;
@@ -73,8 +77,8 @@ describe('Login Page', () => {
     });
 
     it('handles unregistered player', async () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
+      const loggerErrorSpy = vi
+        .spyOn(logger, 'error')
         .mockImplementation((...args) => args);
       const user = userEvent.setup();
       render(<LoginWithRouter />);
@@ -99,7 +103,7 @@ describe('Login Page', () => {
       fireEvent.submit(formEl);
 
       await waitFor(() => {
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect(loggerErrorSpy).toHaveBeenCalledWith(
           'Login failed: Invalid username or password.',
         );
       });

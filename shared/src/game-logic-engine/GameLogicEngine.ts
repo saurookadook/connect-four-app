@@ -1,12 +1,12 @@
-import { UUID } from 'node:crypto';
-
 import {
-  GameSessionStatus,
+  GameSessionStatus, // force formatting
   PlayerColor,
-  sharedLog,
+} from '@/constants';
+import { log as sharedLog } from '@/logger';
+import {
+  type PlayerID, // force formatting
   type PlayerMove,
-} from '@connect-four-app/shared';
-import { PlayerDTO } from '@/player/dtos/player.dto';
+} from '@/types/main';
 import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
 
@@ -26,8 +26,8 @@ export class GameLogicEngine {
     playerTwoID,
   }: {
     moves?: PlayerMove[];
-    playerOneID: UUID;
-    playerTwoID: UUID;
+    playerOneID: PlayerID;
+    playerTwoID: PlayerID;
   }): LogicSession {
     try {
       const logicSession = new LogicSession({
@@ -55,7 +55,7 @@ export class GameLogicEngine {
     sessionRef,
   }: {
     columnIndex: number;
-    playerID: UUID;
+    playerID: PlayerID;
     sessionRef: LogicSession;
   }): LogicSession {
     sessionRef.updateBoard({
@@ -72,7 +72,7 @@ export class GameLogicEngine {
     return sessionRef;
   }
 
-  checkForWin(board: LogicBoard, activePlayer: PlayerDTO['playerID']): boolean {
+  checkForWin(board: LogicBoard, activePlayer: PlayerID): boolean {
     const lastUpdatedCell = board.lastUpdatedCell;
 
     if (lastUpdatedCell == null) return false;

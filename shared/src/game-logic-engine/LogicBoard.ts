@@ -1,11 +1,13 @@
 import {
   BOARD_COLS, // force formatting
   BOARD_ROWS,
+} from '@/constants';
+import {
   type BoardCell,
   type GameBoard,
   type Nullable,
   type PlayerID,
-} from '@connect-four-app/shared';
+} from '@/types/main';
 import { LogicSession } from './LogicSession';
 
 export class LogicBoard {

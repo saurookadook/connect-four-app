@@ -2,6 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 
 import {
   GameSessionStatus,
+  type Nullable,
   type PlayerID,
   type PlayerMove,
 } from '@connect-four-app/shared';
@@ -21,6 +22,9 @@ export class GameSessionDTO extends BaseDTO {
   @Expose()
   status: GameSessionStatus;
 
+  @Expose()
+  winner: Nullable<PlayerID>;
+
   // constructor(partial: Partial<GameSessionDTO>) {
   //   Object.assign(this, partial);
   // }
@@ -33,6 +37,12 @@ export class CreateGameSessionDTO {
 
   @Expose()
   playerTwoID: GameSessionDTO['playerTwoID'];
+
+  @Expose()
+  moves?: GameSessionDTO['moves'];
+
+  @Expose()
+  status?: GameSessionDTO['status'];
 }
 
 @Exclude()

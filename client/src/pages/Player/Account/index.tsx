@@ -5,28 +5,25 @@ import { useAppStore } from '@/store';
 import { Login, Register } from '../playerPages';
 import { AppParams } from '@/types/main';
 
-function AccountDetails({
-  email,
-  playerID,
-  username,
-}: {
-  email?: string;
-  playerID: string;
-  username?: string;
-}) {
+function AccountDetails() {
+  const { appState } = useAppStore();
+  const { email, playerID, username } = appState.player;
+
   return (
     <div id="account-details">
       <h2>Account Details</h2>
 
       <dl>
         <dt>Player ID</dt>
-        <dd>{playerID}</dd>
+        <dd>
+          <code>{`'${playerID}'`}</code>
+        </dd>
 
         <dt>Email</dt>
-        <dd>{email ?? '⚠️ Not set'}</dd>
+        <dd>{email != null ? <code>{email}</code> : '⚠️ Not set'}</dd>
 
         <dt>Username</dt>
-        <dd>{username ?? '⚠️ Not set'}</dd>
+        <dd>{username != null ? <code>{username}</code> : '⚠️ Not set'}</dd>
       </dl>
     </div>
   );
@@ -64,6 +61,6 @@ export function AccountPortal() {
   return playerID == null ? ( // force formatting
     <NewPlayerForm />
   ) : (
-    <AccountDetails playerID={playerID} />
+    <AccountDetails />
   );
 }

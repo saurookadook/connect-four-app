@@ -1,18 +1,48 @@
 /* eslint-disable @typescript-eslint/unbound-method */
+import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Types } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 import ws from 'ws';
 import WSMock from 'jest-websocket-mock';
 
 import {
+  BOARD_ROWS,
+  SEND_MOVE,
+  LogicSession,
+  GameLogicEngine,
+  GameSessionStatus,
+  moveTuplesByGenerator,
+  populateBoardWithMoves,
+  populateBoardWithOneMoveTilWin,
+  type PlayerMove,
+} from '@connect-four-app/shared';
+import { createBoardStateDocumentMock } from '@/__mocks__/boardStatesMocks';
+import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
+import {
+  mockPlayers,
   mockPlayerOneID,
   mockPlayerTwoID,
-  mockThirdPlayer,
 } from '@/__mocks__/playerMocks';
+import {
+  BOARD_STATE_MODEL_TOKEN,
+  GAME_SESSION_MODEL_TOKEN,
+  PLAYER_MODEL_TOKEN,
+} from '@/constants';
 import { databaseProviders } from '@/database/database.providers';
-import { GameEngineModule } from '../game-engine.module';
+import { BoardStatesService } from '@/game-engine/board-states/board-states.service';
+import {
+  BoardState,
+  BoardStateDocument,
+  GameSession,
+  GameSessionDocument,
+} from '@/game-engine/schemas';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
+import { GameEngineModule } from '@/game-engine/game-engine.module';
+import { Player } from '@/player/schemas/player.schema';
+import { PlayerService } from '@/player/player.service';
 import { GameEventsGateway, type GameSessionMap } from './game-events.gateway';
-import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
+
+const mockThirdPlayer = mockPlayers[2];
 
 describe('GameEventsGateway', () => {
   const mockGameSession = createNewGameSessionDocumentMock({
@@ -21,7 +51,16 @@ describe('GameEventsGateway', () => {
     playerTwoID: mockPlayerTwoID,
   });
   const mockGameSessionID = mockGameSession._id!.toString();
+  const mockBoardStateDocument =
+    createBoardStateDocumentMock(mockGameSessionID);
 
+  let mongoConnection: Connection;
+  let boardStateModel: Model<BoardState>;
+  let boardStatesService: BoardStatesService;
+  let gameSessionModel: Model<GameSession>;
+  let gameSessionsService: GameSessionsService;
+  let playerModel: Model<Player>;
+  let playerService: PlayerService;
   let gateway: GameEventsGateway;
   let activeGameSession: GameSessionMap;
 
@@ -34,7 +73,26 @@ describe('GameEventsGateway', () => {
       providers: [GameEventsGateway],
     }).compile();
 
-    gateway = module.get(GameEventsGateway);
+    mongoConnection = await module.resolve(getConnectionToken());
+    playerService = await module.resolve(PlayerService);
+    await Promise.all(
+      mockPlayers.map((player) => playerService.createOne({ ...player })),
+    );
+
+    gameSessionsService = await module.resolve(GameSessionsService);
+    await gameSessionsService.createOne(mockGameSession);
+
+    boardStatesService = await module.resolve(BoardStatesService);
+    await boardStatesService.createOne({
+      ...mockBoardStateDocument,
+      gameSessionID: mockBoardStateDocument.gameSessionID.toJSON(),
+    });
+
+    boardStateModel = await module.resolve(BOARD_STATE_MODEL_TOKEN);
+    gameSessionModel = await module.resolve(GAME_SESSION_MODEL_TOKEN);
+    playerModel = await module.resolve(PLAYER_MODEL_TOKEN);
+
+    gateway = await module.resolve(GameEventsGateway);
     // @ts-expect-error: Not sure why these types don't line up better?
     gateway.server = new WSMock(`ws://localhost:8090`).server;
 
@@ -58,6 +116,17 @@ describe('GameEventsGateway', () => {
     );
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(async () => {
+    await boardStateModel.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
+    await playerModel.deleteMany({}).exec();
+    await mongoConnection.close();
+  });
+
   describe("'onStartGame' method", () => {
     it.skip('should start game and broadcast results to appropriate clients', async () => {
       // TODO: implement this :]
@@ -69,41 +138,173 @@ describe('GameEventsGateway', () => {
       const firstTimestamp = new Date();
       const secondTimestamp = new Date(firstTimestamp.getTime() + 2000);
 
+      const testGameSessionDocument = (await gameSessionsService.findOneById(
+        mockGameSessionID,
+      )) as GameSessionDocument;
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+        testGameSessionDocument;
+
+      const testBoardStateDocument =
+        (await boardStatesService.findOneByGameSessionID(
+          testGameSessionID,
+        )) as BoardStateDocument;
+
       const firstMakeMoveEvent = {
         columnIndex: 1,
-        gameSessionID: mockGameSessionID,
-        playerID: mockPlayerOneID,
+        gameSessionID: testGameSessionID,
+        playerID: testPlayerOneID,
         timestamp: firstTimestamp,
       };
 
       await gateway.onMakeMove(firstMakeMoveEvent);
 
+      let targetRowIndex = BOARD_ROWS - 1;
+      let updatedCells = testBoardStateDocument.cells;
+      updatedCells[1][targetRowIndex].cellState = testPlayerOneID;
+
+      const firstSendMoveEvent = {
+        event: SEND_MOVE,
+        data: {
+          id: testGameSessionID,
+          boardCells: updatedCells,
+          moves: [
+            ...testGameSessionDocument.moves, // force formatting
+            firstMakeMoveEvent,
+          ],
+          playerOneID: testGameSessionDocument.playerOneID,
+          playerTwoID: testGameSessionDocument.playerTwoID,
+          status: testGameSessionDocument.status,
+          winner: null,
+        },
+      };
+
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerOneID).send,
-      ).toHaveBeenNthCalledWith(1, JSON.stringify(firstMakeMoveEvent));
+        activeGameSession?.get(testPlayerOneID).send,
+      ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerTwoID).send,
-      ).toHaveBeenNthCalledWith(1, JSON.stringify(firstMakeMoveEvent));
+        activeGameSession?.get(testPlayerTwoID).send,
+      ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
 
       const secondMakeMoveEvent = {
-        columnIndex: 1,
-        gameSessionID: mockGameSessionID,
-        playerID: mockPlayerTwoID,
+        ...firstMakeMoveEvent,
+        playerID: testPlayerTwoID,
         timestamp: secondTimestamp,
       };
 
       await gateway.onMakeMove(secondMakeMoveEvent);
 
+      targetRowIndex -= 1;
+      updatedCells = testBoardStateDocument.cells;
+      updatedCells[1][targetRowIndex].cellState = testPlayerTwoID;
+
+      const secondSendMoveEvent = {
+        event: SEND_MOVE,
+        data: {
+          ...firstSendMoveEvent.data,
+          boardCells: updatedCells,
+          moves: [
+            ...testGameSessionDocument.moves, // force formatting
+            firstMakeMoveEvent,
+            secondMakeMoveEvent,
+          ],
+        },
+      };
+
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerOneID).send,
-      ).toHaveBeenNthCalledWith(2, JSON.stringify(secondMakeMoveEvent));
+        activeGameSession?.get(testPlayerOneID).send,
+      ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerTwoID).send,
-      ).toHaveBeenNthCalledWith(2, JSON.stringify(secondMakeMoveEvent));
+        activeGameSession?.get(testPlayerTwoID).send,
+      ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
+    });
+
+    it('should handle a winning move and broadcast results of updated data to appropriate clients', async () => {
+      /* START TEST SETUP */
+      // TODO: populate board with winning state minus one move
+      const moveTuples =
+        moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
+      const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
+        (moveTuple) => {
+          const [columnIndex, playerID] = moveTuple;
+          return {
+            columnIndex: columnIndex,
+            gameSessionID: mockGameSessionID,
+            playerID: playerID,
+            timestamp: new Date(),
+          };
+        },
+      );
+
+      const testGameSessionDocument = (await gameSessionsService.updateOne(
+        mockGameSessionID,
+        {
+          moves: playerMovesFromTuples,
+        },
+      )) as GameSessionDocument;
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+        testGameSessionDocument;
+
+      let logicSession: LogicSession = new GameLogicEngine().startGame({
+        playerOneID: testPlayerOneID,
+        playerTwoID: testPlayerTwoID,
+      });
+      logicSession = populateBoardWithMoves({
+        logicSessionRef: logicSession,
+        moves: moveTuples,
+      });
+
+      let testBoardStateDocument =
+        await boardStatesService.findOneByGameSessionID(testGameSessionID);
+      testBoardStateDocument = (await boardStatesService.updateOne(
+        testBoardStateDocument!._id.toJSON(),
+        {
+          gameSessionID: testGameSessionID,
+          cells: logicSession.board.gameBoardState,
+        },
+      )) as BoardStateDocument;
+
+      const expectedCells = Array.from(testBoardStateDocument.cells);
+      const colIndex = 0;
+      const rowIndex = BOARD_ROWS - 4;
+      const winningMove = {
+        columnIndex: 0,
+        gameSessionID: testGameSessionID,
+        playerID: testPlayerOneID,
+        timestamp: new Date(),
+      };
+      expectedCells[colIndex][rowIndex].cellState = testPlayerOneID;
+      const expectedMoves = [...testGameSessionDocument.moves, winningMove];
+      /* END TEST SETUP */
+
+      await gateway.onMakeMove({ ...winningMove });
+
+      const winningSendMoveEvent = {
+        event: SEND_MOVE,
+        data: {
+          id: testGameSessionID,
+          boardCells: expectedCells,
+          moves: expectedMoves,
+          playerOneID: testPlayerOneID,
+          playerTwoID: testPlayerTwoID,
+          status: GameSessionStatus.COMPLETED,
+          winner: testPlayerOneID,
+        },
+      };
+
+      expect(
+        // @ts-expect-error: Until I can figure out a better way to mock the client
+        activeGameSession?.get(testPlayerOneID).send,
+      ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
+      expect(
+        // @ts-expect-error: Until I can figure out a better way to mock the client
+        activeGameSession?.get(testPlayerTwoID).send,
+      ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
     });
   });
 });

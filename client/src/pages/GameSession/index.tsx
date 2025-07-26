@@ -4,12 +4,10 @@ import { useParams } from 'react-router-dom';
 import {
   SEND_GAME_SESSION,
   SEND_MOVE,
-  START_GAME,
   PlayerColor,
-  PlayerMove,
   sharedLog,
   safeParseJSON,
-  type PlayerID,
+  type BaseWebSocketMessageEvent,
 } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn, FlexRow } from '@/layouts';
@@ -34,14 +32,14 @@ export function GameSession() {
       activePlayer,
       playerOneID,
       playerTwoID,
+      winner,
     },
     player: { playerID },
   } = appState;
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
-      // TODO: make `safeParseJSON` generic
-      const messageData = safeParseJSON(event.data) as { event: string; data: any };
+      const messageData = safeParseJSON<BaseWebSocketMessageEvent>(event.data);
       // logger.log(
       //   '    [wsMessageHandler] Receiving message!     '
       //     .padStart(60, '-')
@@ -56,6 +54,7 @@ export function GameSession() {
         logger.error(
           `Encountered ERROR parsing message data: ${event.data} (type '${typeof event.data}')`,
         );
+        return;
       }
 
       switch (messageData.event) {
@@ -63,6 +62,9 @@ export function GameSession() {
           startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
           break;
         case SEND_MOVE:
+          // logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
+          //   gameSessionData: messageData.data,
+          // });
           updateGameState({
             dispatch: appDispatch,
             gameSessionData: messageData.data,
@@ -87,9 +89,18 @@ export function GameSession() {
     wsMessageHandler,
   });
 
+  useEffect(() => {
+    return () => {
+      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
+      wsManager.closeWSConn();
+    };
+  }, []);
+
   return (
     <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four: Current Game 🔴 ⚫`}</h2>
+
+      {winner != null && <h3>{`🏆🏆🏆 Winner: '${winner}' 🏆🏆🏆`}</h3>}
 
       <DebuggingPanel // force formatting
         gameSessionID={gameSessionID}

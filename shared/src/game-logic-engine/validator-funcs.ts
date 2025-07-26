@@ -1,23 +1,19 @@
-import {
-  BOARD_COLS, // force formatting
-  BOARD_ROWS,
-  sharedLog,
-  type GameBoard,
-} from '@connect-four-app/shared';
-import { PlayerDTO } from '@/player/dtos/player.dto';
+import { BOARD_COLS, BOARD_ROWS } from '@/constants';
+import { log as sharedLog } from '@/logger';
+import { type GameBoard, type PlayerID } from '@/types/main';
 
 export type ValidatorFunc = (
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerID: PlayerDTO['playerID'],
+  playerID: PlayerID,
 ) => boolean;
 
 export function checkVerticalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerID: PlayerDTO['playerID'],
+  playerID: PlayerID,
   loggingEnabled = false,
 ): boolean {
   const logger = sharedLog.getLogger(checkVerticalWin.name);
@@ -48,7 +44,7 @@ export function checkDescendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerID: PlayerDTO['playerID'],
+  playerID: PlayerID,
   loggingEnabled = false,
 ): boolean {
   const logger = sharedLog.getLogger(checkDescendingSlopeDiagonalWin.name);
@@ -106,7 +102,7 @@ export function checkAscendingSlopeDiagonalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerID: PlayerDTO['playerID'],
+  playerID: PlayerID,
   loggingEnabled = false,
 ): boolean {
   const logger = sharedLog.getLogger(checkAscendingSlopeDiagonalWin.name);
@@ -164,7 +160,7 @@ export function checkHorizontalWin(
   boardState: GameBoard,
   colStart: number,
   rowStart: number,
-  playerID: PlayerDTO['playerID'],
+  playerID: PlayerID,
   loggingEnabled = false,
 ): boolean {
   const logger = sharedLog.getLogger(checkHorizontalWin.name);
@@ -242,7 +238,7 @@ function cellIsOccupiedByPlayer({
   boardState: GameBoard;
   colIndex: number;
   rowIndex: number;
-  playerID: PlayerDTO['playerID'];
+  playerID: PlayerID;
 }): boolean {
   return (
     !isBeyondBoardBounds(colIndex, rowIndex) &&
