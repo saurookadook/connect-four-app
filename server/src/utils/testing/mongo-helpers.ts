@@ -14,6 +14,8 @@ export function expectHydratedDocumentToMatch<T>(
   for (const [key, value] of Object.entries(expected)) {
     if (dateFields.has(key)) {
       expect(documentUnderTest).toHaveProperty(key, expect.any(Date));
+    } else if (key === '__v') {
+      expect(documentUnderTest).toHaveProperty(key, expect.any(Number));
     } else {
       expect(documentUnderTest).toHaveProperty(key, value);
     }
