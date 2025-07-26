@@ -30,6 +30,7 @@ export const initialGameSessionStateSlice = {
   playerOneID: null,
   playerTwoID: null,
   status: GameSessionStatus.ACTIVE,
+  winner: null,
 };
 
 export const gameSessionRequestInProgress: CombinedGameSessionStateSlice['gameSessionRequestInProgress'] =
@@ -188,6 +189,22 @@ const status: CombinedGameSessionStateSlice['status'] = [
   initialGameSessionStateSlice.status,
 ];
 
+const winner: CombinedGameSessionStateSlice['winner'] = [
+  (stateSlice, action) => {
+    switch (action.type) {
+      case RESET_GAME:
+        return initialGameSessionStateSlice.winner;
+      case UPDATE_GAME_STATE:
+      case SET_GAME_SESSION:
+      case START_GAME:
+        return action.payload.gameSession.winner;
+      default:
+        return stateSlice;
+    }
+  },
+  initialGameSessionStateSlice.winner,
+];
+
 export * from './reducer.types';
 
 export default combineReducers({
@@ -199,4 +216,5 @@ export default combineReducers({
   playerOneID,
   playerTwoID,
   status,
+  winner,
 });

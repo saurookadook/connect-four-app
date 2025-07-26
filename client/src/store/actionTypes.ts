@@ -21,3 +21,4 @@ export const ATTEMPT_SIGN_UP = 'ATTEMPT_SIGN_UP';
 export const REGISTER_NEW_PLAYER = 'REGISTER_NEW_PLAYER';
 export const LOG_IN_PLAYER = 'LOG_IN_PLAYER';
 export const SET_PLAYER_ID = 'SET_PLAYER_ID';
+export const SET_PLAYER_INFO = 'SET_PLAYER_INFO';

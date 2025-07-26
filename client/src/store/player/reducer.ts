@@ -1,20 +1,25 @@
 import combineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
-import { safeParseJSON, type PlayerID } from '@connect-four-app/shared';
+import { safeParseJSON } from '@connect-four-app/shared';
 import { PLAYER_DETAILS_LS_KEY } from '@/constants';
-import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
-
-export type PlayerStateSlice = {
-  playerID: PlayerID | null;
-  username: string | null;
-};
+import {
+  REGISTER_NEW_PLAYER,
+  LOG_IN_PLAYER,
+  SET_PLAYER_ID,
+  SET_PLAYER_INFO,
+} from '@/store/actionTypes';
+import { type CombinedPlayerStateSlice, type PlayerStateSlice } from './reducer.types';
 
 // TODO: maybe use `sessionStorage` instead?
 function getInitialPlayerStateFromLocalStorage(): PlayerStateSlice {
   const storedPlayerDetails = window.localStorage.getItem(PLAYER_DETAILS_LS_KEY);
-  const parsedDetails = safeParseJSON(storedPlayerDetails) as Record<string, any>;
+  const parsedDetails = safeParseJSON<{
+    playerID: PlayerStateSlice['playerID'];
+    username: PlayerStateSlice['username'];
+  }>(storedPlayerDetails);
 
   return {
+    email: null,
     playerID: parsedDetails?.playerID ?? null,
     username: parsedDetails?.username ?? null,
   };
@@ -22,12 +27,28 @@ function getInitialPlayerStateFromLocalStorage(): PlayerStateSlice {
 
 export const initialPlayerStateSlice = getInitialPlayerStateFromLocalStorage();
 
+const email: CombinedPlayerStateSlice['email'] = [
+  (stateSlice, action) => {
+    switch (action.type) {
+      case REGISTER_NEW_PLAYER:
+      case LOG_IN_PLAYER:
+      case SET_PLAYER_ID:
+      case SET_PLAYER_INFO:
+        return action.payload.email;
+      default:
+        return stateSlice;
+    }
+  },
+  initialPlayerStateSlice.email,
+];
+
 const playerID: CombinedPlayerStateSlice['playerID'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case REGISTER_NEW_PLAYER:
       case LOG_IN_PLAYER:
       case SET_PLAYER_ID:
+      case SET_PLAYER_INFO:
         return action.payload.playerID;
       default:
         return stateSlice;
@@ -42,6 +63,7 @@ const username: CombinedPlayerStateSlice['username'] = [
       case REGISTER_NEW_PLAYER:
         return action.payload.username;
       case LOG_IN_PLAYER:
+      case SET_PLAYER_INFO:
         return action.payload.username;
       default:
         return stateSlice;
@@ -50,26 +72,10 @@ const username: CombinedPlayerStateSlice['username'] = [
   initialPlayerStateSlice.username,
 ];
 
+export * from './reducer.types';
+
 export default combineReducers({
+  email,
   playerID,
   username,
 });
-
-type CombinedPlayerStateSlice = {
-  playerID: combineReducers.ArgsTuple<
-    PlayerStateSlice['playerID'], // force formatting
-    PlayerAction
-  >;
-  username: combineReducers.ArgsTuple<
-    PlayerStateSlice['username'], // force formatting
-    UsernameAction
-  >;
-};
-
-type PlayerAction = combineReducers.ReducerAction<{
-  playerID?: PlayerStateSlice['playerID'];
-}>;
-
-type UsernameAction = combineReducers.ReducerAction<{
-  username?: PlayerStateSlice['username'];
-}>;
