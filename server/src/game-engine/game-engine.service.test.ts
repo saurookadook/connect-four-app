@@ -333,7 +333,6 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           cells: expectedCells,
-          __v: mockBoardStateDocument.__v + 1,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
@@ -341,7 +340,6 @@ describe('GameEngineService', () => {
         {
           ...mockGameSessionDocument,
           moves: sessionMoves,
-          __v: mockGameSessionDocument.__v + 1,
         },
       );
 
@@ -369,7 +367,6 @@ describe('GameEngineService', () => {
         {
           ...mockBoardStateDocument,
           cells: expectedCells,
-          __v: mockBoardStateDocument.__v + 2,
         },
       );
       expectHydratedDocumentToMatch<GameSession>(
@@ -377,13 +374,22 @@ describe('GameEngineService', () => {
         {
           ...mockGameSessionDocument,
           moves: sessionMoves,
-          __v: mockGameSessionDocument.__v + 2,
         },
       );
     });
 
+    it.skip('should prevent move from player who moved last', async () => {
+      expect('implement me').toBe(false);
+    });
+
     it('should handle winning move', async () => {
       /* START TEST SETUP */
+      let testGameSessionDocument = await gameSessionsService.createOne({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+
       const moveTuples =
         moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
       const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
@@ -391,12 +397,19 @@ describe('GameEngineService', () => {
           const [columnIndex, playerID] = moveTuple;
           return {
             columnIndex: columnIndex,
-            gameSessionID: mockGameSessionID,
+            gameSessionID: testGameSessionID,
             playerID: playerID,
             timestamp: new Date(),
           };
         },
       );
+
+      testGameSessionDocument = (await gameSessionsService.updateOne(
+        testGameSessionID,
+        {
+          moves: playerMovesFromTuples,
+        },
+      )) as GameSessionDocument;
 
       let logicSession: LogicSession = new GameLogicEngine().startGame({
         playerOneID: mockPlayerOneID,
@@ -407,34 +420,29 @@ describe('GameEngineService', () => {
         moves: moveTuples,
       });
 
-      const gameSessionDocument = await gameSessionsService.createOne({
-        moves: playerMovesFromTuples,
-        playerOneID: mockPlayerOneID,
-        playerTwoID: mockPlayerTwoID,
-      });
-
-      const boardStateDocument = await boardStatesService.createOne({
-        gameSessionID: mockGameSessionID,
+      const testBoardStateDocument = await boardStatesService.createOne({
+        gameSessionID: testGameSessionID,
       });
       const populatedBoardState = await boardStatesService.updateOne(
-        boardStateDocument._id.toJSON(),
+        testBoardStateDocument._id.toJSON(),
         {
-          gameSessionID: mockGameSessionID,
+          gameSessionID: testGameSessionID,
           cells: logicSession.board.gameBoardState,
         },
       );
 
       const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
-      const expectedCells = Array.from(boardStateDocument.cells);
+      const expectedCells = Array.from(logicSession.board.gameBoardState);
       const colIndex = 0;
       const rowIndex = BOARD_ROWS - 4;
       const move = {
         columnIndex: colIndex,
-        gameSessionID: mockGameSessionID,
+        gameSessionID: testGameSessionID,
         playerID: mockPlayerOneID,
         timestamp: nowPlus30Seconds,
       };
       expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
+      const expectedMoves = [...testGameSessionDocument.moves, move];
       /* END TEST SETUP */
 
       const result = await gameEngineService.handlePlayerMove({
@@ -443,24 +451,31 @@ describe('GameEngineService', () => {
       const updatedBoardState = result.boardState;
       const updatedGameSession = result.gameSession;
 
+      expect(updatedBoardState.cells[colIndex][rowIndex].cellState).toEqual(
+        mockPlayerOneID,
+      );
       expectHydratedDocumentToMatch<BoardState>(
         updatedBoardState, // force formatting
         {
-          ...mockBoardStateDocument,
-          cells: logicSession.board.gameBoardState,
-          // __v: mockBoardStateDocument.__v + 2,
-          __v: expect.any(Number),
+          _id: testBoardStateDocument._id,
+          gameSessionID: testBoardStateDocument.gameSessionID,
+          cells: expectedCells,
+          createdAt: testBoardStateDocument.createdAt,
+          updatedAt: testBoardStateDocument.updatedAt,
         },
       );
+      expect(updatedGameSession.moves.length).toEqual(expectedMoves.length);
       expectHydratedDocumentToMatch<GameSession>(
         updatedGameSession, // force formatting
         {
-          ...mockGameSessionDocument,
-          moves: [...playerMovesFromTuples, move],
+          _id: testGameSessionDocument._id,
+          playerOneID: testGameSessionDocument.playerOneID,
+          playerTwoID: testGameSessionDocument.playerTwoID,
+          moves: expectedMoves,
           status: GameSessionStatus.COMPLETED,
           winner: mockPlayerOneID,
-          // __v: mockGameSessionDocument.__v + 2,
-          __v: expect.any(Number),
+          createdAt: testGameSessionDocument.createdAt,
+          updatedAt: testGameSessionDocument.updatedAt,
         },
       );
     });

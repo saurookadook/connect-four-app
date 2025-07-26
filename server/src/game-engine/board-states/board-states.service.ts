@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
-import { GameLogicEngine } from '@connect-four-app/shared';
+import { GameLogicEngine, type GameBoard } from '@connect-four-app/shared';
 import {
   CreateBoardStateDTO, // force formatting
   GameSessionDTO,
@@ -15,6 +15,11 @@ import {
   GameSessionDocument,
 } from '@/game-engine/schemas';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
+
+type BoardStateUpdateFields = {
+  gameSessionID: Types.ObjectId;
+  cells?: GameBoard;
+};
 
 @Injectable()
 export class BoardStatesService {
@@ -70,17 +75,18 @@ export class BoardStatesService {
     const gameSession = await this._validateGameSession(
       boardState.gameSessionID,
     );
-    this.handleUpdateForMove(boardState, gameSession);
 
-    return await this.boardStateModel // TODO: need to handle gameSessionID casting?
-      .findByIdAndUpdate(
-        id,
-        {
-          ...boardState,
-          gameSessionID: new Types.ObjectId(boardState.gameSessionID),
-        },
-        { new: true },
-      )
+    const updateFields: BoardStateUpdateFields = {
+      gameSessionID: new Types.ObjectId(boardState.gameSessionID),
+    };
+    const updatedCells = this.getUpdatedCellsForMove(boardState, gameSession);
+
+    if (updatedCells != null) {
+      updateFields.cells = updatedCells;
+    }
+
+    return await this.boardStateModel
+      .findByIdAndUpdate(id, updateFields, { new: true })
       .exec();
   }
 
@@ -92,11 +98,14 @@ export class BoardStatesService {
       .exec();
   }
 
-  handleUpdateForMove(
-    boardStateRef: UpdateBoardStateDTO,
+  getUpdatedCellsForMove(
+    boardStateDTORef: UpdateBoardStateDTO,
     gameSessionRef: GameSessionDocument,
   ) {
-    if (gameSessionRef == null || boardStateRef.move == null) {
+    if (
+      gameSessionRef == null ||
+      (boardStateDTORef.move == null && boardStateDTORef.cells == null)
+    ) {
       return;
     }
 
@@ -105,13 +114,20 @@ export class BoardStatesService {
       playerOneID: gameSessionRef.playerOneID,
       playerTwoID: gameSessionRef.playerTwoID,
     });
-    logicSession = this.gameLogicEngine.handleMove({
-      columnIndex: boardStateRef.move.columnIndex,
-      playerID: boardStateRef.move.playerID,
-      sessionRef: logicSession,
-    });
 
-    boardStateRef.cells = logicSession.board.gameBoardState;
+    if (boardStateDTORef.cells != null) {
+      logicSession.board.gameBoardState = boardStateDTORef.cells;
+    }
+
+    if (boardStateDTORef.move != null) {
+      logicSession = this.gameLogicEngine.handleMove({
+        columnIndex: boardStateDTORef.move.columnIndex,
+        playerID: boardStateDTORef.move.playerID,
+        sessionRef: logicSession,
+      });
+    }
+
+    return logicSession.board.gameBoardState;
   }
 
   async _validateGameSession(
