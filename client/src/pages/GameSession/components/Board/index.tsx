@@ -21,7 +21,12 @@ export function Board() {
   const { gameSession, player } = appState;
 
   function handleCellClick(cell: BoardCell) {
-    if (
+    if (gameSession.winner != null) {
+      window.alert(
+        `Can't carry out move; the game has been won by '${gameSession.winner}'.`,
+      );
+      return;
+    } else if (
       !canPlayerMakeMove({
         activePlayer: gameSession.activePlayer,
         playerID: player.playerID,
