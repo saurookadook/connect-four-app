@@ -138,59 +138,67 @@ describe('GameEventsGateway', () => {
       const firstTimestamp = new Date();
       const secondTimestamp = new Date(firstTimestamp.getTime() + 2000);
 
-      const gameSessionDocument =
-        await gameSessionsService.findOneById(mockGameSessionID);
-      const boardStateDocument =
-        await boardStatesService.findOneByGameSessionID(mockGameSessionID);
+      const testGameSessionDocument = (await gameSessionsService.findOneById(
+        mockGameSessionID,
+      )) as GameSessionDocument;
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+        testGameSessionDocument;
+
+      const testBoardStateDocument =
+        (await boardStatesService.findOneByGameSessionID(
+          testGameSessionID,
+        )) as BoardStateDocument;
 
       const firstMakeMoveEvent = {
         columnIndex: 1,
-        gameSessionID: mockGameSessionID,
-        playerID: mockPlayerOneID,
+        gameSessionID: testGameSessionID,
+        playerID: testPlayerOneID,
         timestamp: firstTimestamp,
       };
 
       await gateway.onMakeMove(firstMakeMoveEvent);
 
       let targetRowIndex = BOARD_ROWS - 1;
-      let updatedCells = boardStateDocument!.cells;
-      updatedCells[1][targetRowIndex].cellState = mockPlayerOneID;
+      let updatedCells = testBoardStateDocument.cells;
+      updatedCells[1][targetRowIndex].cellState = testPlayerOneID;
 
       const firstSendMoveEvent = {
         event: SEND_MOVE,
         data: {
-          id: mockGameSessionID,
+          id: testGameSessionID,
           boardCells: updatedCells,
           moves: [
-            ...gameSessionDocument!.moves, // force formatting
+            ...testGameSessionDocument.moves, // force formatting
             firstMakeMoveEvent,
           ],
-          playerOneID: gameSessionDocument?.playerOneID,
-          playerTwoID: gameSessionDocument?.playerTwoID,
-          status: gameSessionDocument?.status,
+          playerOneID: testGameSessionDocument.playerOneID,
+          playerTwoID: testGameSessionDocument.playerTwoID,
+          status: testGameSessionDocument.status,
+          winner: null,
         },
       };
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerOneID).send,
+        activeGameSession?.get(testPlayerOneID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwoID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
 
       const secondMakeMoveEvent = {
         ...firstMakeMoveEvent,
-        playerID: mockPlayerTwoID,
+        playerID: testPlayerTwoID,
         timestamp: secondTimestamp,
       };
 
       await gateway.onMakeMove(secondMakeMoveEvent);
 
       targetRowIndex -= 1;
-      updatedCells = boardStateDocument!.cells;
-      updatedCells[1][targetRowIndex].cellState = mockPlayerTwoID;
+      updatedCells = testBoardStateDocument.cells;
+      updatedCells[1][targetRowIndex].cellState = testPlayerTwoID;
 
       const secondSendMoveEvent = {
         event: SEND_MOVE,
@@ -198,7 +206,7 @@ describe('GameEventsGateway', () => {
           ...firstSendMoveEvent.data,
           boardCells: updatedCells,
           moves: [
-            ...gameSessionDocument!.moves, // force formatting
+            ...testGameSessionDocument.moves, // force formatting
             firstMakeMoveEvent,
             secondMakeMoveEvent,
           ],
@@ -207,11 +215,11 @@ describe('GameEventsGateway', () => {
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerOneID).send,
+        activeGameSession?.get(testPlayerOneID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwoID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
     });
 
@@ -238,10 +246,13 @@ describe('GameEventsGateway', () => {
           moves: playerMovesFromTuples,
         },
       )) as GameSessionDocument;
+      const testGameSessionID = testGameSessionDocument._id.toJSON();
+      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+        testGameSessionDocument;
 
       let logicSession: LogicSession = new GameLogicEngine().startGame({
-        playerOneID: mockPlayerOneID,
-        playerTwoID: mockPlayerTwoID,
+        playerOneID: testPlayerOneID,
+        playerTwoID: testPlayerTwoID,
       });
       logicSession = populateBoardWithMoves({
         logicSessionRef: logicSession,
@@ -249,11 +260,11 @@ describe('GameEventsGateway', () => {
       });
 
       let testBoardStateDocument =
-        await boardStatesService.findOneByGameSessionID(mockGameSessionID);
+        await boardStatesService.findOneByGameSessionID(testGameSessionID);
       testBoardStateDocument = (await boardStatesService.updateOne(
         testBoardStateDocument!._id.toJSON(),
         {
-          gameSessionID: mockGameSessionID,
+          gameSessionID: testGameSessionID,
           cells: logicSession.board.gameBoardState,
         },
       )) as BoardStateDocument;
@@ -263,11 +274,11 @@ describe('GameEventsGateway', () => {
       const rowIndex = BOARD_ROWS - 4;
       const winningMove = {
         columnIndex: 0,
-        gameSessionID: mockGameSessionID,
-        playerID: mockPlayerOneID,
+        gameSessionID: testGameSessionID,
+        playerID: testPlayerOneID,
         timestamp: new Date(),
       };
-      expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
+      expectedCells[colIndex][rowIndex].cellState = testPlayerOneID;
       const expectedMoves = [...testGameSessionDocument.moves, winningMove];
       /* END TEST SETUP */
 
@@ -276,22 +287,23 @@ describe('GameEventsGateway', () => {
       const winningSendMoveEvent = {
         event: SEND_MOVE,
         data: {
-          id: mockGameSessionID,
+          id: testGameSessionID,
           boardCells: expectedCells,
           moves: expectedMoves,
-          playerOneID: testGameSessionDocument?.playerOneID,
-          playerTwoID: testGameSessionDocument?.playerTwoID,
+          playerOneID: testPlayerOneID,
+          playerTwoID: testPlayerTwoID,
           status: GameSessionStatus.COMPLETED,
+          winner: testPlayerOneID,
         },
       };
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerOneID).send,
+        activeGameSession?.get(testPlayerOneID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(mockPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwoID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
     });
   });

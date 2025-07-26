@@ -110,6 +110,7 @@ export class GameEventsGateway implements OnGatewayConnection {
             playerOneID: gameSession.playerOneID,
             playerTwoID: gameSession.playerTwoID,
             status: gameSession.status,
+            winner: gameSession.winner,
           },
         }),
       );
@@ -148,6 +149,7 @@ export class GameEventsGateway implements OnGatewayConnection {
             playerOneID: gameSession.playerOneID,
             playerTwoID: gameSession.playerTwoID,
             status: gameSession.status,
+            winner: gameSession.winner,
           },
         }),
       );

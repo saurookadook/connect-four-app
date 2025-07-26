@@ -1,3 +1,4 @@
+import { inspect } from 'node:util';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection, Types } from 'mongoose';
@@ -17,7 +18,6 @@ import {
 } from '@/game-engine/schemas';
 import { BoardStatesService } from './board-states/board-states.service';
 import { GameSessionsService } from './sessions/game-sessions.service';
-import { inspect } from 'node:util';
 
 const logger = sharedLog.getLogger('GameEngineService');
 
