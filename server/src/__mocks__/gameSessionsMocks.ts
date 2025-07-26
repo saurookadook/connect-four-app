@@ -9,6 +9,7 @@ const commonDefaults = {
   createdAt: mockNow,
   moves: [],
   status: GameSessionStatus.ACTIVE,
+  winner: null,
   updatedAt: mockNow,
 };
 
@@ -21,6 +22,7 @@ export type GameSessionDocumentMock =
     | 'playerTwoID'
     | 'moves'
     | 'status'
+    | 'winner'
     | 'createdAt'
     | 'updatedAt'
     | '__v'
@@ -29,7 +31,7 @@ export type GameSessionDocumentMock =
 export type OptionalDocumentMockArgs = Partial<
   Pick<
     HydratedDocument<GameSession>,
-    '_id' | 'createdAt' | 'moves' | 'status' | 'updatedAt' | '__v'
+    '_id' | 'createdAt' | 'moves' | 'status' | 'winner' | 'updatedAt' | '__v'
   >
 >;
 

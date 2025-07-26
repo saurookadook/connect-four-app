@@ -2,7 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 
-import { BOARD_ROWS, GameSessionStatus } from '@connect-four-app/shared';
+import {
+  BOARD_ROWS,
+  GameLogicEngine,
+  GameSessionStatus,
+  LogicSession,
+  moveTuplesByGenerator,
+  populateBoardWithMoves,
+  populateBoardWithOneMoveTilWin,
+  sharedLog,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import {
   createBoardStateDocumentMock,
   type BoardStateDocumentMock,
@@ -40,6 +50,8 @@ import { GameEngineService } from './game-engine.service';
 
 const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
 
+const logger = sharedLog.getLogger('GameEngineService__tests');
+
 describe('GameEngineService', () => {
   let mongoConnection: Connection;
   let boardStateModel: Model<BoardState>;
@@ -75,6 +87,12 @@ describe('GameEngineService', () => {
       mockSecondPlayer,
       mockThirdPlayer,
     ]);
+  });
+
+  afterEach(async () => {
+    await boardStateModel.deleteMany({}).exec();
+    await gameSessionModel.deleteMany({}).exec();
+    jest.clearAllTimers();
   });
 
   afterAll(async () => {
@@ -280,6 +298,7 @@ describe('GameEngineService', () => {
     });
 
     afterEach(async () => {
+      await boardStateModel.deleteMany({}).exec();
       await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
@@ -362,5 +381,101 @@ describe('GameEngineService', () => {
         },
       );
     });
+
+    it('should handle winning move', async () => {
+      /* START TEST SETUP */
+      const moveTuples =
+        moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
+      const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
+        (moveTuple) => {
+          const [columnIndex, playerID] = moveTuple;
+          return {
+            columnIndex: columnIndex,
+            gameSessionID: mockGameSessionID,
+            playerID: playerID,
+            timestamp: new Date(),
+          };
+        },
+      );
+
+      let logicSession: LogicSession = new GameLogicEngine().startGame({
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+      logicSession = populateBoardWithMoves({
+        logicSessionRef: logicSession,
+        moves: moveTuples,
+      });
+
+      const gameSessionDocument = await gameSessionsService.createOne({
+        moves: playerMovesFromTuples,
+        playerOneID: mockPlayerOneID,
+        playerTwoID: mockPlayerTwoID,
+      });
+
+      const boardStateDocument = await boardStatesService.createOne({
+        gameSessionID: mockGameSessionID,
+      });
+      const populatedBoardState = await boardStatesService.updateOne(
+        boardStateDocument._id.toJSON(),
+        {
+          gameSessionID: mockGameSessionID,
+          cells: logicSession.board.gameBoardState,
+        },
+      );
+
+      const nowPlus30Seconds = new Date(mockNow.getTime() + 30000);
+      const expectedCells = Array.from(boardStateDocument.cells);
+      const colIndex = 0;
+      const rowIndex = BOARD_ROWS - 4;
+      const move = {
+        columnIndex: colIndex,
+        gameSessionID: mockGameSessionID,
+        playerID: mockPlayerOneID,
+        timestamp: nowPlus30Seconds,
+      };
+      expectedCells[colIndex][rowIndex].cellState = mockPlayerOneID;
+      /* END TEST SETUP */
+
+      const result = await gameEngineService.handlePlayerMove({
+        ...move,
+      });
+      const updatedBoardState = result.boardState;
+      const updatedGameSession = result.gameSession;
+
+      expectHydratedDocumentToMatch<BoardState>(
+        updatedBoardState, // force formatting
+        {
+          ...mockBoardStateDocument,
+          cells: logicSession.board.gameBoardState,
+          // __v: mockBoardStateDocument.__v + 2,
+          __v: expect.any(Number),
+        },
+      );
+      expectHydratedDocumentToMatch<GameSession>(
+        updatedGameSession, // force formatting
+        {
+          ...mockGameSessionDocument,
+          moves: [...playerMovesFromTuples, move],
+          status: GameSessionStatus.COMPLETED,
+          winner: mockPlayerOneID,
+          // __v: mockGameSessionDocument.__v + 2,
+          __v: expect.any(Number),
+        },
+      );
+    });
   });
 });
+
+// NOTE: for debugging :]
+// logicSession.board.gameBoardState.forEach((c, i) => {
+//   c.forEach((r, j) => {
+//     const pbsCell = populatedBoardState!.cells[i][j];
+//     logger.log(
+//       '\n',
+//       `Value at (c: ${i}, r: ${j})\n`,
+//       `==== for 'logicSession' : ${r.cellState}`,
+//       `==== for 'populatedBoardState' : ${pbsCell.cellState}`,
+//     );
+//   });
+// });
