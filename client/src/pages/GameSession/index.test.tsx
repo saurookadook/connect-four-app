@@ -106,6 +106,18 @@ describe('GameSession', () => {
       });
     });
   });
+
+  test.skip("alert is thrown when trying to move during other player's turn", async () => {
+    const { container } = renderWithContext(
+      <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
+      AppStateProvider,
+      {
+        player: {
+          playerID: mockSecondPlayer.playerID,
+        },
+      },
+    );
+  });
 });
 
 function GameSessionWithRouter({ gameSessionID }: { gameSessionID: string }) {

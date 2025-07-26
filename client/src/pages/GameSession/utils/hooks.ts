@@ -55,6 +55,7 @@ export function useLoadGame({
     }
 
     wsManager.initializeConnection({ gameSessionID: params.gameSessionID, playerID });
+    wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
 
     // NOTE: this _might_ be unnecessary...?
     // or maybe the interval can be abstracted into a method as part of the WebSocketManager
@@ -76,13 +77,6 @@ export function useLoadGame({
 
       clearInterval(initInterval);
     }, 250);
-
-    wsManager.getOpenWSConn().addEventListener('message', wsMessageHandler);
-
-    return () => {
-      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
-      wsManager.closeWSConn();
-    };
   }, [gameSessionID, playerID, wsMessageHandler]);
 }
 

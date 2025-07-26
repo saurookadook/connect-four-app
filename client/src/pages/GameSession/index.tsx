@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -15,6 +15,7 @@ import { Board, DebuggingPanel } from '@/pages/GameSession/components';
 import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import { startGame, updateGameState } from '@/store/actions';
 import { useAppStore } from '@/store';
+import { wsManager } from '@/utils';
 import './styles.css';
 
 const logger = sharedLog.getLogger(GameSession.name);
@@ -31,6 +32,7 @@ export function GameSession() {
       activePlayer,
       playerOneID,
       playerTwoID,
+      winner,
     },
     player: { playerID },
   } = appState;
@@ -60,6 +62,9 @@ export function GameSession() {
           startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
           break;
         case SEND_MOVE:
+          // logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
+          //   gameSessionData: messageData.data,
+          // });
           updateGameState({
             dispatch: appDispatch,
             gameSessionData: messageData.data,
@@ -84,9 +89,18 @@ export function GameSession() {
     wsMessageHandler,
   });
 
+  useEffect(() => {
+    return () => {
+      wsManager.getOpenWSConn().removeEventListener('message', wsMessageHandler);
+      wsManager.closeWSConn();
+    };
+  }, []);
+
   return (
     <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four: Current Game 🔴 ⚫`}</h2>
+
+      {winner != null && <h3>{`🏆🏆🏆 Winner: '${winner}' 🏆🏆🏆`}</h3>}
 
       <DebuggingPanel // force formatting
         gameSessionID={gameSessionID}
