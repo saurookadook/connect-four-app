@@ -40,9 +40,10 @@ export interface ActiveGameMessageEvent {
   playerOneID: PlayerID;
   playerTwoID: PlayerID;
   status: GameSessionStatus;
+  winner: Nullable<PlayerID>;
 }
 
-export interface SendGameSessionMessageEvent<ExtraData>
+export interface SendGameSessionMessageEvent<ExtraData = undefined>
   extends BaseWebSocketMessageEvent {
   // prettier-ignore
   event: typeof SEND_GAME_SESSION;
@@ -51,7 +52,7 @@ export interface SendGameSessionMessageEvent<ExtraData>
     : ActiveGameMessageEvent;
 }
 
-export interface SendMoveMessageEvent<ExtraData>
+export interface SendMoveMessageEvent<ExtraData = undefined>
   extends BaseWebSocketMessageEvent {
   // prettier-ignore
   event: typeof SEND_MOVE;
