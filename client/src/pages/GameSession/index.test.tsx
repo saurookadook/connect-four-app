@@ -30,6 +30,12 @@ import { DEBUG_LS_KEY, GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/cons
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { AppStateProvider } from '@/store';
 import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
+import {
+  expectGameBoardToBeVisibleAndCorrect,
+  expectGameDetailsToBeVisibleAndCorrect,
+  expectHeadingToBeVisible,
+  getGameSessionDetails,
+} from './utils/testing';
 
 const testPlayerOneID = mockFirstPlayer.playerID;
 const testPlayerTwoID = mockSecondPlayer.playerID;
@@ -41,6 +47,10 @@ const mockGameSession = allGameSessionsMock.find((gameSession) => {
   );
 }) as GameSessionMock;
 const emptyBoard = createEmptyBoard();
+
+function GameSessionWithRouter({ gameSessionID }: { gameSessionID: string }) {
+  return <WithMemoryRouter initialEntries={[`/game-session/${gameSessionID}`]} />;
+}
 
 describe('GameSession', () => {
   // @ts-expect-error: I know the type doesn't match exactly but that's ok :]
@@ -74,15 +84,13 @@ describe('GameSession', () => {
       AppStateProvider,
     );
 
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: /Connect Four/,
-      }),
-    ).toBeVisible();
+    await expectHeadingToBeVisible({
+      screenRef: screen,
+      level: 2,
+      name: /Connect Four/,
+    });
 
     let gameSessionDetailsEl: HTMLElement;
-    let gameBoardContainerEl: HTMLElement;
 
     await waitFor(() => {
       gameSessionDetailsEl = getGameSessionDetails(container);
@@ -102,24 +110,18 @@ describe('GameSession', () => {
       await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
     ).toBeVisible();
 
-    await waitFor(() => {
-      gameBoardContainerEl = getGameBoardContainer(container);
-      expect(gameBoardContainerEl).not.toBeNull();
-      expect(gameBoardContainerEl).not.toBeEmptyDOMElement();
+    await expectGameDetailsToBeVisibleAndCorrect({
+      containerRef: container,
+      activePlayerID: mockGameSession.playerOneID,
+      playerOneID: mockGameSession.playerOneID,
+      playerTwoID: mockGameSession.playerTwoID,
     });
 
-    emptyBoard.forEach((column, i) => {
-      column.forEach((rowCell, j) => {
-        const boardCellEl = getBoardCell({
-          containerRef: gameBoardContainerEl,
-          boardCellRef: {
-            cellState: rowCell.cellState,
-            col: i,
-            row: j,
-          },
-        });
-        expect(boardCellEl).toBeVisible();
-      });
+    await expectGameBoardToBeVisibleAndCorrect({
+      containerRef: container,
+      boardCells: emptyBoard,
+      playerOneID: testPlayerOneID,
+      playerTwoID: testPlayerTwoID,
     });
   });
 
@@ -178,15 +180,13 @@ describe('GameSession', () => {
       },
     );
 
-    expect(
-      await screen.findByRole('heading', {
-        level: 2,
-        name: /Connect Four/,
-      }),
-    ).toBeVisible();
+    await expectHeadingToBeVisible({
+      screenRef: screen,
+      level: 2,
+      name: /Connect Four/,
+    });
 
     let gameSessionDetailsEl: HTMLElement;
-    let gameBoardContainerEl: HTMLElement;
 
     await waitFor(() => {
       gameSessionDetailsEl = getGameSessionDetails(container);
@@ -206,33 +206,11 @@ describe('GameSession', () => {
       await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
     ).toBeVisible();
 
-    await waitFor(() => {
-      gameBoardContainerEl = getGameBoardContainer(container);
-      expect(gameBoardContainerEl).not.toBeNull();
-      expect(gameBoardContainerEl).not.toBeEmptyDOMElement();
-    });
-
-    testBoardCells.forEach((column, i) => {
-      column.forEach((rowCell, j) => {
-        const boardCellEl = getBoardCell({
-          containerRef: gameBoardContainerEl,
-          boardCellRef: {
-            cellState: rowCell.cellState,
-            col: i,
-            row: j,
-          },
-        });
-        expect(boardCellEl).toBeVisible();
-        if (rowCell.cellState == null) {
-          expect(boardCellEl).not.toHaveClass('red', 'black');
-        } else if (rowCell.cellState === testPlayerOneID) {
-          expect(boardCellEl).toHaveClass('red');
-          expect(boardCellEl).not.toHaveClass('black');
-        } else if (rowCell.cellState === testPlayerTwoID) {
-          expect(boardCellEl).not.toHaveClass('red');
-          expect(boardCellEl).toHaveClass('black');
-        }
-      });
+    await expectGameBoardToBeVisibleAndCorrect({
+      containerRef: container,
+      boardCells: testBoardCells,
+      playerOneID: testPlayerOneID,
+      playerTwoID: testPlayerTwoID,
     });
 
     const firstCellFromFirstColumn = container.querySelector(
@@ -245,30 +223,3 @@ describe('GameSession', () => {
     });
   });
 });
-
-function GameSessionWithRouter({ gameSessionID }: { gameSessionID: string }) {
-  return <WithMemoryRouter initialEntries={[`/game-session/${gameSessionID}`]} />;
-}
-
-function getGameSessionDetails(containerRef: HTMLElement): HTMLElement {
-  return containerRef.querySelector(
-    '#game-session .game-session-details',
-  ) as HTMLElement;
-}
-
-function getGameBoardContainer(containerRef: HTMLElement): HTMLElement {
-  return containerRef.querySelector(
-    '#game-session #game-board-container',
-  ) as HTMLElement;
-}
-
-function getBoardCell({
-  containerRef,
-  boardCellRef,
-}: {
-  containerRef: HTMLElement;
-  boardCellRef: BoardCell;
-}): HTMLElement {
-  const { cellState, col, row } = boardCellRef;
-  return containerRef.querySelector(`#cell-${col}-${row}`) as HTMLElement;
-}

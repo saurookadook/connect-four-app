@@ -111,6 +111,7 @@ export function GameSession() {
       <FlexRow>
         <FlexColumn id="game-details">
           <h3>{`Active player: ${activePlayer}`}</h3>
+          {/* TODO: maybe add `role="list"` to this and `role="listitem"` to `dt` elements */}
           <dl>
             <span>
               <b>Players</b>
@@ -122,8 +123,8 @@ export function GameSession() {
               return (
                 playerID != null && (
                   <Fragment key={playerID}>
-                    <dt>{`Player ${suffix}`}</dt>
-                    <dd>{playerID}</dd>
+                    <dt className={`data-item-${index}`}>{`Player ${suffix}`}</dt>
+                    <dd className={`data-item-${index}`}>{playerID}</dd>
                   </Fragment>
                 )
               );

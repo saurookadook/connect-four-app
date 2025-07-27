@@ -1,8 +1,12 @@
 import { waitFor, within, type Screen } from '@testing-library/react';
 import { expect } from 'vitest';
 
-import { PlayerColor, type PlayerID } from '@connect-four-app/shared';
-import { getGameDetails } from './domElementGetters';
+import { PlayerColor, type GameBoard, type PlayerID } from '@connect-four-app/shared';
+import {
+  getBoardCell,
+  getGameBoardContainer,
+  getGameDetails,
+} from './domElementGetters';
 
 export async function expectHeadingToBeVisible({
   screenRef,
@@ -60,5 +64,49 @@ export async function expectGameDetailsToBeVisibleAndCorrect({
     expect(gameDetailsEl.querySelector(`dl dd.data-item-${index}`)).toHaveTextContent(
       playerID,
     );
+  });
+}
+
+export async function expectGameBoardToBeVisibleAndCorrect({
+  containerRef,
+  boardCells,
+  playerOneID,
+  playerTwoID,
+}: {
+  containerRef: HTMLElement;
+  boardCells: GameBoard;
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
+}) {
+  let gameBoardContainerEl: HTMLElement;
+
+  await waitFor(() => {
+    gameBoardContainerEl = getGameBoardContainer(containerRef);
+    expect(gameBoardContainerEl).not.toBeNull();
+    expect(gameBoardContainerEl).not.toBeEmptyDOMElement();
+  });
+
+  boardCells.forEach((column, i) => {
+    column.forEach((rowCell, j) => {
+      const boardCellEl = getBoardCell({
+        containerRef: gameBoardContainerEl,
+        boardCellRef: {
+          cellState: rowCell.cellState,
+          col: i,
+          row: j,
+        },
+      });
+
+      expect(boardCellEl).toBeVisible();
+      if (rowCell.cellState == null) {
+        expect(boardCellEl).not.toHaveClass('red', 'black');
+      } else if (rowCell.cellState === playerOneID) {
+        expect(boardCellEl).toHaveClass('red');
+        expect(boardCellEl).not.toHaveClass('black');
+      } else if (rowCell.cellState === playerTwoID) {
+        expect(boardCellEl).not.toHaveClass('red');
+        expect(boardCellEl).toHaveClass('black');
+      }
+    });
   });
 }
