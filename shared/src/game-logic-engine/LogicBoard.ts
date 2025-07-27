@@ -2,6 +2,7 @@ import {
   BOARD_COLS, // force formatting
   BOARD_ROWS,
 } from '@/constants';
+import { log as sharedLog } from '@/logger';
 import {
   type BoardCell,
   type GameBoard,
@@ -9,6 +10,8 @@ import {
   type PlayerID,
 } from '@/types/main';
 import { LogicSession } from './LogicSession';
+
+const logger = sharedLog.getLogger('LogicBoard');
 
 export class LogicBoard {
   #logicSession: Nullable<LogicSession>;
@@ -79,6 +82,62 @@ export class LogicBoard {
     }
 
     return emptyBoard;
+  }
+
+  // 0   1   2   3   4   5   6
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │   │   │   │   │   │   │   │ 0
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │   │   │   │   │   │   │   │ 1
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │   │   │   │   │   │   │   │ 2
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │ R │ R │   │   │   │   │   │ 3
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │ B │ R │ R │ B │   │   │   │ 4
+  // ├───┼───┼───┼───┼───┼───┼───┤
+  // │ B │ B │ B │ R │   │   │   │ 5
+  // └───┴───┴───┴───┴───┴───┴───┘
+  printGameBoardState(): string {
+    if (this.#logicSession == null) {
+      logger.error('No logic session available to print game board state');
+      return '';
+    }
+
+    const colorsByPlayer = {
+      [this.#logicSession?.playerOneID]: 'R',
+      [this.#logicSession?.playerTwoID]: 'B',
+    };
+    const fullCharWidth = 32;
+    const displayLines: string[] = [];
+    displayLines.push('0   1   2   3   4   5   6');
+
+    const middleDivider = '├───┼───┼───┼───┼───┼───┼───┤';
+
+    displayLines.push(middleDivider);
+
+    for (let rowIndex = 0; rowIndex < BOARD_ROWS; rowIndex++) {
+      const rowCells = this.gameBoardState.map((col) => {
+        const { cellState } = col[rowIndex] || {};
+        return cellState != null && cellState in colorsByPlayer
+          ? ` ${colorsByPlayer[cellState]} `
+          : '   ';
+      });
+      const rowString = `|${rowCells.join('|')}| ${rowIndex}`;
+      displayLines.push(rowString);
+      if (rowIndex < BOARD_ROWS - 1) {
+        displayLines.push(middleDivider);
+      } else {
+        displayLines.push('└───┴───┴───┴───┴───┴───┴───┘');
+      }
+    }
+
+    const finalLines = displayLines.map((line) =>
+      `\n ${line}`.padEnd(fullCharWidth, ' '),
+    );
+    logger.debug('\n', ...finalLines);
+
+    return ['\n', ...finalLines].join('');
   }
 
   get logicSession(): Nullable<LogicSession> {
