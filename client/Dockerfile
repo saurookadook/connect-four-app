@@ -7,8 +7,9 @@ EXPOSE 5173
 WORKDIR /opt/connect-four-app/
 COPY .env .yarnrc.yml package.json yarn.lock /opt/connect-four-app/
 COPY client/ /opt/connect-four-app/client/
-COPY .env /opt/connect-four-app/client/.env
+COPY .env .env.test /opt/connect-four-app/client/
 COPY shared/ /opt/connect-four-app/shared/
+COPY .env .env.test /opt/connect-four-app/shared/
 RUN corepack enable
 RUN corepack use yarn@$YARN_VERSION
 RUN $yarn shared:base build
