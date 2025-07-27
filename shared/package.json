@@ -20,13 +20,13 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "yarn build:tsup-dev",
+    "build": "cp ../.env ./.env && yarn build:tsup-dev",
     "build:test": "yarn build:tsup-test",
     "build:prod": "yarn build:tsup-prod",
     "build:tsup-dev": "rimraf dist && tsup --tsconfig tsconfig.dev.json ./src/index.ts",
     "build:tsup-test": "rimraf dist && tsup --tsconfig tsconfig.test.json ./src/index.ts",
     "build:tsup-prod": "rimraf dist && tsup --tsconfig tsconfig.build.json ./src/index.ts",
-    "test": "build:tsup-test && jest"
+    "test": "yarn build:test && jest"
   },
   "dependencies": {
     "loglevel": "^1.9.2",
