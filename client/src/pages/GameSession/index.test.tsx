@@ -20,11 +20,13 @@ import {
   populateBoardWithDescendingSlopeDiagonalWinOne,
   populateBoardWithOneMoveTilWin,
   populateBoardWithMoves,
-  type BoardCell,
   type PlayerMove,
   GameSessionStatus,
 } from '@connect-four-app/shared';
-import { allGameSessionsMock, GameSessionMock } from '@/__mocks__/gameSessionsMocks';
+import {
+  findGameSessionMockForPlayers,
+  type GameSessionMock,
+} from '@/__mocks__/gameSessionsMocks';
 import { server } from '@/__mocks__/mswServers';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { DEBUG_LS_KEY, GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
@@ -34,18 +36,17 @@ import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
 import {
   expectGameBoardToBeVisibleAndCorrect,
   expectGameDetailsToBeVisibleAndCorrect,
+  expectGameSessionDetailsToBeVisibleAndCorrect,
   expectHeadingToBeVisible,
-  getGameSessionDetails,
+  getGameSessionDetailsEl,
 } from './utils/testing';
 
 const testPlayerOneID = mockFirstPlayer.playerID;
 const testPlayerTwoID = mockSecondPlayer.playerID;
 
-const mockGameSession = allGameSessionsMock.find((gameSession) => {
-  return (
-    gameSession.playerOneID === testPlayerOneID &&
-    gameSession.playerTwoID === testPlayerTwoID
-  );
+const mockGameSession = findGameSessionMockForPlayers({
+  playerOneID: testPlayerOneID,
+  playerTwoID: testPlayerTwoID,
 }) as GameSessionMock;
 const emptyBoard = createEmptyBoard();
 
@@ -92,25 +93,7 @@ describe('GameSession', () => {
       name: /Connect Four/,
     });
 
-    let gameSessionDetailsEl: HTMLElement;
-
-    await waitFor(() => {
-      gameSessionDetailsEl = getGameSessionDetails(container);
-      expect(gameSessionDetailsEl).not.toBeNull();
-      expect(gameSessionDetailsEl).not.toBeEmptyDOMElement();
-    });
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Game Session ID', {
-        exact: false,
-      }),
-    ).toBeVisible();
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
-    ).toBeVisible();
+    await expectGameSessionDetailsToBeVisibleAndCorrect({ containerRef: container });
 
     await expectGameDetailsToBeVisibleAndCorrect({
       containerRef: container,
@@ -188,25 +171,7 @@ describe('GameSession', () => {
       name: /Connect Four/,
     });
 
-    let gameSessionDetailsEl: HTMLElement;
-
-    await waitFor(() => {
-      gameSessionDetailsEl = getGameSessionDetails(container);
-      expect(gameSessionDetailsEl).not.toBeNull();
-      expect(gameSessionDetailsEl).not.toBeEmptyDOMElement();
-    });
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Game Session ID', {
-        exact: false,
-      }),
-    ).toBeVisible();
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
-    ).toBeVisible();
+    await expectGameSessionDetailsToBeVisibleAndCorrect({ containerRef: container });
 
     await expectGameBoardToBeVisibleAndCorrect({
       containerRef: container,
@@ -286,25 +251,7 @@ describe('GameSession', () => {
       name: new RegExp(`Winner: '${testPlayerOneID}'`),
     });
 
-    let gameSessionDetailsEl: HTMLElement;
-
-    await waitFor(() => {
-      gameSessionDetailsEl = getGameSessionDetails(container);
-      expect(gameSessionDetailsEl).not.toBeNull();
-      expect(gameSessionDetailsEl).not.toBeEmptyDOMElement();
-    });
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Game Session ID', {
-        exact: false,
-      }),
-    ).toBeVisible();
-
-    expect(
-      // @ts-expect-error: This should go away once the test config is loaded correctly
-      await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
-    ).toBeVisible();
+    await expectGameSessionDetailsToBeVisibleAndCorrect({ containerRef: container });
 
     await expectGameBoardToBeVisibleAndCorrect({
       containerRef: container,

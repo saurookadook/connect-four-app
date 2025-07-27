@@ -97,6 +97,10 @@ export function findGameSessionMockForPlayers({
   playerTwoID: PlayerID;
 }) {
   return allGameSessionsMock.find((gameSession) => {
+    if (gameSessionID != null && playerOneID == null && playerTwoID == null) {
+      return gameSession.id === gameSessionID;
+    }
+
     const gameSessionHasBothPlayerIDs =
       gameSession.playerOneID === playerOneID &&
       gameSession.playerTwoID === playerTwoID;

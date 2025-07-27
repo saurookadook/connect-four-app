@@ -59,6 +59,7 @@ export function GameSession() {
 
       switch (messageData.event) {
         case SEND_GAME_SESSION:
+          console.log({ gameSessionData: messageData.data });
           startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
           break;
         case SEND_MOVE:

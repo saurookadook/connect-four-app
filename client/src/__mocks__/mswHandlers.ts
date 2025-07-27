@@ -15,10 +15,8 @@ import {
 } from '@connect-four-app/shared';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import {
-  allGameSessionsMock,
   findGameSessionMock,
   findGameSessionMockForPlayers,
-  type GameSessionMock,
 } from './gameSessionsMocks';
 
 const WS_CONN_URL = 'ws://localhost:8090/connect-ws';
@@ -59,22 +57,18 @@ export const handlers = [
         // ),
       );
 
-      let data = '';
+      let data: any = null;
 
       // TODO: make all of this more dynamic
       //    (i.e. use `gameSessionID` from `clientEventData` to find game session mock data)
       switch (clientEventData.event) {
         case START_GAME:
           event.preventDefault();
-          data = JSON.stringify(
-            createSendGameSessionData({ startGameData: clientEventData.data }),
-          );
+          data = createSendGameSessionData({ startGameData: clientEventData.data });
           break;
         case MAKE_MOVE:
           event.preventDefault();
-          data = JSON.stringify(
-            createSendMoveData({ playerMoveData: clientEventData.data }),
-          );
+          data = createSendMoveData({ playerMoveData: clientEventData.data });
           break;
         default:
           console.log(
@@ -83,7 +77,7 @@ export const handlers = [
       }
 
       wsApi.clients.forEach((client) => {
-        client.send(data);
+        client.send(JSON.stringify(data));
       });
     });
   }),
@@ -102,13 +96,13 @@ function createSendGameSessionData({
 }): SendGameSessionMessageEvent {
   const { gameSessionID, playerOneID, playerTwoID } = startGameData;
 
-  const mockSession = findGameSessionMockForPlayers({
+  const mockGameSession = findGameSessionMockForPlayers({
     gameSessionID,
     playerOneID,
     playerTwoID,
   });
 
-  if (mockSession == null) {
+  if (mockGameSession == null) {
     throw new Error(
       `No mock game session found for:\n ---- 'gameSessionID': '${gameSessionID}'\n ---- 'playerOneID': '${playerOneID}'\n ---- 'playerTwoID': '${playerTwoID}'`,
     );
@@ -117,13 +111,13 @@ function createSendGameSessionData({
   return {
     event: SEND_GAME_SESSION,
     data: {
-      id: mockSession.id,
+      id: mockGameSession.id,
       // TODO: should populate `boardCells` from `mockGameSession.moves`
       boardCells: emptyBoard,
-      moves: mockSession.moves,
-      playerOneID: mockSession.playerOneID,
-      playerTwoID: mockSession.playerTwoID,
-      status: mockSession.status,
+      moves: mockGameSession.moves,
+      playerOneID: mockGameSession.playerOneID,
+      playerTwoID: mockGameSession.playerTwoID,
+      status: mockGameSession.status,
       winner: null,
     },
   };
@@ -136,12 +130,12 @@ function createSendMoveData({
 }): SendMoveMessageEvent {
   const { gameSessionID, playerID } = playerMoveData;
 
-  const mockSession = findGameSessionMock({
+  const mockGameSession = findGameSessionMock({
     gameSessionID,
     playerID,
   });
 
-  if (mockSession == null) {
+  if (mockGameSession == null) {
     throw new Error(
       `No mock game session found for:\n ---- 'gameSessionID': '${gameSessionID}'\n ---- 'playerID': '${playerID}'`,
     );
@@ -150,13 +144,13 @@ function createSendMoveData({
   return {
     event: SEND_MOVE,
     data: {
-      id: mockSession.id,
+      id: mockGameSession.id,
       // TODO: should populate `boardCells` from `mockGameSession.moves`
       boardCells: emptyBoard,
-      moves: [...mockSession.moves, playerMoveData],
-      playerOneID: mockSession.playerOneID,
-      playerTwoID: mockSession.playerTwoID,
-      status: mockSession.status,
+      moves: [...mockGameSession.moves, playerMoveData],
+      playerOneID: mockGameSession.playerOneID,
+      playerTwoID: mockGameSession.playerTwoID,
+      status: mockGameSession.status,
       // TODO: should assign winner for winning move
       winner: null,
     },

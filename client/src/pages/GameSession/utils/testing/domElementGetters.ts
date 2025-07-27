@@ -1,10 +1,10 @@
 import { type BoardCell } from '@connect-four-app/shared';
 
-export function getGameDetails(containerRef: HTMLElement): HTMLElement {
+export function getGameDetailsEl(containerRef: HTMLElement): HTMLElement {
   return containerRef.querySelector('#game-session #game-details') as HTMLElement;
 }
 
-export function getGameSessionDetails(containerRef: HTMLElement): HTMLElement {
+export function getGameSessionDetailsEl(containerRef: HTMLElement): HTMLElement {
   return containerRef.querySelector(
     '#game-session .game-session-details',
   ) as HTMLElement;
@@ -16,7 +16,7 @@ export function getGameBoardContainer(containerRef: HTMLElement): HTMLElement {
   ) as HTMLElement;
 }
 
-export function getBoardCell({
+export function getBoardCellEl({
   containerRef,
   boardCellRef,
 }: {

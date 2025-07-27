@@ -3,9 +3,10 @@ import { expect } from 'vitest';
 
 import { PlayerColor, type GameBoard, type PlayerID } from '@connect-four-app/shared';
 import {
-  getBoardCell,
+  getBoardCellEl,
   getGameBoardContainer,
-  getGameDetails,
+  getGameDetailsEl,
+  getGameSessionDetailsEl,
 } from './domElementGetters';
 
 export async function expectHeadingToBeVisible({
@@ -25,6 +26,32 @@ export async function expectHeadingToBeVisible({
   expect(headingEl).toBeVisible();
 }
 
+export async function expectGameSessionDetailsToBeVisibleAndCorrect({
+  containerRef,
+}: {
+  containerRef: HTMLElement;
+}) {
+  let gameSessionDetailsEl: HTMLElement;
+
+  await waitFor(() => {
+    gameSessionDetailsEl = getGameSessionDetailsEl(containerRef);
+    expect(gameSessionDetailsEl).not.toBeNull();
+    expect(gameSessionDetailsEl).not.toBeEmptyDOMElement();
+  });
+
+  expect(
+    // @ts-expect-error: This should go away once the test config is loaded correctly
+    await within(gameSessionDetailsEl).findByText('Game Session ID', {
+      exact: false,
+    }),
+  ).toBeVisible();
+
+  expect(
+    // @ts-expect-error: This should go away once the test config is loaded correctly
+    await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
+  ).toBeVisible();
+}
+
 export async function expectGameDetailsToBeVisibleAndCorrect({
   containerRef,
   activePlayerID,
@@ -39,7 +66,7 @@ export async function expectGameDetailsToBeVisibleAndCorrect({
   let gameDetailsEl: HTMLElement;
 
   await waitFor(() => {
-    gameDetailsEl = getGameDetails(containerRef);
+    gameDetailsEl = getGameDetailsEl(containerRef);
     expect(gameDetailsEl).not.toBeNull();
     expect(gameDetailsEl).not.toBeEmptyDOMElement();
   });
@@ -88,7 +115,7 @@ export async function expectGameBoardToBeVisibleAndCorrect({
 
   boardCells.forEach((column, i) => {
     column.forEach((rowCell, j) => {
-      const boardCellEl = getBoardCell({
+      const boardCellEl = getBoardCellEl({
         containerRef: gameBoardContainerEl,
         boardCellRef: {
           cellState: rowCell.cellState,
