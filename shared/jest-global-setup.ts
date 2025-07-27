@@ -1,5 +1,9 @@
 import { inspect } from 'node:util';
 
+import { sharedLog } from '@connect-four-app/shared';
+
+sharedLog.setLevel('DEBUG');
+
 const fullW = process.stdout.columns;
 const halfW = Math.floor(fullW / 2);
 
