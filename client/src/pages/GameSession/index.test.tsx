@@ -1,6 +1,6 @@
 import { inspect } from 'node:util';
 import renderWithContext from '#saurookkadookk/react-utils-render-with-context';
-import { screen, waitFor, within } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import {
   afterAll, // force formatting
   afterEach,
@@ -17,6 +17,7 @@ import {
   LogicSession,
   GameLogicEngine,
   moveTuplesByGenerator,
+  populateBoardWithDescendingSlopeDiagonalWinOne,
   populateBoardWithOneMoveTilWin,
   populateBoardWithMoves,
   type BoardCell,
@@ -69,6 +70,7 @@ describe('GameSession', () => {
   });
 
   afterEach(() => {
+    cleanup();
     server.resetHandlers();
   });
 
@@ -220,6 +222,106 @@ describe('GameSession', () => {
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledExactlyOnceWith('No cheating! 🤪');
+    });
+  });
+
+  test('alert is thrown when trying to move after game has been won', async () => {
+    /* START TEST SETUP */
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(vi.fn());
+
+    const moveTuples =
+      moveTuplesByGenerator[populateBoardWithDescendingSlopeDiagonalWinOne.name];
+
+    const testMoves: PlayerMove[] = moveTuples.map((tuple) => {
+      const [columnIndex, playerID] = tuple;
+      return {
+        columnIndex,
+        gameSessionID: mockGameSession.id,
+        playerID,
+        timestamp: new Date(),
+      };
+    });
+    let logicSession = new GameLogicEngine().startGame({
+      playerOneID: testPlayerOneID,
+      playerTwoID: testPlayerTwoID,
+    });
+    logicSession = populateBoardWithMoves({
+      logicSessionRef: logicSession,
+      moves: moveTuples,
+    });
+
+    const { gameBoardState: testBoardCells } = logicSession.board;
+    /* END TEST SETUP */
+
+    const { container, user } = renderWithContext(
+      <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
+      AppStateProvider,
+      {
+        state: {
+          gameSession: {
+            gameSessionID: mockGameSession.id,
+            boardCells: testBoardCells,
+            moves: testMoves,
+            playerOneID: testPlayerOneID,
+            playerTwoID: testPlayerTwoID,
+            status: GameSessionStatus.COMPLETED,
+            winner: testPlayerOneID,
+          },
+          player: {
+            playerID: testPlayerTwoID,
+          },
+        },
+      },
+    );
+
+    await expectHeadingToBeVisible({
+      screenRef: screen,
+      level: 2,
+      name: /Connect Four/,
+    });
+
+    await expectHeadingToBeVisible({
+      screenRef: screen,
+      level: 3,
+      name: new RegExp(`Winner: '${testPlayerOneID}'`),
+    });
+
+    let gameSessionDetailsEl: HTMLElement;
+
+    await waitFor(() => {
+      gameSessionDetailsEl = getGameSessionDetails(container);
+      expect(gameSessionDetailsEl).not.toBeNull();
+      expect(gameSessionDetailsEl).not.toBeEmptyDOMElement();
+    });
+
+    expect(
+      // @ts-expect-error: This should go away once the test config is loaded correctly
+      await within(gameSessionDetailsEl).findByText('Game Session ID', {
+        exact: false,
+      }),
+    ).toBeVisible();
+
+    expect(
+      // @ts-expect-error: This should go away once the test config is loaded correctly
+      await within(gameSessionDetailsEl).findByText('Player ID', { exact: false }),
+    ).toBeVisible();
+
+    await expectGameBoardToBeVisibleAndCorrect({
+      containerRef: container,
+      boardCells: testBoardCells,
+      playerOneID: testPlayerOneID,
+      playerTwoID: testPlayerTwoID,
+    });
+
+    const firstCellFromFirstColumn = container.querySelector(
+      '.board-col-0 div.cell:first-child',
+    ) as HTMLElement;
+    await user.click(firstCellFromFirstColumn);
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledExactlyOnceWith(
+        `Can't carry out move; the game has been won by '${testPlayerOneID}'.`,
+      );
     });
   });
 });
