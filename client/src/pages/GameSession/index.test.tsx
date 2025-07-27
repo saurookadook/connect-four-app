@@ -32,14 +32,15 @@ import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { DEBUG_LS_KEY, GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { createEmptyBoard } from '@/pages/GameSession/utils';
 import { AppStateProvider } from '@/store';
-import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
 import {
+  createFetchMock,
   expectGameBoardToBeVisibleAndCorrect,
   expectGameDetailsToBeVisibleAndCorrect,
   expectGameSessionDetailsToBeVisibleAndCorrect,
   expectHeadingToBeVisible,
   getGameSessionDetailsEl,
-} from './utils/testing';
+  WithMemoryRouter,
+} from '@/utils/testing';
 
 const testPlayerOneID = mockFirstPlayer.playerID;
 const testPlayerTwoID = mockSecondPlayer.playerID;

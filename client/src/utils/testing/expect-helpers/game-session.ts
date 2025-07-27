@@ -1,5 +1,4 @@
-import { waitFor, within, type Screen } from '@testing-library/react';
-import { expect } from 'vitest';
+import { waitFor, within } from '@testing-library/react';
 
 import { PlayerColor, type GameBoard, type PlayerID } from '@connect-four-app/shared';
 import {
@@ -7,24 +6,8 @@ import {
   getGameBoardContainer,
   getGameDetailsEl,
   getGameSessionDetailsEl,
-} from './domElementGetters';
-
-export async function expectHeadingToBeVisible({
-  screenRef,
-  level = 2,
-  name = /Connect Four/,
-}: {
-  screenRef: Screen;
-  level?: number;
-  name?: RegExp | string;
-}) {
-  const headingEl = await screenRef.findByRole('heading', {
-    level,
-    name,
-  });
-
-  expect(headingEl).toBeVisible();
-}
+} from '../dom-element-getters';
+import { expectHeadingToBeVisible } from './common';
 
 export async function expectGameSessionDetailsToBeVisibleAndCorrect({
   containerRef,
