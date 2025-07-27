@@ -2,7 +2,7 @@ import {
   toBeISODateString,
   toBeStringIncluding,
   toBeUUID,
-} from '@/utils/testing/matchers';
+} from '@connect-four-app/shared';
 
 expect.extend({
   toBeISODateString,
