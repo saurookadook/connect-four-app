@@ -77,6 +77,8 @@ export class GameLogicEngine {
 
     if (lastUpdatedCell == null) return false;
 
+    logger.debug(' lastUpdatedCell:\n', { lastUpdatedCell });
+
     const activePlayerHasWon = this.#validatorFuncs.some((validatorFunc) => {
       return validatorFunc(
         board.gameBoardState, // force formatting
@@ -86,6 +88,9 @@ export class GameLogicEngine {
       );
     });
 
+    logger.debug(
+      `'checkForWin' result for '${activePlayer}': ${activePlayerHasWon}`,
+    );
     return activePlayerHasWon;
   }
 
