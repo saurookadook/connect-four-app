@@ -11,6 +11,7 @@ import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
 
 const logger = sharedLog.getLogger('GameLogicEngine');
+logger.setLevel('debug');
 
 export class GameLogicEngine {
   // TODO: maybe this should be static?
@@ -63,7 +64,7 @@ export class GameLogicEngine {
       playerID: playerID,
     });
 
-    if (this.checkForWin(sessionRef.board, sessionRef.activePlayer)) {
+    if (this.checkForWin(sessionRef.board)) {
       return this.endGame(sessionRef);
     }
 
@@ -72,7 +73,7 @@ export class GameLogicEngine {
     return sessionRef;
   }
 
-  checkForWin(board: LogicBoard, activePlayer: PlayerID): boolean {
+  checkForWin(board: LogicBoard): boolean {
     const lastUpdatedCell = board.lastUpdatedCell;
 
     if (lastUpdatedCell == null) return false;
@@ -84,12 +85,12 @@ export class GameLogicEngine {
         board.gameBoardState, // force formatting
         lastUpdatedCell.col,
         lastUpdatedCell.row,
-        activePlayer,
+        lastUpdatedCell.cellState as PlayerID,
       );
     });
 
     logger.debug(
-      `'checkForWin' result for '${activePlayer}': ${activePlayerHasWon}`,
+      `'checkForWin' result for '${lastUpdatedCell.cellState}': ${activePlayerHasWon}`,
     );
     return activePlayerHasWon;
   }

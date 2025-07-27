@@ -12,6 +12,7 @@ import {
 import { LogicSession } from './LogicSession';
 
 const logger = sharedLog.getLogger('LogicBoard');
+logger.setLevel('debug');
 
 export class LogicBoard {
   #logicSession: Nullable<LogicSession>;
@@ -110,7 +111,7 @@ export class LogicBoard {
     };
     const fullCharWidth = 32;
     const displayLines: string[] = [];
-    displayLines.push('0   1   2   3   4   5   6');
+    displayLines.push('  0   1   2   3   4   5   6');
 
     const middleDivider = '├───┼───┼───┼───┼───┼───┼───┤';
 

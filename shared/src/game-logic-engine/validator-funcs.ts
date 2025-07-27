@@ -19,7 +19,7 @@ export function checkVerticalWin(
   const logger = sharedLog.getLogger(checkVerticalWin.name);
   if (!loggingEnabled) logger.setLevel('silent');
 
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkVerticalWin for ${playerID}`);
   for (let row = rowStart; row <= rowStart + 3; row++) {
@@ -33,6 +33,9 @@ export function checkVerticalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking vertical => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     }
   }
@@ -52,13 +55,14 @@ export function checkDescendingSlopeDiagonalWin(
 ): boolean {
   const logger = sharedLog.getLogger(checkDescendingSlopeDiagonalWin.name);
   if (!loggingEnabled) logger.setLevel('silent');
+  logger.setLevel('debug');
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkDescendingSlopeDiagonalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
     if (!descOpen && !ascOpen) {
       break;
     }
@@ -75,6 +79,9 @@ export function checkDescendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking desc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       descOpen = false;
@@ -85,8 +92,6 @@ export function checkDescendingSlopeDiagonalWin(
     );
     if (
       ascOpen &&
-      colStart - offset !== colStart + offset &&
-      rowStart - offset !== rowStart + offset &&
       cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart + offset,
@@ -94,6 +99,9 @@ export function checkDescendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking asc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       ascOpen = false;
@@ -122,10 +130,10 @@ export function checkAscendingSlopeDiagonalWin(
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkAscendingSlopeDiagonalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
     if (!descOpen && !ascOpen) {
       break;
     }
@@ -142,6 +150,9 @@ export function checkAscendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking desc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       descOpen = false;
@@ -152,8 +163,6 @@ export function checkAscendingSlopeDiagonalWin(
     );
     if (
       ascOpen &&
-      colStart - offset !== colStart + offset &&
-      rowStart + offset !== rowStart - offset &&
       cellIsOccupiedByPlayer({
         boardState, // force formatting
         colIndex: colStart + offset,
@@ -161,6 +170,9 @@ export function checkAscendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking asc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       ascOpen = false;
@@ -189,10 +201,10 @@ export function checkHorizontalWin(
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkHorizontalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
     if (!descOpen && !ascOpen) {
       break;
     }
@@ -222,7 +234,6 @@ export function checkHorizontalWin(
     );
     if (
       ascOpen &&
-      colStart - offset !== colStart + offset &&
       cellIsOccupiedByPlayer({
         boardState,
         colIndex: colStart + offset,

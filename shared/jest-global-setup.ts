@@ -17,7 +17,7 @@ export default function (globalConfig, projectConfig) {
 
   global.inspect = inspect;
 
-  sharedLog.setDefaultLevel('DEBUG');
+  // sharedLog.setDefaultLevel('DEBUG');
 
   console.log(
     ' Jest global setup completed! '.padStart(halfW, '?').padEnd(fullW, '?'),
