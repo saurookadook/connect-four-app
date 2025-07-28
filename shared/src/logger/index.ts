@@ -36,6 +36,7 @@ log.methodFactory = function (methodName, logLevel, loggerName = 'root') {
   };
 };
 
+// TODO: maybe remove this? it's not working like expected
 const ENV_LOG_LEVEL: string = (function () {
   if (typeof process === 'undefined') {
     return 'debug';

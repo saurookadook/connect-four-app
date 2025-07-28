@@ -70,6 +70,7 @@ const config: ViteConfig = {
       '**/*.{test,spec}.{js,jsx,ts,tsx}', // force formatting
       '**/__tests__/**/*.{ts,tsx}',
     ],
+    reporters: ['verbose'],
     sequence: {
       hooks: 'list',
     },

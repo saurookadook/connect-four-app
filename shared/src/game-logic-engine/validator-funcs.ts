@@ -19,7 +19,7 @@ export function checkVerticalWin(
   const logger = sharedLog.getLogger(checkVerticalWin.name);
   if (!loggingEnabled) logger.setLevel('silent');
 
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkVerticalWin for ${playerID}`);
   for (let row = rowStart; row <= rowStart + 3; row++) {
@@ -33,10 +33,16 @@ export function checkVerticalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking vertical => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     }
   }
 
+  logger.debug(
+    `'checkVerticalWin' result for '${playerID}': ${playerHasWon(connectedCount)} (count: ${connectedCount})`,
+  );
   return playerHasWon(connectedCount);
 }
 
@@ -49,13 +55,18 @@ export function checkDescendingSlopeDiagonalWin(
 ): boolean {
   const logger = sharedLog.getLogger(checkDescendingSlopeDiagonalWin.name);
   if (!loggingEnabled) logger.setLevel('silent');
+  logger.setLevel('debug');
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkDescendingSlopeDiagonalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
+    if (!descOpen && !ascOpen) {
+      break;
+    }
+
     logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
     );
@@ -68,6 +79,9 @@ export function checkDescendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking desc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       descOpen = false;
@@ -85,12 +99,18 @@ export function checkDescendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking asc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       ascOpen = false;
     }
 
     if (playerHasWon(connectedCount)) {
+      logger.debug(
+        `'checkDescendingSlopeDiagonalWin' result for '${playerID}': ${playerHasWon(connectedCount)} (count: ${connectedCount})`,
+      );
       return true;
     }
   }
@@ -110,10 +130,14 @@ export function checkAscendingSlopeDiagonalWin(
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkAscendingSlopeDiagonalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
+    if (!descOpen && !ascOpen) {
+      break;
+    }
+
     logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart - offset}`,
     );
@@ -126,6 +150,9 @@ export function checkAscendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking desc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       descOpen = false;
@@ -143,12 +170,18 @@ export function checkAscendingSlopeDiagonalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking asc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       ascOpen = false;
     }
 
     if (playerHasWon(connectedCount)) {
+      logger.debug(
+        `'checkAscendingSlopeDiagonalWin' result for '${playerID}': ${playerHasWon(connectedCount)} (count: ${connectedCount})`,
+      );
       return true;
     }
   }
@@ -168,13 +201,17 @@ export function checkHorizontalWin(
 
   let descOpen = true;
   let ascOpen = true;
-  let connectedCount = 0;
+  let connectedCount = 1;
 
   logger.debug(`checkHorizontalWin for ${playerID}`);
-  for (let offset = 0; offset < 4; offset++) {
+  for (let offset = 1; offset < 4; offset++) {
+    if (!descOpen && !ascOpen) {
+      break;
+    }
     logger.debug(
       `---- Checking desc => col: ${colStart - offset} | row: ${rowStart}`,
     );
+
     if (
       descOpen &&
       cellIsOccupiedByPlayer({
@@ -184,6 +221,9 @@ export function checkHorizontalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking desc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       descOpen = false;
@@ -201,6 +241,9 @@ export function checkHorizontalWin(
         playerID,
       })
     ) {
+      logger.debug(
+        `---- Checking asc => increase count from ${connectedCount} to ${connectedCount + 1}`,
+      );
       connectedCount += 1;
     } else {
       ascOpen = false;
@@ -211,6 +254,9 @@ export function checkHorizontalWin(
     }
   }
 
+  logger.debug(
+    `'checkHorizontalWin' result for '${playerID}': ${playerHasWon(connectedCount)} (count: ${connectedCount})`,
+  );
   return playerHasWon(connectedCount);
 }
 

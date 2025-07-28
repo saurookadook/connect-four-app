@@ -3,14 +3,20 @@ import classNames from 'classnames';
 
 import './styles.css';
 
-const usernamePattern = {
+export const usernamePattern = {
   asRegExp: /^[a-zA-Z0-9_]{5,24}$/,
   asString: '^[a-zA-Z0-9_]{5,24}$',
 };
-const passwordPattern = {
+export const passwordPattern = {
   asRegExp: /^[A-Za-z0-9!@#$%^&*\-_]{8,30}$/,
   asString: '^[A-Za-z0-9!@#$%^&*\\-_]{8,30}$',
 };
+
+export enum InputType {
+  USERNAME = 'username',
+  PASSWORD = 'password',
+  TEXT = 'text',
+}
 
 /**
  * @TODO
@@ -32,12 +38,23 @@ function BaseInputEl(
     ...nativeProps
   } = props;
 
+  const inputType = (function () {
+    const { name, type } = nativeProps;
+    if (type === InputType.TEXT && name === InputType.USERNAME) {
+      return InputType.USERNAME;
+    } else if (type === InputType.PASSWORD) {
+      return InputType.PASSWORD;
+    } else {
+      return InputType.TEXT;
+    }
+  })();
+
   const patternProp = (function () {
     if (pattern) {
       return pattern;
-    } else if (nativeProps.type === 'text' && nativeProps.name === 'username') {
+    } else if (inputType === InputType.USERNAME) {
       return usernamePattern.asString;
-    } else if (nativeProps.type === 'password') {
+    } else if (inputType === InputType.PASSWORD) {
       return passwordPattern.asString;
     }
 

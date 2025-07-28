@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "vite",
         "tsc:build": "tsc --project ./tsconfig.json",
-        "build": "yarn tsc:build && vite build",
+        "build": "cp ../.env ./.env && yarn tsc:build && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
         "start:dev": "vite build && yarn dev",

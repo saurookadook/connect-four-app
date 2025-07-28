@@ -25,12 +25,31 @@ export function Register() {
       confirmPassword,
     } = getFormData(event.target as HTMLFormElement);
 
+    const { elements } = formRef.current as HTMLFormElement;
+    // @ts-expect-error: TypeScript doesn't like this :]
+    const usernameEl = elements['username'] as HTMLInputElement;
+    // @ts-expect-error: TypeScript doesn't like this :]
+    const passwordEl = elements['password'] as HTMLInputElement;
+    // @ts-expect-error: TypeScript doesn't like this :]
+    const confirmPasswordEl = elements['confirm-password'] as HTMLInputElement;
+
+    if (username.value.length < usernameEl.minLength) {
+      usernameEl.setCustomValidity(
+        `Username must be at least ${usernameEl.minLength} characters long.`,
+      );
+      return;
+    }
+
+    if (password.value.length < passwordEl.minLength) {
+      passwordEl.setCustomValidity(
+        `Password must be at least ${passwordEl.minLength} characters long.`,
+      );
+      return;
+    }
+
     // TODO: add further error/invalid handling
     if (password.value !== confirmPassword.value) {
-      // @ts-expect-error: TypeScript doesn't like this :]
-      formRef.current.elements['confirm-password'].setCustomValidity(
-        'Password fields must be identical.',
-      );
+      confirmPasswordEl.setCustomValidity('Password fields must be identical.');
       return;
     }
 

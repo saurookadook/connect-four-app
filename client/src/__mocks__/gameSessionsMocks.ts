@@ -1,15 +1,21 @@
-import { randomUUID, type UUID } from 'crypto';
+import { randomUUID } from 'crypto';
 
-import { GameSessionStatus, type PlayerID } from '@connect-four-app/shared';
+import {
+  GameSessionStatus,
+  type Nullable,
+  type PlayerID,
+  type PlayerMove,
+} from '@connect-four-app/shared';
 import { mockPlayers } from './playerMocks';
 
 export type GameSessionMock = {
   /** @todo This should be a MongoDB `ObjectId` */
   id: string;
-  moves: Record<string, unknown>[];
+  moves: PlayerMove[];
   playerOneID: PlayerID;
   playerTwoID: PlayerID;
   status: GameSessionStatus;
+  winner: Nullable<PlayerID>;
 };
 
 const playerCombinations = [
@@ -59,8 +65,48 @@ export const unstartedGameSessionsMock: GameSessionMock[] = playerCombinations.m
       playerOneID,
       playerTwoID,
       status: GameSessionStatus.ACTIVE,
+      winner: null,
     };
   },
 );
 
 export const allGameSessionsMock: GameSessionMock[] = [...unstartedGameSessionsMock];
+
+export function findGameSessionMock({
+  gameSessionID,
+  playerID,
+}: {
+  gameSessionID: string;
+  playerID: PlayerID;
+}) {
+  return allGameSessionsMock.find((gameSession) => {
+    return (
+      gameSession.id === gameSessionID &&
+      (gameSession.playerOneID === playerID || gameSession.playerTwoID === playerID)
+    );
+  });
+}
+
+export function findGameSessionMockForPlayers({
+  gameSessionID,
+  playerOneID,
+  playerTwoID,
+}: {
+  gameSessionID?: string;
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
+}) {
+  return allGameSessionsMock.find((gameSession) => {
+    if (gameSessionID != null && playerOneID == null && playerTwoID == null) {
+      return gameSession.id === gameSessionID;
+    }
+
+    const gameSessionHasBothPlayerIDs =
+      gameSession.playerOneID === playerOneID &&
+      gameSession.playerTwoID === playerTwoID;
+
+    return gameSessionID == null
+      ? gameSessionHasBothPlayerIDs
+      : gameSession.id === gameSessionID && gameSessionHasBothPlayerIDs;
+  });
+}

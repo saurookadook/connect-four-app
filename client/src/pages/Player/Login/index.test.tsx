@@ -20,6 +20,9 @@ function LoginWithRouter() {
 describe('Login Page', () => {
   // @ts-expect-error: I know the type doesn't match exactly but that's ok :]
   const fetchMock = vi.spyOn(window, 'fetch').mockImplementation(createFetchMock());
+  const loggerErrorSpy = vi
+    .spyOn(logger, 'error')
+    .mockImplementation((...args) => args);
 
   afterEach(() => {
     fetchMock.mockClear();
@@ -77,9 +80,6 @@ describe('Login Page', () => {
     });
 
     it('handles unregistered player', async () => {
-      const loggerErrorSpy = vi
-        .spyOn(logger, 'error')
-        .mockImplementation((...args) => args);
       const user = userEvent.setup();
       render(<LoginWithRouter />);
 
@@ -107,6 +107,29 @@ describe('Login Page', () => {
           'Login failed: Invalid username or password.',
         );
       });
+    });
+  });
+
+  describe('invalid form submission', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      cleanup();
+    });
+
+    it.skip("handles username that's too short", async () => {
+      expect('implement me!').toBe(false);
+    });
+
+    it.skip("handles password that's too short", async () => {
+      expect('implement me!').toBe(false);
+    });
+
+    it.skip("handles password that doesn't meet character requirements", async () => {
+      expect('implement me!').toBe(false);
+    });
+
+    it.skip('handles incorrect password for username', async () => {
+      expect('implement me!').toBe(false);
     });
   });
 });

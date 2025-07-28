@@ -2,50 +2,6 @@ import { LogicSession } from '@/game-logic-engine';
 import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
 import { type PlayerID } from '@/types/main';
 
-type MoveTuplesByGenerator = {
-  [generatorName: string]: MoveTuple[];
-};
-
-export const moveTuplesByGenerator: MoveTuplesByGenerator = {
-  [populateBoardWithOneMoveTilWin.name]: [
-    [3, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-  ],
-  [populateBoardWithDescendingSlopeDiagonalWinOne.name]: [
-    [3, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-  ],
-  [populateBoardWithDescendingSlopeDiagonalWinTwo.name]: [],
-  [populateBoardWithDescendingSlopeDiagonalWinThree.name]: [],
-  [populateBoardWithDescendingSlopeDiagonalWinFour.name]: [],
-  [populateBoardWithAscendingSlopeDiagonalWinOne.name]: [],
-  [populateBoardWithAscendingSlopeDiagonalWinTwo.name]: [],
-  [populateBoardWithAscendingSlopeDiagonalWinThree.name]: [],
-  [populateBoardWithAscendingSlopeDiagonalWinFour.name]: [],
-  [populateBoardWithVerticalWin.name]: [],
-  [populateBoardWithHorizontalWinOne.name]: [],
-  [populateBoardWithHorizontalWinTwo.name]: [],
-  [populateBoardWithHorizontalWinThree.name]: [],
-  [populateBoardWithHorizontalWinFour.name]: [],
-};
-
 /**
  * @note Winning move is Red @ columnIndex 0
  * @example
@@ -58,11 +14,11 @@ export const moveTuplesByGenerator: MoveTuplesByGenerator = {
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ R │   │   │   │   │   │ 3
+ * │ r │ r │   │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ R │ B │   │   │   │ 4
+ * │ b │ r │ r │ b │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ B │ B │ R │   │   │   │ 5
+ * │ b │ b │ b │ r │   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
@@ -86,13 +42,13 @@ export function populateBoardWithOneMoveTilWin(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │(R)│   │   │   │   │   │   │ 2
+ * │(r)│   │   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ R │   │   │   │   │   │ 3
+ * │ r │ r │   │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ R │ B │   │   │   │ 4
+ * │ b │ r │ r │ b │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ B │ B │ R │   │   │   │ 5
+ * │ b │ b │ b │ r │   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
@@ -116,36 +72,24 @@ export function populateBoardWithDescendingSlopeDiagonalWinOne(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │   │   │   │   │   │   │ 2
+ * │ r │   │   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │(R)│   │   │   │   │   │ 3
+ * │ b │(r)│   │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ R │ R │ B │   │   │   │ 4
+ * │ r │ r │ r │ b │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ B │ B │ R │   │   │   │ 5
+ * │ b │ b │ b │ r │   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithDescendingSlopeDiagonalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithDescendingSlopeDiagonalWinTwo.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -158,36 +102,24 @@ export function populateBoardWithDescendingSlopeDiagonalWinTwo(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │   │   │   │   │   │   │ 2
+ * │ r │   │   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ R │   │   │   │   │   │ 3
+ * │ r │ r │   │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │(R)│ B │   │   │   │ 4
+ * │ b │ r │(r)│ b │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ B │ B │ R │   │   │   │ 5
+ * │ b │ b │ b │ r │   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithDescendingSlopeDiagonalWinThree(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithDescendingSlopeDiagonalWinThree.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -200,36 +132,24 @@ export function populateBoardWithDescendingSlopeDiagonalWinThree(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │   │   │   │   │   │   │ 2
+ * │ r │   │   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ B │   │   │   │   │ 3
+ * │ b │ r │ b │   │   │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ B │ R │ R │   │   │   │   │ 4
+ * │ b │ r │ r │   │   │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │ R │ B │ B │(R)│   │   │   │ 5
+ * │ r │ b │ b │(r)│   │   │   │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithDescendingSlopeDiagonalWinFour(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [0, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithDescendingSlopeDiagonalWinFour.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -242,36 +162,54 @@ export function populateBoardWithDescendingSlopeDiagonalWinFour(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │(R)│ 2
+ * │   │(b)│   │   │   │   │   │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │ R │ R │ 3
+ * │   │ b │ b │ r │ r │   │   │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ B │ R │ R │ B │ 4
+ * │   │ r │ r │ b │ b │   │   │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ R │ B │ B │ B │ 5
+ * │ b │ r │ r │ r │ b │   │   │ 5
+ * └───┴───┴───┴───┴───┴───┴───┘
+ * ```
+ */
+export function populateBoardWithDescendingSlopeDiagonalWinFive(
+  logicSessionRef: LogicSession,
+): void {
+  const genFunc = populateBoardWithDescendingSlopeDiagonalWinFive.name;
+
+  populateBoardWithMoves({
+    logicSessionRef,
+    moves: moveTuplesByGenerator[genFunc],
+  });
+}
+
+/**
+ * @example
+ * ```txt
+ *   0   1   2   3   4   5   6
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 0
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │   │ 1
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │   │(r)│ 2
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │   │   │ r │ r │ 3
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ b │ r │ r │ b │ 4
+ * ├───┼───┼───┼───┼───┼───┼───┤
+ * │   │   │   │ r │ b │ b │ b │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithAscendingSlopeDiagonalWinOne(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [4, mockPlayerOneID],
-    [5, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithAscendingSlopeDiagonalWinOne.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -284,36 +222,24 @@ export function populateBoardWithAscendingSlopeDiagonalWinOne(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │ R │ 2
+ * │   │   │   │   │   │   │ r │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │(R)│ B │ 3
+ * │   │   │   │   │   │(r)│ b │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ B │ R │ R │ R │ 4
+ * │   │   │   │ b │ r │ r │ r │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ R │ B │ B │ B │ 5
+ * │   │   │   │ r │ b │ b │ b │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithAscendingSlopeDiagonalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [4, mockPlayerOneID],
-    [5, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithAscendingSlopeDiagonalWinTwo.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -326,36 +252,24 @@ export function populateBoardWithAscendingSlopeDiagonalWinTwo(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │ R │ 2
+ * │   │   │   │   │   │   │ r │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │ R │ R │ 3
+ * │   │   │   │   │   │ r │ r │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ B │(R)│ R │ B │ 4
+ * │   │   │   │ b │(r)│ r │ b │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │ R │ B │ B │ B │ 5
+ * │   │   │   │ r │ b │ b │ b │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithAscendingSlopeDiagonalWinThree(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [5, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [3, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [4, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithAscendingSlopeDiagonalWinThree.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -368,36 +282,24 @@ export function populateBoardWithAscendingSlopeDiagonalWinThree(
  * ├───┼───┼───┼───┼───┼───┼───┤
  * │   │   │   │   │   │   │   │ 1
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │   │   │ R │ 2
+ * │   │   │   │   │   │   │ r │ 2
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │ B │ R │ B │ 3
+ * │   │   │   │   │ b │ r │ b │ 3
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │   │ R │ R │ B │ 4
+ * │   │   │   │   │ r │ r │ b │ 4
  * ├───┼───┼───┼───┼───┼───┼───┤
- * │   │   │   │(R)│ B │ B │ R │ 5
+ * │   │   │   │(r)│ b │ b │ r │ 5
  * └───┴───┴───┴───┴───┴───┴───┘
  * ```
  */
 export function populateBoardWithAscendingSlopeDiagonalWinFour(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [6, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [4, mockPlayerOneID],
-    [5, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [5, mockPlayerOneID],
-    [6, mockPlayerTwoID],
-    [6, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithAscendingSlopeDiagonalWinFour.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -422,19 +324,11 @@ export function populateBoardWithAscendingSlopeDiagonalWinFour(
 export function populateBoardWithVerticalWin(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [3, mockPlayerOneID],
-    [1, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-    [0, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-    [2, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithVerticalWin.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -459,19 +353,11 @@ export function populateBoardWithVerticalWin(
 export function populateBoardWithHorizontalWinOne(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [1, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [0, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithHorizontalWinOne.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -496,19 +382,11 @@ export function populateBoardWithHorizontalWinOne(
 export function populateBoardWithHorizontalWinTwo(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [0, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithHorizontalWinTwo.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -533,19 +411,11 @@ export function populateBoardWithHorizontalWinTwo(
 export function populateBoardWithHorizontalWinThree(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [0, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithHorizontalWinThree.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -570,19 +440,11 @@ export function populateBoardWithHorizontalWinThree(
 export function populateBoardWithHorizontalWinFour(
   logicSessionRef: LogicSession,
 ): void {
-  const movesTuples: MoveTuple[] = [
-    [0, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [1, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [2, mockPlayerOneID],
-    [4, mockPlayerTwoID],
-    [3, mockPlayerOneID],
-  ];
+  const genFunc = populateBoardWithHorizontalWinFour.name;
 
   populateBoardWithMoves({
     logicSessionRef,
-    moves: movesTuples,
+    moves: moveTuplesByGenerator[genFunc],
   });
 }
 
@@ -591,6 +453,7 @@ export const winningConditionGeneratorFuncs = [
   populateBoardWithDescendingSlopeDiagonalWinTwo,
   populateBoardWithDescendingSlopeDiagonalWinThree,
   populateBoardWithDescendingSlopeDiagonalWinFour,
+  populateBoardWithDescendingSlopeDiagonalWinFive,
   populateBoardWithAscendingSlopeDiagonalWinOne,
   populateBoardWithAscendingSlopeDiagonalWinTwo,
   populateBoardWithAscendingSlopeDiagonalWinThree,
@@ -642,3 +505,187 @@ export function populateBoardWithMoves({
 
   return logicSessionRef;
 }
+
+type MoveTuplesByGenerator = {
+  [generatorName: string]: MoveTuple[];
+};
+
+export const moveTuplesByGenerator: MoveTuplesByGenerator = {
+  [populateBoardWithOneMoveTilWin.name]: [
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+  ],
+  [populateBoardWithDescendingSlopeDiagonalWinOne.name]: [
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+  ],
+  [populateBoardWithDescendingSlopeDiagonalWinTwo.name]: [
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+  ],
+  [populateBoardWithDescendingSlopeDiagonalWinThree.name]: [
+    [3, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+  ],
+  [populateBoardWithDescendingSlopeDiagonalWinFour.name]: [
+    [0, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+  ],
+  [populateBoardWithDescendingSlopeDiagonalWinFive.name]: [
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+  ],
+  [populateBoardWithAscendingSlopeDiagonalWinOne.name]: [
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+  ],
+  [populateBoardWithAscendingSlopeDiagonalWinTwo.name]: [
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+  ],
+  [populateBoardWithAscendingSlopeDiagonalWinThree.name]: [
+    [3, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [3, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+  ],
+  [populateBoardWithAscendingSlopeDiagonalWinFour.name]: [
+    [6, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [4, mockPlayerOneID],
+    [5, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [5, mockPlayerOneID],
+    [6, mockPlayerTwoID],
+    [6, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+  ],
+  [populateBoardWithVerticalWin.name]: [
+    [3, mockPlayerOneID],
+    [1, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [0, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [2, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+  ],
+  [populateBoardWithHorizontalWinOne.name]: [
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [0, mockPlayerOneID],
+  ],
+  [populateBoardWithHorizontalWinTwo.name]: [
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+  ],
+  [populateBoardWithHorizontalWinThree.name]: [
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+  ],
+  [populateBoardWithHorizontalWinFour.name]: [
+    [0, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [1, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [2, mockPlayerOneID],
+    [4, mockPlayerTwoID],
+    [3, mockPlayerOneID],
+  ],
+};

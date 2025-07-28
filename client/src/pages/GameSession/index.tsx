@@ -59,12 +59,15 @@ export function GameSession() {
 
       switch (messageData.event) {
         case SEND_GAME_SESSION:
+          logger.debug(`    wsMessageHandler - '${SEND_GAME_SESSION}' case`, {
+            gameSessionData: messageData.data,
+          });
           startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
           break;
         case SEND_MOVE:
-          // logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
-          //   gameSessionData: messageData.data,
-          // });
+          logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
+            gameSessionData: messageData.data,
+          });
           updateGameState({
             dispatch: appDispatch,
             gameSessionData: messageData.data,
@@ -111,6 +114,7 @@ export function GameSession() {
       <FlexRow>
         <FlexColumn id="game-details">
           <h3>{`Active player: ${activePlayer}`}</h3>
+          {/* TODO: maybe add `role="list"` to this and `role="listitem"` to `dt` elements */}
           <dl>
             <span>
               <b>Players</b>
@@ -122,8 +126,8 @@ export function GameSession() {
               return (
                 playerID != null && (
                   <Fragment key={playerID}>
-                    <dt>{`Player ${suffix}`}</dt>
-                    <dd>{playerID}</dd>
+                    <dt className={`data-item-${index}`}>{`Player ${suffix}`}</dt>
+                    <dd className={`data-item-${index}`}>{playerID}</dd>
                   </Fragment>
                 )
               );

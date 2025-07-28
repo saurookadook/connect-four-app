@@ -1,11 +1,14 @@
 import { GameSessionStatus } from '@/constants';
 import { GameLogicEngine, LogicSession } from '@/game-logic-engine';
+import { log as sharedLog } from '@/logger';
 import { mockPlayerOneID, mockPlayerTwoID } from '@/mocks';
 import {
   populateBoardWithOneMoveTilWin,
   populateBoardWithDescendingSlopeDiagonalWinOne,
   winningConditionGeneratorFuncs,
 } from '@/utils/testing/winConditionGenerators';
+
+const logger = sharedLog.getLogger('GameLogicEngine__Tests');
 
 describe('GameLogicEngine', () => {
   let gameEngine: GameLogicEngine;
@@ -121,9 +124,65 @@ describe('GameLogicEngine', () => {
           playerID: mockPlayerOneID,
         });
 
-        expect(
-          gameEngine.checkForWin(logicSession.board, logicSession.activePlayer),
-        ).toBe(false);
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(false);
+      });
+
+      test('weird case', () => {
+        logicSession.board.updateBoardState({
+          columnIndex: 3,
+          playerID: mockPlayerOneID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 4,
+          playerID: mockPlayerTwoID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 2,
+          playerID: mockPlayerOneID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 4,
+          playerID: mockPlayerTwoID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 1,
+          playerID: mockPlayerOneID,
+        });
+
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(false);
+      });
+
+      test('simple, weird case', () => {
+        logicSession.board.updateBoardState({
+          columnIndex: 3,
+          playerID: mockPlayerOneID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 4,
+          playerID: mockPlayerTwoID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 2,
+          playerID: mockPlayerOneID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 3,
+          playerID: mockPlayerTwoID,
+        });
+        logicSession.board.updateBoardState({
+          columnIndex: 1,
+          playerID: mockPlayerOneID,
+        });
+
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(false);
+      });
+
+      test('complex case', () => {
+        populateBoardWithOneMoveTilWin(logicSession);
+
+        logicSession.board.printGameBoardState();
+
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(false);
       });
     });
 
@@ -148,12 +207,18 @@ describe('GameLogicEngine', () => {
         ][],
       );
 
+      // test.only('DEBUGGING', () => {
+      //   populateBoardWithDescendingSlopeDiagonalWinFive(logicSession);
+
+      //   logger.debug(logicSession.board.printGameBoardState());
+
+      //   expect(gameEngine.checkForWin(logicSession.board)).toBe(true);
+      // });
+
       test.each(winningCases)('%s', (_, generatorFunc) => {
         generatorFunc(logicSession);
 
-        expect(
-          gameEngine.checkForWin(logicSession.board, logicSession.activePlayer),
-        ).toBe(true);
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(true);
       });
     });
   });
