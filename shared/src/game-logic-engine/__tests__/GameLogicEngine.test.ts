@@ -6,6 +6,7 @@ import {
   populateBoardWithOneMoveTilWin,
   populateBoardWithDescendingSlopeDiagonalWinOne,
   winningConditionGeneratorFuncs,
+  type MoveTuple,
 } from '@/utils/testing/winConditionGenerators';
 
 const logger = sharedLog.getLogger('GameLogicEngine__Tests');
@@ -147,6 +148,31 @@ describe('GameLogicEngine', () => {
         logicSession.board.updateBoardState({
           columnIndex: 1,
           playerID: mockPlayerOneID,
+        });
+
+        expect(gameEngine.checkForWin(logicSession.board)).toBe(false);
+      });
+
+      test('another weird case', () => {
+        const moveTuples = [
+          [3, mockPlayerOneID],
+          [4, mockPlayerTwoID],
+          [3, mockPlayerOneID],
+          [4, mockPlayerTwoID],
+          [2, mockPlayerOneID],
+          [3, mockPlayerTwoID],
+          [1, mockPlayerOneID],
+          [0, mockPlayerTwoID],
+          [4, mockPlayerOneID],
+          [4, mockPlayerTwoID],
+        ] as MoveTuple[];
+
+        moveTuples.forEach((moveTuple) => {
+          const [columnIndex, playerID] = moveTuple;
+          logicSession.board.updateBoardState({
+            columnIndex,
+            playerID,
+          });
         });
 
         expect(gameEngine.checkForWin(logicSession.board)).toBe(false);

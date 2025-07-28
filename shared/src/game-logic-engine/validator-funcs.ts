@@ -22,7 +22,7 @@ export function checkVerticalWin(
   let connectedCount = 1;
 
   logger.debug(`checkVerticalWin for ${playerID}`);
-  for (let row = rowStart; row <= rowStart + 3; row++) {
+  for (let row = rowStart + 1; row < rowStart + 4; row++) {
     logger.debug(`---- Checking vertical => col: ${colStart} | row: ${row}`);
 
     if (
@@ -37,6 +37,8 @@ export function checkVerticalWin(
         `---- Checking vertical => increase count from ${connectedCount} to ${connectedCount + 1}`,
       );
       connectedCount += 1;
+    } else {
+      break;
     }
   }
 
@@ -55,7 +57,6 @@ export function checkDescendingSlopeDiagonalWin(
 ): boolean {
   const logger = sharedLog.getLogger(checkDescendingSlopeDiagonalWin.name);
   if (!loggingEnabled) logger.setLevel('silent');
-  logger.setLevel('debug');
 
   let descOpen = true;
   let ascOpen = true;

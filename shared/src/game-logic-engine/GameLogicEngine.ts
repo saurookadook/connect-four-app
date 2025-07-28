@@ -11,7 +11,6 @@ import validatorFuncs, { ValidatorFunc } from './validator-funcs';
 import { LogicBoard, LogicSession } from './';
 
 const logger = sharedLog.getLogger('GameLogicEngine');
-logger.setLevel('debug');
 
 export class GameLogicEngine {
   // TODO: maybe this should be static?

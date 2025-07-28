@@ -12,7 +12,6 @@ import {
 import { LogicSession } from './LogicSession';
 
 const logger = sharedLog.getLogger('LogicBoard');
-logger.setLevel('debug');
 
 export class LogicBoard {
   #logicSession: Nullable<LogicSession>;
