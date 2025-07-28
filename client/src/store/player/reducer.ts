@@ -7,6 +7,7 @@ import {
   LOG_IN_PLAYER,
   SET_PLAYER_ID,
   SET_PLAYER_INFO,
+  UNSET_PLAYER_INFO,
 } from '@/store/actionTypes';
 import { type CombinedPlayerStateSlice, type PlayerStateSlice } from './reducer.types';
 
@@ -50,6 +51,8 @@ const playerID: CombinedPlayerStateSlice['playerID'] = [
       case SET_PLAYER_ID:
       case SET_PLAYER_INFO:
         return action.payload.playerID;
+      case UNSET_PLAYER_INFO:
+        return null;
       default:
         return stateSlice;
     }
@@ -61,10 +64,11 @@ const username: CombinedPlayerStateSlice['username'] = [
   (stateSlice, action) => {
     switch (action.type) {
       case REGISTER_NEW_PLAYER:
-        return action.payload.username;
       case LOG_IN_PLAYER:
       case SET_PLAYER_INFO:
         return action.payload.username;
+      case UNSET_PLAYER_INFO:
+        return null;
       default:
         return stateSlice;
     }
