@@ -5,7 +5,10 @@ export function getButtonByRole(containerRef: HTMLElement, labelText: string) {
   return within(containerRef).getByRole('button', { name: labelText });
 }
 
-export function getInput(containerRef: HTMLElement, labelText: string) {
+export function getInput(
+  containerRef: HTMLElement,
+  labelText: string,
+): HTMLInputElement {
   return within(containerRef).getByLabelText(labelText);
 }
 

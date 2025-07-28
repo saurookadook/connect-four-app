@@ -1,4 +1,5 @@
 import { waitFor, within } from '@testing-library/react';
+import { expect } from 'vitest';
 
 import { PlayerColor, type GameBoard, type PlayerID } from '@connect-four-app/shared';
 import {

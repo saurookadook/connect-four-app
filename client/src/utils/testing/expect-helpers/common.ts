@@ -1,4 +1,5 @@
 import { type Screen } from '@testing-library/react';
+import { expect } from 'vitest';
 
 export async function expectHeadingToBeVisible({
   screenRef,
