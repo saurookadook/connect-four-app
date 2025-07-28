@@ -28,7 +28,8 @@
     "client:test": "yarn client:base test",
     "server:base": "yarn workspace @connect-four-app/server",
     "server:test": "yarn dcr server-test test",
-    "shared:base": "yarn workspace @connect-four-app/shared"
+    "shared:base": "yarn workspace @connect-four-app/shared",
+    "shared:test": "yarn shared:base test"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
