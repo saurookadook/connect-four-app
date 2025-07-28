@@ -59,13 +59,15 @@ export function GameSession() {
 
       switch (messageData.event) {
         case SEND_GAME_SESSION:
-          console.log({ gameSessionData: messageData.data });
+          logger.debug(`    wsMessageHandler - '${SEND_GAME_SESSION}' case`, {
+            gameSessionData: messageData.data,
+          });
           startGame({ dispatch: appDispatch, gameSessionData: messageData.data });
           break;
         case SEND_MOVE:
-          // logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
-          //   gameSessionData: messageData.data,
-          // });
+          logger.debug(`    wsMessageHandler - '${SEND_MOVE}' case`, {
+            gameSessionData: messageData.data,
+          });
           updateGameState({
             dispatch: appDispatch,
             gameSessionData: messageData.data,
