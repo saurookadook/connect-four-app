@@ -20,13 +20,12 @@ import { PlayersModule } from '@/players/players.module';
 import { PlayersService } from '@/players/players.service';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
 
-describe('GameSessionsController', () => {
+describe('PlayersController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
 
   let app: INestApplication<App>;
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
-  let playersService: PlayersService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,17 +43,6 @@ describe('GameSessionsController', () => {
 
     mongoConnection = await app.resolve(getConnectionToken());
     playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
-    playersService = await app.resolve(PlayersService);
-
-    await playerModel.insertMany([
-      mockFirstPlayer,
-      mockSecondPlayer,
-      mockThirdPlayer,
-    ]);
-  });
-
-  afterEach(async () => {
-    await playerModel.deleteMany({}).exec();
   });
 
   afterAll(async () => {
@@ -64,30 +52,131 @@ describe('GameSessionsController', () => {
   });
 
   describe('/players/:playerID (GET)', () => {
-    it.skip("should get a player document given a 'playerID'", () => {
-      expect('implement me!').toBe(false);
+    beforeEach(async () => {
+      await playerModel.insertMany([
+        mockFirstPlayer,
+        mockSecondPlayer,
+        mockThirdPlayer,
+      ]);
     });
 
-    it.skip("should respond with error details if no player document can be found for a given 'playerID'", () => {
+    afterEach(async () => {
+      await playerModel.deleteMany({}).exec();
+    });
+
+    it("should get a player document given a 'playerID'", async () => {
+      await request(app.getHttpServer())
+        .get(`/players/${mockFirstPlayer.playerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.player).not.toBeNull();
+          expectSerializedDocumentToMatch<Player>(
+            resultBody.player, // force formatting
+            {
+              ...mockFirstPlayer,
+            },
+          );
+        });
+    });
+
+    it("should respond with error details if no player document can be found for a given 'playerID'", async () => {
+      const randomUUID = '454d91b9-bace-4a0f-bcdb-e74afbf8ccf6';
+
+      await request(app.getHttpServer())
+        .get(`/players/${randomUUID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            `Player with ID '${randomUUID}' not found`,
+          );
+          expect(resultBody.statusCode).toBe(404);
+        });
       expect('implement me!').toBe(false);
     });
   });
 
   describe('/players/all (GET)', () => {
-    it.skip('should get all player documents', () => {
-      expect('implement me!').toBe(false);
+    beforeEach(async () => {
+      await playerModel.insertMany([
+        mockFirstPlayer,
+        mockSecondPlayer,
+        mockThirdPlayer,
+      ]);
     });
 
-    it.skip("should get all player documents excluding those with the given 'pids' search param", () => {
-      expect('implement me!').toBe(false);
+    afterEach(async () => {
+      await playerModel.deleteMany({}).exec();
     });
 
-    it.skip('should return empty array if no player documents can be found', () => {
-      expect('implement me!').toBe(false);
+    it('should get all player documents', async () => {
+      await request(app.getHttpServer())
+        .get(`/players/all`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.players).not.toBeNull();
+          expect(resultBody.players).toHaveLength(3);
+
+          mockPlayers.forEach((mockPlayer, index) => {
+            const playerFromResult = resultBody.players[index];
+
+            expectSerializedDocumentToMatch<Player>(
+              playerFromResult, // force formatting
+              {
+                ...mockPlayer,
+              },
+            );
+          });
+        });
     });
 
-    it.skip('should return empty array if no player documents can be found for given search criteria', () => {
-      expect('implement me!').toBe(false);
+    it("should get all player documents excluding one with the given 'currentPlayerID' search param", async () => {
+      await request(app.getHttpServer())
+        .get(`/players/all?currentPlayerID=${mockSecondPlayer.playerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.players).not.toBeNull();
+          expect(resultBody.players).toHaveLength(2);
+
+          [mockFirstPlayer, mockThirdPlayer].forEach((mockPlayer, index) => {
+            const playerFromResult = resultBody.players[index];
+
+            expectSerializedDocumentToMatch<Player>(
+              playerFromResult, // force formatting
+              {
+                ...mockPlayer,
+              },
+            );
+          });
+        });
+    });
+
+    it('should return empty array if no player documents can be found', async () => {
+      await playerModel.deleteMany({}).exec();
+
+      await request(app.getHttpServer())
+        .get(`/players/all`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.players).not.toBeNull();
+          expect(resultBody.players).toHaveLength(0);
+        });
+    });
+
+    // TODO: maybe hold off on this until there are more filters?
+    it.skip('should return empty array if no player documents can be found for given search criteria', async () => {
+      await request(app.getHttpServer())
+        .get(`/players/all?something=what`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.players).not.toBeNull();
+          expect(resultBody.players).toHaveLength(0);
+        });
     });
   });
 });
