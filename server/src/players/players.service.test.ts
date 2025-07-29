@@ -7,8 +7,8 @@ import { PLAYER_MODEL_TOKEN } from '@/constants/db';
 import { DatabaseModule } from '@/database/database.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { Player, PlayerDocument } from './schemas/player.schema';
-import { PlayerModule } from './player.module';
-import { PlayerService } from './player.service';
+import { PlayersModule } from './players.module';
+import { PlayersService } from './players.service';
 
 const mockPlayerID = randomUUID();
 const mockNow = new Date();
@@ -20,9 +20,9 @@ const mockPlayer = {
   updatedAt: mockNow,
 };
 
-describe('PlayerService', () => {
+describe('PlayersService', () => {
   let mongoConnection: Connection;
-  let service: PlayerService;
+  let service: PlayersService;
   let model: Model<Player>;
 
   beforeAll(async () => {
@@ -34,12 +34,12 @@ describe('PlayerService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         DatabaseModule, // force formatting
-        PlayerModule,
+        PlayersModule,
       ],
     }).compile();
 
     mongoConnection = await module.resolve(getConnectionToken());
-    service = await module.resolve(PlayerService);
+    service = await module.resolve(PlayersService);
     model = await module.resolve(PLAYER_MODEL_TOKEN);
   });
 

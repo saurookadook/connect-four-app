@@ -11,7 +11,7 @@ import {
 } from './schemas/player.schema';
 
 @Injectable()
-export class PlayerService {
+export class PlayersService {
   constructor(
     @InjectModel(Player.name) private playerModel: Model<PlayerDocument>,
   ) {}
