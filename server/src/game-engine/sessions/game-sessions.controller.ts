@@ -1,4 +1,3 @@
-import { UUID } from 'node:crypto';
 import {
   Body,
   Controller,
@@ -10,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 
+import { type PlayerID } from '@connect-four-app/shared';
 import { Public } from '@/auth/decorators/public.decorator';
 import { CreateGameSessionDTO, GameSessionDTO } from '../dtos/game-session.dto';
 import { GameSessionDocument } from '../schemas/game-session.schema';
@@ -46,7 +46,7 @@ export class GameSessionsController {
   @Public()
   @Get('history/:playerID')
   async getGameSessionsHistoryForPlayerID(
-    @Param('playerID') playerID: UUID,
+    @Param('playerID') playerID: PlayerID,
   ): Promise<{ sessions: GameSessionDTO[] }> {
     const playerSessions =
       await this.gameSessionsService.findAllForPlayer(playerID);

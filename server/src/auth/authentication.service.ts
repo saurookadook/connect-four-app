@@ -1,8 +1,8 @@
-import { UUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
+import { type PlayerID } from '@connect-four-app/shared';
 import { PlayerDocument } from '@/players/schemas/player.schema';
 import { PlayersService } from '@/players/players.service';
 import { PlayerDetails } from '@/types/main';
@@ -35,7 +35,7 @@ export class AuthenticationService {
     const newPlayer = await this.playersService.createOne({
       username: registrationData.username,
       password: passwordHash,
-      playerID: uuidv4() as UUID,
+      playerID: uuidv4() as PlayerID,
       email: registrationData.email,
     });
 
