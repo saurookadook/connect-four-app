@@ -147,12 +147,22 @@ async function $logOutPlayer(
     requestPathname: `/api/auth/logout/${playerID}`,
     fetchOpts: {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include',
+      },
     },
-  }); // TODO: should catch error?
+  });
 
   logger.debug(`[${logOutPlayer.name}] responseData:`, {
     responseData,
   });
+
+  if (responseData !== 'Accepted') {
+    // TODO: throw error?
+  }
+
+  window.localStorage.removeItem(PLAYER_DETAILS_LS_KEY);
 
   return unsetPlayer({
     dispatch,
