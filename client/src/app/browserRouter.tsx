@@ -4,7 +4,8 @@ import {
   type RouteObject,
 } from 'react-router-dom';
 
-import { sharedLog } from '@connect-four-app/shared';
+import { safeParseJSON, sharedLog } from '@connect-four-app/shared';
+import { PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { Root } from '@/layouts';
 import {
   AccountPortal,
@@ -49,21 +50,6 @@ export const routerConfig: RouteObject[] = [
         label: navItemsLabels.HOME,
         element: <Home />,
       },
-      // {
-      //   // TODO: make this page conditionally render Login/Register
-      //   // or maybe consolidate into auth portal?
-      //   path: 'login',
-      //   // @ts-expect-error: I hope this is just temporarily missing
-      //   label: 'Login',
-      //   element: <Login />,
-      // },
-      // {
-      //   // TODO: make this page conditionally render Login/Register
-      //   path: 'register',
-      //   // @ts-expect-error: I hope this is just temporarily missing
-      //   label: 'Register',
-      //   element: <Register />,
-      // },
       {
         path: 'game-sessions-history',
         // @ts-expect-error: I hope this is just temporarily missing
@@ -90,9 +76,23 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: navItemsLabels.ACCOUNT,
         element: <AccountPortal />,
+        // TODO: this whole loader situation feels... messy?
         loader: async ({ params }) => {
-          if (params['subPage'] == null || params['subPage'] == ':subPage') {
+          const playerDetailsFromLocalStorage =
+            window.localStorage.getItem(PLAYER_DETAILS_LS_KEY);
+          const parsedPlayerData = safeParseJSON(playerDetailsFromLocalStorage);
+
+          if (parsedPlayerData?.playerID != null && params['subPage'] !== 'details') {
             return redirect('/account/details');
+          }
+
+          if (params['subPage'] == null || params['subPage'] === ':subPage') {
+            const targetPathname =
+              parsedPlayerData?.playerID != null
+                ? '/account/details'
+                : '/account/login';
+
+            return redirect(targetPathname);
           }
         },
       },
