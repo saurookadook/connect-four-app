@@ -12,6 +12,7 @@ import {
   GameSession, // force formatting
   GameSessionsHistory,
   Home,
+  Matchmaking,
   Login,
   Register,
 } from '@/pages';
@@ -20,6 +21,7 @@ const logger = sharedLog.getLogger('browserRouter');
 
 export const navItemsLabels = {
   HOME: 'Home',
+  MATCHMAKING: 'Matchmaking',
   GAME_SESSIONS_HISTORY: 'Game Sessions History',
   ACCOUNT: 'Account',
 };
@@ -49,6 +51,12 @@ export const routerConfig: RouteObject[] = [
         // @ts-expect-error: I hope this is just temporarily missing
         label: navItemsLabels.HOME,
         element: <Home />,
+      },
+      {
+        path: 'matchmaking',
+        // @ts-expect-error: I hope this is just temporarily missing
+        label: navItemsLabels.MATCHMAKING,
+        element: <Matchmaking />,
       },
       {
         path: 'game-sessions-history',
