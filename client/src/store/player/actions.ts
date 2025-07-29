@@ -1,7 +1,13 @@
-import { sharedLog } from '@connect-four-app/shared';
+import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL, PLAYER_DETAILS_LS_KEY } from '@/constants';
-import { type BaseAction } from '@/types/main';
-import { REGISTER_NEW_PLAYER, LOG_IN_PLAYER, SET_PLAYER_ID } from '../actionTypes';
+import { BoundThis, type BaseAction } from '@/types/main';
+import { safeFetch } from '@/utils';
+import {
+  REGISTER_NEW_PLAYER,
+  LOG_IN_PLAYER,
+  SET_PLAYER_ID,
+  UNSET_PLAYER_INFO,
+} from '../actionTypes';
 
 const logger = sharedLog.getLogger('playerActions');
 
@@ -130,14 +136,59 @@ export async function logInPlayer({
   });
 }
 
+async function $logOutPlayer(
+  this: BoundThis,
+  {
+    dispatch, // force formatting
+    playerID,
+  }: BaseAction & { playerID: PlayerID },
+) {
+  const responseData = await safeFetch.call(this, {
+    requestPathname: `/api/auth/logout/${playerID}`,
+    fetchOpts: {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include',
+      },
+    },
+  });
+
+  logger.debug(`[${logOutPlayer.name}] responseData:`, {
+    responseData,
+  });
+
+  if (responseData !== 'Accepted') {
+    // TODO: throw error?
+  }
+
+  window.localStorage.removeItem(PLAYER_DETAILS_LS_KEY);
+
+  return unsetPlayer({
+    dispatch,
+  });
+}
+
+export const logOutPlayer = $logOutPlayer.bind({
+  name: $logOutPlayer.name,
+});
+
 export function setPlayerID({
   dispatch, // force formatting
   playerID,
-}: BaseAction & { playerID: string }) {
+}: BaseAction & { playerID: PlayerID }) {
   return dispatch({
     type: SET_PLAYER_ID,
     payload: {
       playerID: playerID,
     },
+  });
+}
+
+export function unsetPlayer({
+  dispatch, // force formatting
+}: BaseAction) {
+  return dispatch({
+    type: UNSET_PLAYER_INFO,
   });
 }

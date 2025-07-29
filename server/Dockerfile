@@ -16,12 +16,12 @@ RUN $yarn server:base build
 
 FROM server-dev-base AS server-dev
 EXPOSE 3993 8090
-ENTRYPOINT [ "yarn", "server:base" ]
+ENTRYPOINT [ "corepack", "yarn", "server:base" ]
 CMD [ "start:dev" ]
 
 FROM server-dev-base AS server-test
 EXPOSE 3030 8099
-ENTRYPOINT [ "yarn", "server:base" ]
+ENTRYPOINT [ "corepack", "yarn", "server:base" ]
 CMD [ "test" ]
 
 

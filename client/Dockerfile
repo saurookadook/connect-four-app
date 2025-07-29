@@ -16,10 +16,10 @@ RUN $yarn shared:base build
 RUN $yarn client:base build
 
 FROM client-dev-base AS client-dev
-ENTRYPOINT [ "yarn", "client:base" ]
+ENTRYPOINT [ "corepack", "yarn", "client:base" ]
 CMD [ "start:dev" ]
 
 FROM client-dev-base AS client-test
 COPY .env.test /opt/connect-four-app
-ENTRYPOINT [ "yarn", "client:base" ]
+ENTRYPOINT [ "corepack", "yarn", "client:base" ]
 CMD [ "test" ]

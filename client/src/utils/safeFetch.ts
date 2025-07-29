@@ -1,8 +1,17 @@
-import { sharedLog } from '@connect-four-app/shared';
+import { safeParseJSON, sharedLog } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL } from '@/constants';
 import { type BoundThis } from '@/types/main';
 
 const logger = sharedLog.getLogger(safeFetch.name);
+
+async function resolveResponseData(response: Response) {
+  if (response.status === 202) {
+    const dataAsText = await response.text();
+    return safeParseJSON(dataAsText) || dataAsText;
+  }
+
+  return await response.json();
+}
 
 export async function safeFetch(
   this: BoundThis,
@@ -39,7 +48,7 @@ export async function safeFetch(
       );
     }
 
-    responseData = await response.json();
+    responseData = await resolveResponseData(response);
   } catch (error) {
     const _error: Error = error instanceof Error ? error : new Error();
     logger.error(_error);

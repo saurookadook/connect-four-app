@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+import { type PlayerID } from '@connect-four-app/shared';
+import { logOutPlayer } from '@/store/actions';
 import { useAppStore } from '@/store';
 import { Login, Register } from '../playerPages';
 import { AppParams } from '@/types/main';
 
 function AccountDetails() {
-  const { appState } = useAppStore();
+  const { appState, appDispatch } = useAppStore();
   const { email, playerID, username } = appState.player;
+
+  function handleLogoutClick(event: React.MouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    logOutPlayer({ dispatch: appDispatch, playerID: playerID as PlayerID });
+  }
 
   return (
     <div id="account-details">
@@ -25,6 +32,8 @@ function AccountDetails() {
         <dt>Username</dt>
         <dd>{username != null ? <code>{username}</code> : '⚠️ Not set'}</dd>
       </dl>
+
+      <button onClick={handleLogoutClick}>Log Out</button>
     </div>
   );
 }
@@ -40,23 +49,37 @@ function NewPlayerForm() {
         <div>
           <Login />
 
-          <span>
-            {"Don't have an account? "}
+          <div>
+            <span>{"Don't have an account? "}</span>
             <button onClick={() => navigate('/account/register')}>
               {'Register for one here'}
             </button>
-          </span>
+          </div>
         </div>
       ) : (
-        <Register />
+        <div>
+          <Register />
+
+          <div>
+            <span>{'Already registered? '}</span>
+            <button onClick={() => navigate('/account/login')}>{'Log In here'}</button>
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
 export function AccountPortal() {
+  const navigate = useNavigate();
   const { appState } = useAppStore();
   const { playerID } = appState.player;
+
+  useEffect(() => {
+    if (playerID == null) {
+      navigate('/account/login');
+    }
+  }, [playerID]);
 
   return playerID == null ? ( // force formatting
     <NewPlayerForm />

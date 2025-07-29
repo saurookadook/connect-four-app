@@ -1,8 +1,19 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { inspect } from 'node:util';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { type Request, type Response } from 'express';
 
-import { sharedLog } from '@connect-four-app/shared';
+import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { PlayerDetails } from '@/types/main';
 import {
   AuthenticationRequestDTO,
@@ -67,12 +78,32 @@ export class AuthController {
     return playerDetails;
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('logout')
-  async logout(@Req() req: Request) {
-    // const playerID = req.user.playerID;
-    // return this.authenticationService.logout(playerID);
-    return req.logout();
+  @Delete('logout/:playerID')
+  async logout(
+    // TODO: maybe don't need to pass this? or could use it to delete the other session record?
+    @Param('playerID') playerID: PlayerID, // force formatting
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    logger.debug(
+      '[logout method] args',
+      inspect(
+        {
+          playerID,
+          req,
+          res,
+        },
+        {
+          colors: true,
+          compact: false,
+          depth: 1,
+          showHidden: true,
+          sorted: true,
+        },
+      ),
+    );
+
+    return this._handlePassportLogout(req, res);
   }
 
   _handlePassportLogin({
@@ -103,6 +134,24 @@ export class AuthController {
         throw new Error(`${errorMessage} [REASON] ${err.toString()}`);
       }
       // should this redirect somewhere?
+    });
+  }
+
+  _handlePassportLogout(req: Request, res: Response) {
+    return req.logout(function (err) {
+      if (err) {
+        logger.error('Logout failed:\n', err);
+        throw new Error(`Logout failed: ${err.message}`, { cause: err });
+      }
+
+      req.session.destroy(function (err) {
+        if (err) {
+          logger.error('Failed to destroy session:\n', err);
+        }
+      });
+
+      res.clearCookie('connect.sid', { path: '/' });
+      return res.status(200).send({ message: 'Logut successful', status: 200 });
     });
   }
 }

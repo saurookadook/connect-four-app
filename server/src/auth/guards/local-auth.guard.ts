@@ -1,3 +1,4 @@
+import { inspect } from 'node:util';
 import {
   ExecutionContext,
   Injectable,
@@ -5,7 +6,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+
+import { sharedLog } from '@connect-four-app/shared';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+
+const logger = sharedLog.getLogger('LocalAuthGuard');
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
@@ -27,6 +32,18 @@ export class LocalAuthGuard extends AuthGuard('local') {
   }
 
   handleRequest(err, user, info) {
+    logger.trace(
+      '[handleRequest method] call args:\n',
+      inspect(
+        {
+          err,
+          user,
+          info,
+        },
+        { colors: true, compact: false, depth: 3, sorted: true },
+      ),
+    );
+
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       throw err || new UnauthorizedException();
