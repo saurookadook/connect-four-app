@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { sharedLog } from '@connect-four-app/shared';
 import { AuthenticationService } from '@/auth/authentication.service';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
-import { PlayerService } from '@/player/player.service';
+import { PlayersService } from '@/players/players.service';
 import { GameSessionSeed, PlayerSeed } from '@/scripts/seed-data';
 
 const logger = sharedLog.getLogger('SeedService');
@@ -13,7 +13,7 @@ export class SeedService {
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly gameSessionsService: GameSessionsService,
-    private readonly playerService: PlayerService,
+    private readonly playersService: PlayersService,
   ) {}
 
   async seedGameSessions(
@@ -60,7 +60,7 @@ export class SeedService {
       const hashedPassword = await AuthenticationService.createPasswordHash(
         playerSeed.password,
       );
-      return this.playerService.createOne({
+      return this.playersService.createOne({
         ...playerSeed,
         password: hashedPassword,
       });

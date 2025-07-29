@@ -38,8 +38,8 @@ import {
 } from '@/game-engine/schemas';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 import { GameEngineModule } from '@/game-engine/game-engine.module';
-import { Player } from '@/player/schemas/player.schema';
-import { PlayerService } from '@/player/player.service';
+import { Player } from '@/players/schemas/player.schema';
+import { PlayersService } from '@/players/players.service';
 import { GameEventsGateway, type GameSessionMap } from './game-events.gateway';
 
 const mockThirdPlayer = mockPlayers[2];
@@ -60,7 +60,7 @@ describe('GameEventsGateway', () => {
   let gameSessionModel: Model<GameSession>;
   let gameSessionsService: GameSessionsService;
   let playerModel: Model<Player>;
-  let playerService: PlayerService;
+  let playersService: PlayersService;
   let gateway: GameEventsGateway;
   let activeGameSession: GameSessionMap;
 
@@ -74,9 +74,9 @@ describe('GameEventsGateway', () => {
     }).compile();
 
     mongoConnection = await module.resolve(getConnectionToken());
-    playerService = await module.resolve(PlayerService);
+    playersService = await module.resolve(PlayersService);
     await Promise.all(
-      mockPlayers.map((player) => playerService.createOne({ ...player })),
+      mockPlayers.map((player) => playersService.createOne({ ...player })),
     );
 
     gameSessionsService = await module.resolve(GameSessionsService);

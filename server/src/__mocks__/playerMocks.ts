@@ -1,5 +1,5 @@
 import { AuthenticationService } from '@/auth/authentication.service';
-import { Player } from '@/player/schemas/player.schema';
+import { Player } from '@/players/schemas/player.schema';
 import { mockNow } from './commonMocks';
 
 type MockUnregisteredPlayer = Omit<Player, 'password'> & {
