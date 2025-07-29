@@ -1,8 +1,8 @@
-import { UUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
+import { type PlayerID } from '@connect-four-app/shared';
 import { CreatePlayerDTO, UpdatePlayerDTO } from './dtos/player.dto';
 import {
   NullablePlayerDocument,
@@ -31,7 +31,7 @@ export class PlayersService {
       .exec();
   }
 
-  async findOneByPlayerID(playerID: UUID) {
+  async findOneByPlayerID(playerID: PlayerID) {
     return await this.playerModel
       .findOne({ playerID: playerID }, { projection: { password: 0 } })
       .exec();
