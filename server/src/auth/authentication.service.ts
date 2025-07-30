@@ -1,10 +1,10 @@
-import { UUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
-import { PlayerDocument } from '@/player/schemas/player.schema';
-import { PlayerService } from '@/player/player.service';
+import { type PlayerID } from '@connect-four-app/shared';
+import { PlayerDocument } from '@/players/schemas/player.schema';
+import { PlayersService } from '@/players/players.service';
 import { PlayerDetails } from '@/types/main';
 import { RegisterDTO, LoginDTO } from './dtos/auth.dto';
 
@@ -23,7 +23,7 @@ export type AuthenticationErrorResult = AuthenticationResult & {
 export class AuthenticationService {
   static readonly SALT_ROUNDS = 10;
 
-  constructor(private playerService: PlayerService) {}
+  constructor(private playersService: PlayersService) {}
 
   async register(
     registrationData: RegisterDTO,
@@ -32,10 +32,10 @@ export class AuthenticationService {
     const passwordHash = await AuthenticationService.createPasswordHash(
       registrationData.unhashedPassword,
     );
-    const newPlayer = await this.playerService.createOne({
+    const newPlayer = await this.playersService.createOne({
       username: registrationData.username,
       password: passwordHash,
-      playerID: uuidv4() as UUID,
+      playerID: uuidv4() as PlayerID,
       email: registrationData.email,
     });
 
@@ -71,7 +71,7 @@ export class AuthenticationService {
     username: LoginDTO['username'];
     unhashedPassword: LoginDTO['unhashedPassword'];
   }) {
-    const player = await this.playerService.findOneByUsername(username);
+    const player = await this.playersService.findOneByUsername(username);
 
     if (
       player == null ||

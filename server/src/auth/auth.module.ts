@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 
-import { PlayerModule } from '@/player/player.module';
+import { PlayersModule } from '@/players/players.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
 import { AuthenticationService } from './authentication.service';
@@ -10,7 +10,7 @@ import { AuthenticationService } from './authentication.service';
   controllers: [AuthController],
   imports: [
     PassportModule.register({ session: true }), // force formatting
-    PlayerModule,
+    PlayersModule,
   ],
   providers: [
     AuthenticationService, // force formatting

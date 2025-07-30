@@ -29,7 +29,7 @@ import {
   GameSession,
 } from '@/game-engine/schemas';
 import { GameSessionsModule } from '@/game-engine/sessions/game-sessions.module';
-import { Player } from '@/player/schemas/player.schema';
+import { Player } from '@/players/schemas/player.schema';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { BoardStatesModule } from './board-states.module';
 import { BoardStatesService } from './board-states.service';

@@ -9,7 +9,7 @@ import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
-import { Player } from '@/player/schemas/player.schema';
+import { Player } from '@/players/schemas/player.schema';
 import { AuthModule } from './auth.module';
 import { AuthenticationService } from './authentication.service';
 

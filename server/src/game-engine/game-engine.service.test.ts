@@ -39,8 +39,8 @@ import {
   GameSession,
   GameSessionDocument,
 } from '@/game-engine/schemas';
-import { Player } from '@/player/schemas/player.schema';
-import { PlayerModule } from '@/player/player.module';
+import { Player } from '@/players/schemas/player.schema';
+import { PlayersModule } from '@/players/players.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
 import { BoardStatesModule } from './board-states/board-states.module';
 import { BoardStatesService } from './board-states/board-states.service';
@@ -70,7 +70,7 @@ describe('GameEngineService', () => {
       imports: [
         DatabaseModule, // force formatting
         GameEngineModule,
-        PlayerModule,
+        PlayersModule,
       ],
     }).compile();
 

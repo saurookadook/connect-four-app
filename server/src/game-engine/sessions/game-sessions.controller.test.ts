@@ -15,8 +15,8 @@ import {
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
 import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
-import { PlayerModule } from '@/player/player.module';
-import { Player } from '@/player/schemas/player.schema';
+import { PlayersModule } from '@/players/players.module';
+import { Player } from '@/players/schemas/player.schema';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
 import {
   GameSession,
@@ -39,7 +39,7 @@ describe('GameSessionsController', () => {
       imports: [
         DatabaseModule, // force formatting
         GameSessionsModule,
-        PlayerModule,
+        PlayersModule,
       ],
       providers: [CatchAllFilterProvider, HttpExceptionFilterProvider],
     }).compile();

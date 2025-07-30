@@ -17,14 +17,14 @@ import {
   GameSessionDocument,
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
-import { PlayerService } from '@/player/player.service';
+import { PlayersService } from '@/players/players.service';
 
 @Injectable()
 export class GameSessionsService {
   constructor(
     @InjectModel(GameSession.name)
     private readonly gameSessionModel: Model<GameSessionDocument>,
-    private readonly playerService: PlayerService,
+    private readonly playersService: PlayersService,
   ) {}
 
   async createOne(
@@ -53,7 +53,7 @@ export class GameSessionsService {
   }
 
   async findAllForPlayer(playerID: PlayerID): Promise<GameSessionDocument[]> {
-    const foundPlayer = await this.playerService.findOneByPlayerID(playerID);
+    const foundPlayer = await this.playersService.findOneByPlayerID(playerID);
 
     if (foundPlayer == null) {
       throw new NotFoundException(
@@ -101,7 +101,7 @@ export class GameSessionsService {
     }
 
     const playerOneExists =
-      await this.playerService.findOneByPlayerID(playerOneID);
+      await this.playersService.findOneByPlayerID(playerOneID);
 
     if (!playerOneExists) {
       throw new UnauthorizedException(
@@ -110,7 +110,7 @@ export class GameSessionsService {
     }
 
     const playerTwoExists =
-      await this.playerService.findOneByPlayerID(playerTwoID);
+      await this.playersService.findOneByPlayerID(playerTwoID);
 
     if (!playerTwoExists) {
       throw new UnauthorizedException(

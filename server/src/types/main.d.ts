@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
-import { PlayerDTO } from '@/player/dtos/player.dto';
+import { type PlayerID } from '@connect-four-app/shared';
+import { PlayerDTO } from '@/players/dtos/player.dto';
 
 export type PlayerDetails = {
   playerID: PlayerID;

@@ -6,8 +6,8 @@ import { GameSessionStatus } from '@connect-four-app/shared';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
-import { PlayerModule } from '@/player/player.module';
-import { Player } from '@/player/schemas/player.schema';
+import { Player } from '@/players/schemas/player.schema';
+import { PlayersModule } from '@/players/players.module';
 import {
   GAME_SESSION_MODEL_TOKEN, // force formatting
   PLAYER_MODEL_TOKEN,
@@ -46,7 +46,7 @@ describe('GameSessionsService', () => {
       imports: [
         DatabaseModule, // force formatting
         GameSessionsModule,
-        PlayerModule,
+        PlayersModule,
       ],
     }).compile();
 
