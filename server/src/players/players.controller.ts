@@ -13,7 +13,16 @@ import { plainToInstance } from 'class-transformer';
 
 import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { PlayerDTO } from './dtos/player.dto';
-import { PlayersService } from './players.service';
+import {
+  PlayersService,
+  type PlayerFilterOptions,
+  type SortOptions,
+} from './players.service';
+
+type FindAllOptions = {
+  filterOpts?: PlayerFilterOptions;
+  sortOpts?: SortOptions;
+};
 
 const logger = sharedLog.getLogger('PlayersController');
 logger.setLevel('debug');
@@ -24,19 +33,25 @@ export class PlayersController {
 
   @Get('all')
   async getAllPlayers(
-    @Param('playerID') playerID: PlayerID, // force formatting
-    @Query('currentPlayerID') currentPlayerID: string,
-  ): Promise<{ players: PlayerDTO[] }> {
-    logger.debug(
-      `[${this.getAllPlayers.name} method] Call arguments\n`,
+    @Query('currentPlayerID') currentPlayerID?: string, // force formatting
+  ): Promise<{ playersData: Pick<PlayerDTO, 'playerID' | 'username'>[] }> {
+    const methodName = this.getAllPlayers.name;
+    logger.trace(
+      `[${methodName} method] Call arguments\n`,
       inspect({
-        playerID,
         currentPlayerID,
       }),
     );
 
+    const opts: FindAllOptions = {};
+    if (currentPlayerID != null) {
+      opts.filterOpts = { playerID: { $nin: [currentPlayerID] } };
+    }
+
+    const foundPlayers = await this.playersService.findAll(opts);
+
     return {
-      players: [],
+      playersData: foundPlayers,
     };
   }
 
@@ -44,16 +59,31 @@ export class PlayersController {
   async getPlayerByPlayerID(
     @Param('playerID') playerID: PlayerID, // force formatting
   ): Promise<{ player: PlayerDTO }> {
-    logger.debug(
-      `[${this.getPlayerByPlayerID.name} method] Call arguments\n`,
+    const methodName = this.getPlayerByPlayerID.name;
+    logger.trace(
+      `[${methodName} method] Call arguments\n`,
       inspect({
         playerID,
       }),
     );
 
+    const foundPlayer = await this.playersService.findOneByPlayerID(playerID);
+
+    logger.trace(
+      `[${methodName} method] Found player document\n`,
+      inspect({
+        foundPlayer,
+      }),
+    );
+
+    if (foundPlayer == null) {
+      throw new NotFoundException(
+        `[PlayersController.${methodName}] : Could not find 'player' with ID '${playerID}'.`,
+      );
+    }
+
     return {
-      // @ts-expect-error: Just for now :]
-      player: null,
+      player: plainToInstance(PlayerDTO, foundPlayer.toJSON()),
     };
   }
 }

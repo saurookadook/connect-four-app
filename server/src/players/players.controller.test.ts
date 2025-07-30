@@ -89,11 +89,10 @@ describe('PlayersController', () => {
           const resultBody = JSON.parse(result.text);
 
           expect(resultBody.message).toBeStringIncluding(
-            `Player with ID '${randomUUID}' not found`,
+            `Could not find 'player' with ID '${randomUUID}'.`,
           );
           expect(resultBody.statusCode).toBe(404);
         });
-      expect('implement me!').toBe(false);
     });
   });
 
@@ -116,18 +115,14 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.players).not.toBeNull();
-          expect(resultBody.players).toHaveLength(3);
+          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).toHaveLength(3);
 
-          mockPlayers.forEach((mockPlayer, index) => {
-            const playerFromResult = resultBody.players[index];
+          mockPlayers.forEach((expectedPlayer, index) => {
+            const playerFromResult = resultBody.playersData[index];
 
-            expectSerializedDocumentToMatch<Player>(
-              playerFromResult, // force formatting
-              {
-                ...mockPlayer,
-              },
-            );
+            expect(playerFromResult.playerID).toEqual(expectedPlayer.playerID);
+            expect(playerFromResult.username).toEqual(expectedPlayer.username);
           });
         });
     });
@@ -138,19 +133,21 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.players).not.toBeNull();
-          expect(resultBody.players).toHaveLength(2);
+          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).toHaveLength(2);
 
-          [mockFirstPlayer, mockThirdPlayer].forEach((mockPlayer, index) => {
-            const playerFromResult = resultBody.players[index];
+          [mockFirstPlayer, mockThirdPlayer].forEach(
+            (expectedPlayer, index) => {
+              const playerFromResult = resultBody.playersData[index];
 
-            expectSerializedDocumentToMatch<Player>(
-              playerFromResult, // force formatting
-              {
-                ...mockPlayer,
-              },
-            );
-          });
+              expect(playerFromResult.playerID).toEqual(
+                expectedPlayer.playerID,
+              );
+              expect(playerFromResult.username).toEqual(
+                expectedPlayer.username,
+              );
+            },
+          );
         });
     });
 
@@ -162,8 +159,8 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.players).not.toBeNull();
-          expect(resultBody.players).toHaveLength(0);
+          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).toHaveLength(0);
         });
     });
 
@@ -174,8 +171,8 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.players).not.toBeNull();
-          expect(resultBody.players).toHaveLength(0);
+          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).toHaveLength(0);
         });
     });
   });
