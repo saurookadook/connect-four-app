@@ -23,7 +23,7 @@ export type AppParams = {
 
 export type RouterParams = ReturnType<typeof useParams<AppParams>>;
 
-type MatchmakingPlayersData = {
+export type MatchmakingPlayersData = {
   playerID: PlayerID;
   username: string;
 };
