@@ -33,7 +33,7 @@ export const initialGameSessionStateSlice = {
   winner: null,
 };
 
-export const gameSessionRequestInProgress: CombinedGameSessionStateSlice['gameSessionRequestInProgress'] =
+const gameSessionRequestInProgress: CombinedGameSessionStateSlice['gameSessionRequestInProgress'] =
   [
     (stateSlice, action) => {
       switch (action.type) {

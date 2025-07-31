@@ -17,6 +17,10 @@ export type PlayerAction = CombineReducers.ReducerAction<{
 }>;
 
 export type CombinedMatchmakingStateSlice = {
+  playersDataRequestInProgress: CombineReducers.ArgsTuple<
+    MatchmakingStateSlice['playersDataRequestInProgress'], // force formatting
+    PlayerAction
+  >;
   playersData: CombineReducers.ArgsTuple<
     MatchmakingStateSlice['playersData'], // force formatting
     PlayerAction
