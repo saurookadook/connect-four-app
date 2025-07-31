@@ -16,9 +16,9 @@ export class SeedGameSessionsCommand extends CommandRunner {
   }
 
   async run(): Promise<void> {
-    logger.log('\n');
+    logger.debug('\n');
     await this.seedService.seedGameSessions(allGameSessionsSeedData);
-    logger.log('\n');
+    logger.debug('\n');
 
     process.exitCode = 0;
   }
