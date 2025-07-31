@@ -8,7 +8,7 @@ const logger = sharedLog.getLogger('matchmakingReducer');
 
 export const initialMatchmakingStateSlice = {
   playersDataRequestInProgress: false,
-  playersData: [],
+  playersData: null,
 };
 
 const playersDataRequestInProgress: CombinedMatchmakingStateSlice['playersDataRequestInProgress'] =

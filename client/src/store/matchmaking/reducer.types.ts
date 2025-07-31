@@ -9,7 +9,7 @@ type PlayerData = {
 
 export type MatchmakingStateSlice = {
   playersDataRequestInProgress: boolean;
-  playersData: PlayerData[];
+  playersData: Nullable<PlayerData[]>;
 };
 
 export type PlayerAction = CombineReducers.ReducerAction<{
