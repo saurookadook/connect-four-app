@@ -29,17 +29,14 @@ export async function fetchPlayersData({
   });
 }
 
-export async function makeStartGameRequest(
-  this: BoundThis,
-  {
-    dispatch,
-    playerOneID,
-    playerTwoID,
-  }: BaseAction & {
-    playerOneID: PlayerID;
-    playerTwoID: PlayerID;
-  },
-) {
+export async function makeStartGameRequest({
+  dispatch,
+  playerOneID,
+  playerTwoID,
+}: BaseAction & {
+  playerOneID: PlayerID;
+  playerTwoID: PlayerID;
+}) {
   const fnName = makeStartGameRequest.name;
   const fetchOptions = {
     method: 'POST',
