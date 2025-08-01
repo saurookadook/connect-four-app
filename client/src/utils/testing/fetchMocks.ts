@@ -1,10 +1,12 @@
 /* eslint-disable no-case-declarations */
 import { vi } from 'vitest';
 
-import { sharedLog } from '@connect-four-app/shared';
+import { GameSessionStatus, sharedLog } from '@connect-four-app/shared';
 import { allGameSessionsMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { BASE_API_SERVER_URL } from '@/constants';
+import type { MatchmakingPlayersData } from '@/types/main';
+import { createEmptyBoard } from '@/pages/GameSession/utils';
 
 const logger = sharedLog.getLogger('fetchMocks');
 
@@ -17,23 +19,24 @@ function findPlayerByUsernameAndPassword(username: string, password: string) {
 }
 
 function handleGetRequest(url: string, options: RequestInit) {
-  // logger.log({
-  //   name: 'handleGetRequest',
-  //   url,
-  //   options,
-  // });
   const urlObj = new URL(url);
   const gameSessionID = urlObj.pathname.replace(/^\/api\/game-sessions\//, '');
+  logger.debug(` 'handleGetRequest' ${'-'.repeat(120)}\n`, {
+    url,
+    options,
+    urlObj,
+    gameSessionID,
+  });
 
   let responseData;
 
-  switch (url) {
-    case `${BASE_API_SERVER_URL}/api/game-sessions/all`:
+  switch (urlObj.pathname) {
+    case `/api/game-sessions/all`:
       responseData = {
         sessions: [...allGameSessionsMock],
       };
       break;
-    case `${BASE_API_SERVER_URL}/api/game-sessions/${gameSessionID}`:
+    case `/api/game-sessions/${gameSessionID}`:
       const foundGameSession = allGameSessionsMock.find(
         (gameSession) => gameSession.id === gameSessionID,
       );
@@ -49,6 +52,28 @@ function handleGetRequest(url: string, options: RequestInit) {
             };
 
       break;
+    case '/api/players/all':
+      const currentPlayerID = urlObj.searchParams.get('currentPlayerID');
+      const playersData =
+        currentPlayerID == null
+          ? mockPlayers.map((player) => ({
+              playerID: player.playerID,
+              username: player.username,
+            }))
+          : mockPlayers.reduce<MatchmakingPlayersData[]>((acc, cur) => {
+              if (cur.playerID !== currentPlayerID) {
+                acc.push({
+                  playerID: cur.playerID,
+                  username: cur.username,
+                });
+              }
+
+              return acc;
+            }, []);
+      responseData = {
+        playersData: playersData,
+      };
+      break;
     default:
       responseData = {
         message: `[handlePostRequest] Unhandled endpoint '${url}'`,
@@ -58,10 +83,16 @@ function handleGetRequest(url: string, options: RequestInit) {
 
   const status = responseData?.statusCode || 200;
 
+  logger.debug(` 'handleGetRequest' RESULT ${'-'.repeat(120)}\n`, {
+    url,
+    responseData,
+  });
+
   return resolveWithResult(responseData, status);
 }
 
 function handlePostRequest(url: string, options: RequestInit) {
+  const urlObj = new URL(url);
   const jsonBody =
     typeof options.body === 'string' // force formatting
       ? JSON.parse(options.body)
@@ -70,8 +101,8 @@ function handlePostRequest(url: string, options: RequestInit) {
   let responseData;
   let playerDetails;
 
-  switch (url) {
-    case `${BASE_API_SERVER_URL}/api/auth/register`:
+  switch (urlObj.pathname) {
+    case `/api/auth/register`:
       playerDetails = findPlayerByUsernameAndPassword(
         jsonBody.username,
         jsonBody.password,
@@ -89,7 +120,7 @@ function handlePostRequest(url: string, options: RequestInit) {
         };
       }
       break;
-    case `${BASE_API_SERVER_URL}/api/auth/login`:
+    case `/api/auth/login`:
       playerDetails = findPlayerByUsernameAndPassword(
         jsonBody.username,
         jsonBody.password,
@@ -106,6 +137,21 @@ function handlePostRequest(url: string, options: RequestInit) {
           statusCode: 401,
         };
       }
+      break;
+    case `/api/game-engine/start`:
+      responseData = {
+        boardState: {
+          cells: createEmptyBoard(),
+        },
+        gameSession: {
+          _id: '688cad4b94ed98d6a67b5b13',
+          moves: [],
+          playerOneID: jsonBody.playerOneID,
+          playerTwoID: jsonBody.playerTwoID,
+          status: GameSessionStatus.ACTIVE,
+          winner: null,
+        },
+      };
       break;
     default:
       responseData = {

@@ -8,6 +8,10 @@ import gameSessionsReducer, {
   initialGameSessionsStateSlice,
   type GameSessionsStateSlice,
 } from '@/store/game-sessions/reducer';
+import matchmakingReducer, {
+  initialMatchmakingStateSlice,
+  type MatchmakingStateSlice,
+} from '@/store/matchmaking/reducer';
 import playerReducer, {
   initialPlayerStateSlice,
   type PlayerStateSlice,
@@ -16,6 +20,7 @@ import playerReducer, {
 export type AppState = {
   gameSession: GameSessionStateSlice;
   gameSessions: GameSessionsStateSlice;
+  matchmaking: MatchmakingStateSlice;
   player: PlayerStateSlice;
 };
 // & combineReducers.AmbiguousObject;
@@ -23,11 +28,13 @@ export type AppState = {
 export const initialAppState = {
   gameSession: initialGameSessionStateSlice,
   gameSessions: initialGameSessionsStateSlice,
+  matchmaking: initialMatchmakingStateSlice,
   player: initialPlayerStateSlice,
 };
 
 export default combineReducers({
   gameSession: gameSessionReducer,
   gameSessions: gameSessionsReducer,
+  matchmaking: matchmakingReducer,
   player: playerReducer,
 });

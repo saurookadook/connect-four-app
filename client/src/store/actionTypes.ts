@@ -18,6 +18,10 @@ export const ATTEMPT_LOGIN = 'ATTEMPT_LOGIN';
 export const ATTEMPT_SIGN_UP = 'ATTEMPT_SIGN_UP';
 export const ATTEMPT_LOGOUT = 'ATTEMPT_LOGOUT';
 
+// matchmaking
+export const REQUEST_PLAYERS_DATA = 'REQUEST_PLAYERS_DATA';
+export const SET_PLAYERS_DATA = 'SET_PLAYERS_DATA';
+
 // player
 export const REGISTER_NEW_PLAYER = 'REGISTER_NEW_PLAYER';
 export const LOG_IN_PLAYER = 'LOG_IN_PLAYER';

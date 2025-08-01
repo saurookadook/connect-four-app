@@ -8,7 +8,6 @@ import {
 } from 'vitest';
 import renderWithContext from '#saurookkadookk/react-utils-render-with-context';
 import { screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import { createFetchMock, WithMemoryRouter } from '@/utils/testing';
 import { AppStateProvider } from '@/store';
@@ -69,9 +68,13 @@ describe('GameSessionsHistory', () => {
 
     // const playerHistoryResults = getHistoryItemResults(playerHistoryEl!);
     // expect(playerHistoryResults.length).toBeGreaterThan(0);
-    expect(within(playerHistoryEl!).getByText('No Results', { exact: false })).toBeVisible();
     expect(
-      within(playerHistoryEl!).getByText('Sorry for the inconvenience', { exact: false }),
+      within(playerHistoryEl!).getByText('No Results', { exact: false }),
+    ).toBeVisible();
+    expect(
+      within(playerHistoryEl!).getByText('Sorry for the inconvenience', {
+        exact: false,
+      }),
     ).toBeVisible();
   });
 });

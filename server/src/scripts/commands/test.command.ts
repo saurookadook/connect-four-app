@@ -14,19 +14,19 @@ export class TestCommand extends CommandRunner {
   }
 
   async run(): Promise<void> {
-    logger.log('Executing test command...');
+    logger.debug('Executing test command...');
 
     await new Promise((resolve) => {
       const between1And3Milliseconds = Math.floor(Math.random() * 3 * 1000);
       setTimeout(() => {
-        logger.log(
+        logger.debug(
           `---- Resolved after ${between1And3Milliseconds} milliseconds`,
         );
         resolve(between1And3Milliseconds);
       }, between1And3Milliseconds);
     });
 
-    logger.log('Test command completed successfully!');
+    logger.debug('Test command completed successfully!');
     process.exitCode = 0;
   }
 }

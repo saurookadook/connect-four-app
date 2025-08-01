@@ -1,4 +1,4 @@
-import { waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { expect } from 'vitest';
 
 import { PlayerColor, type GameBoard, type PlayerID } from '@connect-four-app/shared';
@@ -95,6 +95,8 @@ export async function expectGameBoardToBeVisibleAndCorrect({
     gameBoardContainerEl = getGameBoardContainer(containerRef);
     expect(gameBoardContainerEl).not.toBeNull();
     expect(gameBoardContainerEl).not.toBeEmptyDOMElement();
+
+    expect(gameBoardContainerEl.querySelectorAll('.cell').length).toBeGreaterThan(0);
   });
 
   boardCells.forEach((column, i) => {

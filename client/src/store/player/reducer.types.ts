@@ -1,4 +1,4 @@
-import CombineReducers from '#saurookkadookk/react-utils-combine-reducers';
+import CombineReducers from '@saurookkadookk/react-utils-combine-reducers';
 
 import { type Nullable, type PlayerID } from '@connect-four-app/shared';
 

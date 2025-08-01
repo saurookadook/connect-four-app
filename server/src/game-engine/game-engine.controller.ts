@@ -1,12 +1,10 @@
-import { UUID } from 'crypto';
-import * as uuid from 'uuid';
-import { Body, Controller, Get, Query, Param, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { CreateGameSessionDTO } from './dtos/game-session.dto';
 import { GameSessionsService } from './sessions/game-sessions.service';
 import { GameEngineService } from './game-engine.service';
 
-@Controller('games')
+@Controller('game-engine')
 export class GameEngineController {
   constructor(
     private readonly gameEngineService: GameEngineService,

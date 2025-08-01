@@ -42,7 +42,7 @@
             }
 
             &:nth-child(2n - 1) {
-                background: #ffffff;
+                background: var(--white);
             }
         }
     }

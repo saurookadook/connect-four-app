@@ -8,33 +8,29 @@ import {
   SET_GAME_SESSION_ID,
   UPDATE_GAME_STATE,
 } from '@/store';
-import type { BaseAction, BoundThis } from '@/types/main';
+import type { BaseAction } from '@/types/main';
 import { safeFetch } from '@/utils/safeFetch';
 import { GameSessionStateSlice } from './reducer.types';
 
-async function $fetchGameSession(
-  this: BoundThis,
-  {
-    dispatch, // force formatting
-    gameSessionID,
-  }: BaseAction & { gameSessionID: string },
-) {
+export async function fetchGameSession({
+  dispatch, // force formatting
+  gameSessionID,
+}: BaseAction & { gameSessionID: string }) {
   dispatch({ type: REQUEST_GAME_SESSION });
 
-  const responseData = await safeFetch.call(this, {
-    requestPathname: `/api/game-sessions/${gameSessionID}`,
-    fetchOpts: { method: 'GET' },
-  });
+  const responseData = await safeFetch.call(
+    { name: fetchGameSession.name },
+    {
+      requestPathname: `/api/game-sessions/${gameSessionID}`,
+      fetchOpts: { method: 'GET' },
+    },
+  );
 
   return setGameSession({
     dispatch,
     gameSession: responseData.session || {},
   });
 }
-
-export const fetchGameSession = $fetchGameSession.bind({
-  name: $fetchGameSession.name,
-});
 
 export function resetGame({
   dispatch, // force formatting
