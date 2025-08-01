@@ -4,16 +4,19 @@ import {
   SET_ALL_GAME_SESSIONS,
   SET_GAME_SESSIONS_HISTORY,
 } from '@/store';
-import type { BaseAction, BoundThis, GameSessionsItem } from '@/types/main';
+import type { BaseAction, GameSessionsItem } from '@/types/main';
 import { safeFetch } from '@/utils/safeFetch';
 
-async function $fetchAllGameSessions(this: BoundThis, { dispatch }: BaseAction) {
+export async function fetchAllGameSessions({ dispatch }: BaseAction) {
   dispatch({ type: REQUEST_ALL_GAME_SESSIONS });
 
-  const responseData = await safeFetch.call(this, {
-    requestPathname: '/api/game-sessions/all',
-    fetchOpts: { method: 'GET' },
-  });
+  const responseData = await safeFetch.call(
+    { name: fetchAllGameSessions.name },
+    {
+      requestPathname: '/api/game-sessions/all',
+      fetchOpts: { method: 'GET' },
+    },
+  );
 
   return setAllGameSessions({
     dispatch,
@@ -23,23 +26,21 @@ async function $fetchAllGameSessions(this: BoundThis, { dispatch }: BaseAction) 
   });
 }
 
-export const fetchAllGameSessions = $fetchAllGameSessions.bind({
-  name: $fetchAllGameSessions.name,
-});
-
-async function $fetchGameSessionsHistory(
-  this: BoundThis,
-  {
-    dispatch, // force formatting
-    playerID,
-  }: BaseAction & { playerID: string | null },
-) {
+export async function fetchGameSessionsHistory({
+  dispatch, // force formatting
+  playerID,
+}: BaseAction & { playerID: string | null }) {
   dispatch({ type: REQUEST_GAME_SESSIONS_HISTORY });
 
-  const responseData = await safeFetch.call(this, {
-    requestPathname: `/api/game-sessions/history/${playerID}`, // force formatting
-    fetchOpts: { method: 'GET' },
-  });
+  const responseData = await safeFetch.call(
+    {
+      name: fetchGameSessionsHistory.name,
+    },
+    {
+      requestPathname: `/api/game-sessions/history/${playerID}`, // force formatting
+      fetchOpts: { method: 'GET' },
+    },
+  );
 
   return setGameSessionsHistory({
     dispatch,
@@ -48,10 +49,6 @@ async function $fetchGameSessionsHistory(
     },
   });
 }
-
-export const fetchGameSessionsHistory = $fetchGameSessionsHistory.bind({
-  name: $fetchGameSessionsHistory.name,
-});
 
 type AllGameSessions = {
   gameSessions: {

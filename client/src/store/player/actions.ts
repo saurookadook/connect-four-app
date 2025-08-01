@@ -136,23 +136,25 @@ export async function logInPlayer({
   });
 }
 
-async function $logOutPlayer(
-  this: BoundThis,
-  {
-    dispatch, // force formatting
-    playerID,
-  }: BaseAction & { playerID: PlayerID },
-) {
-  const responseData = await safeFetch.call(this, {
-    requestPathname: `/api/auth/logout/${playerID}`,
-    fetchOpts: {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        credentials: 'include',
+export async function logOutPlayer({
+  dispatch, // force formatting
+  playerID,
+}: BaseAction & { playerID: PlayerID }) {
+  const responseData = await safeFetch.call(
+    {
+      name: logOutPlayer.name,
+    },
+    {
+      requestPathname: `/api/auth/logout/${playerID}`,
+      fetchOpts: {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          credentials: 'include',
+        },
       },
     },
-  });
+  );
 
   logger.debug(`[${logOutPlayer.name}] responseData:`, {
     responseData,
@@ -168,10 +170,6 @@ async function $logOutPlayer(
     dispatch,
   });
 }
-
-export const logOutPlayer = $logOutPlayer.bind({
-  name: $logOutPlayer.name,
-});
 
 export function setPlayerID({
   dispatch, // force formatting
