@@ -1,4 +1,5 @@
 import { useEffect, type MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
@@ -10,6 +11,7 @@ import './styles.css';
 const logger = sharedLog.getLogger(Matchmaking.name);
 
 export function Matchmaking() {
+  const navigate = useNavigate();
   const { appState, appDispatch } = useAppStore();
   const { matchmaking, player } = appState;
 
@@ -36,6 +38,20 @@ export function Matchmaking() {
       `[${Matchmaking.name}.${handleOnStartGameClick.name}] playerTwoID: '${playerTwoID}' \n`,
     );
     console.dir(event);
+
+    return makeStartGameRequest({
+      dispatch: appDispatch,
+      playerOneID: player.playerID as PlayerID,
+      playerTwoID: playerTwoID,
+    })
+      .then((result) => {
+        // TODO: need to fix backend response
+        return navigate(`/game-session/${result.gameSession._id}`);
+      })
+      .catch((error) => {
+        logger.error(error.message, error);
+        window.alert('Unable to start your game! ☹️');
+      });
   }
 
   return (

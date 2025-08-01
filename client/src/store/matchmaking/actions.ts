@@ -1,4 +1,5 @@
 import { safeParseJSON, sharedLog, type PlayerID } from '@connect-four-app/shared';
+import { startGame } from '@/store/actions';
 import { REQUEST_PLAYERS_DATA, SET_PLAYERS_DATA } from '@/store';
 import type { BaseAction, BoundThis, MatchmakingPlayersData } from '@/types/main';
 import { safeFetch } from '@/utils';
@@ -58,11 +59,33 @@ export async function makeStartGameRequest({
     },
   );
 
+  logger.setLevel('debug');
   logger.debug(`[${fnName}] responseData`, {
     responseData,
   });
 
-  // TODO: update state...? something else?
+  if (responseData.boardState == null || responseData.gameSession == null) {
+    throw new Error(
+      `[${makeStartGameRequest.name}] Received malformed response:\n${JSON.stringify(responseData, null, 4)}`,
+    );
+  }
+
+  startGame({
+    dispatch,
+    // @ts-expect-error: TEMP
+    gameSessionData: {
+      gameSessionID: responseData.gameSession.id,
+      boardCells: responseData.boardState.cells,
+      moves: [],
+      playerOneID: playerOneID,
+      playerTwoID: playerTwoID,
+    },
+  });
+
+  return {
+    boardState: responseData.boardState,
+    gameSession: responseData.gameSession,
+  };
 }
 
 export function setPlayersData({

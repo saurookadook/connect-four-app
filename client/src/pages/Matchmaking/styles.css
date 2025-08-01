@@ -11,6 +11,7 @@
     & .flex-row {
         background: var(--butterfly-blue-fill-0\.5);
         color: var(--initial-text-color);
+        column-gap: 10rem;
         box-sizing: border-box;
         flex-grow: 1;
         flex-shrink: 0;
