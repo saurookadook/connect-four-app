@@ -4,7 +4,7 @@ import { CreateGameSessionDTO } from './dtos/game-session.dto';
 import { GameSessionsService } from './sessions/game-sessions.service';
 import { GameEngineService } from './game-engine.service';
 
-@Controller('games')
+@Controller('game-engine')
 export class GameEngineController {
   constructor(
     private readonly gameEngineService: GameEngineService,
