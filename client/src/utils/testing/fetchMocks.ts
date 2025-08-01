@@ -1,11 +1,12 @@
 /* eslint-disable no-case-declarations */
 import { vi } from 'vitest';
 
-import { sharedLog } from '@connect-four-app/shared';
+import { GameSessionStatus, sharedLog } from '@connect-four-app/shared';
 import { allGameSessionsMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { BASE_API_SERVER_URL } from '@/constants';
 import type { MatchmakingPlayersData } from '@/types/main';
+import { createEmptyBoard } from '@/pages/GameSession/utils';
 
 const logger = sharedLog.getLogger('fetchMocks');
 
@@ -91,6 +92,7 @@ function handleGetRequest(url: string, options: RequestInit) {
 }
 
 function handlePostRequest(url: string, options: RequestInit) {
+  const urlObj = new URL(url);
   const jsonBody =
     typeof options.body === 'string' // force formatting
       ? JSON.parse(options.body)
@@ -99,8 +101,8 @@ function handlePostRequest(url: string, options: RequestInit) {
   let responseData;
   let playerDetails;
 
-  switch (url) {
-    case `${BASE_API_SERVER_URL}/api/auth/register`:
+  switch (urlObj.pathname) {
+    case `/api/auth/register`:
       playerDetails = findPlayerByUsernameAndPassword(
         jsonBody.username,
         jsonBody.password,
@@ -118,7 +120,7 @@ function handlePostRequest(url: string, options: RequestInit) {
         };
       }
       break;
-    case `${BASE_API_SERVER_URL}/api/auth/login`:
+    case `/api/auth/login`:
       playerDetails = findPlayerByUsernameAndPassword(
         jsonBody.username,
         jsonBody.password,
@@ -135,6 +137,21 @@ function handlePostRequest(url: string, options: RequestInit) {
           statusCode: 401,
         };
       }
+      break;
+    case `/api/game-engine/start`:
+      responseData = {
+        boardState: {
+          cells: createEmptyBoard(),
+        },
+        gameSession: {
+          _id: '688cad4b94ed98d6a67b5b13',
+          moves: [],
+          playerOneID: jsonBody.playerOneID,
+          playerTwoID: jsonBody.playerTwoID,
+          status: GameSessionStatus.ACTIVE,
+          winner: null,
+        },
+      };
       break;
     default:
       responseData = {
