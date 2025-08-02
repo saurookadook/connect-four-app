@@ -24,17 +24,6 @@ Global
   --initial-bg-color: #242424;
   --initial-text-color: rgba(255, 255, 255, 0.87);
 
-  background-color: var(--initial-bg-color);
-  color-scheme: light dark;
-  color: var(--initial-text-color);
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-synthesis: none;
-  font-weight: 400;
-  line-height: 1.5;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   --black: #000000;
   --white: #FFFFFF;
 
@@ -52,6 +41,8 @@ Global
   --black-fill-0\.5: rgb(0 0 0 / 0.5);
 
   --light-gray-edge: rgb(238 238 238 / 0.75);
+  --light-gray-bg: #eeeaea;
+  --light-gray-bg-0\.5: rgb(238 234 234 / 0.75);
 
   --error: #dc3545;
   --warning: #ffc107;
@@ -59,6 +50,17 @@ Global
   --success: #198754;
   /* --error: #ff0033; */
   /* --success: #22bb33; */
+
+  background-color: var(--initial-bg-color);
+  color-scheme: light dark;
+  color: var(--initial-text-color);
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
