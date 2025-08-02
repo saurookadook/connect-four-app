@@ -3,14 +3,14 @@ import { useReducer } from 'react';
 
 import { deeplyMerge } from '@connect-four-app/shared';
 import { AppStateContext, AppDispatchContext } from '@/store/contexts';
-import combinedReducer, { AppState, initialAppState } from '@/store/reducer';
+import combinedReducer, { initialAppState, type AppState } from '@/store/reducer';
 
 export function AppStateProvider({
   children,
   initialState = initialAppState,
 }: {
   children: React.ReactElement;
-  initialState?: AppState;
+  initialState?: Partial<AppState>;
 }) {
   const [combinedReducerFunc, combinedInitialState] = combinedReducer;
 
