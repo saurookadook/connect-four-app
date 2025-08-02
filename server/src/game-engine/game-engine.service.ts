@@ -107,6 +107,18 @@ export class GameEngineService {
 
     const logicSession = this._handleMoveLogic(gameSession, playerMove);
 
+    logger.debug(
+      `[${this.handlePlayerMove.name} method] BEFORE updating documents \n`,
+      {
+        activePlayer: logicSession.activePlayer,
+        boardCells: logicSession.board.gameBoardState,
+        playerMovePlayerID: playerMove.playerID,
+        logicSessionStatus: logicSession.status,
+        status: gameSession.status,
+        winner: gameSession.winner,
+      },
+    );
+
     try {
       boardState = (await this.boardStatesService.updateOne(
         boardState._id.toJSON(),
@@ -130,7 +142,7 @@ export class GameEngineService {
         status: logicSession.status,
         winner:
           logicSession.status === GameSessionStatus.COMPLETED
-            ? logicSession.activePlayer
+            ? playerMove.playerID
             : null,
         updatedAt: new Date(playerMove.timestamp),
       };
@@ -145,6 +157,17 @@ export class GameEngineService {
         { cause: error },
       );
     }
+
+    logger.debug(
+      `[${this.handlePlayerMove.name} method] AFTER updating documents \n`,
+      {
+        activePlayer: logicSession.activePlayer,
+        boardCells: boardState.cells,
+        playerMovePlayerID: playerMove.playerID,
+        status: gameSession.status,
+        winner: gameSession.winner,
+      },
+    );
 
     return {
       boardState,
