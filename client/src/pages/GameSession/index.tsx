@@ -11,7 +11,7 @@ import {
 } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn, FlexRow } from '@/layouts';
-import { Board, DebuggingPanel } from '@/pages/GameSession/components';
+import { Board, DebuggingPanel, PlayerMoveLog } from '@/pages/GameSession/components';
 import { useLoadGame } from '@/pages/GameSession/utils/hooks';
 import { startGame, updateGameState } from '@/store/actions';
 import { useAppStore } from '@/store';
@@ -133,6 +133,8 @@ export function GameSession() {
               );
             })}
           </dl>
+
+          <PlayerMoveLog />
         </FlexColumn>
 
         <FlexColumn id="game-board-container">
