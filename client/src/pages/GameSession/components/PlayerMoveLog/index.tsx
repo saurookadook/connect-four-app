@@ -8,6 +8,7 @@ import {
 import { type PlayerMove } from '@connect-four-app/shared';
 import { FlexRow } from '@/layouts';
 import { useAppStore } from '@/store';
+import './styles.css';
 
 const columnHelper = createColumnHelper<PlayerMove>();
 
@@ -38,11 +39,14 @@ export function PlayerMoveLog({ ...props }) {
         <thead>
           {movesTable.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th key={header.id}>
-                  {header.isPlaceholder
+              {headerGroup.headers.map((headerData) => (
+                <th key={headerData.id}>
+                  {headerData.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : flexRender(
+                        headerData.column.columnDef.header, // force formatting
+                        headerData.getContext(),
+                      )}
                 </th>
               ))}
             </tr>
@@ -54,7 +58,10 @@ export function PlayerMoveLog({ ...props }) {
             <tr key={row.id}>
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  {flexRender(
+                    cell.column.columnDef.cell, // force formatting
+                    cell.getContext(),
+                  )}
                 </td>
               ))}
             </tr>

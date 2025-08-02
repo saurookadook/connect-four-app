@@ -11,6 +11,8 @@ dl {
     }
 
     & dd {
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
         margin-bottom: 0.25rem;
     }
 }
