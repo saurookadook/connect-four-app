@@ -93,7 +93,10 @@ function createSendGameSessionData({
   startGameData, // force formatting
 }: {
   startGameData: StartGameEventData;
-}): SendGameSessionMessageEvent {
+}): SendGameSessionMessageEvent<{
+  playerOneUsername?: string;
+  playerTwoUsername?: string;
+}> {
   const { gameSessionID, playerOneID, playerTwoID } = startGameData;
 
   const mockGameSession = findGameSessionMockForPlayers({
@@ -116,7 +119,9 @@ function createSendGameSessionData({
       boardCells: emptyBoard,
       moves: mockGameSession.moves,
       playerOneID: mockGameSession.playerOneID,
+      playerOneUsername: mockGameSession.playerOneUsername,
       playerTwoID: mockGameSession.playerTwoID,
+      playerTwoUsername: mockGameSession.playerTwoUsername,
       status: mockGameSession.status,
       winner: null,
     },
@@ -127,7 +132,10 @@ function createSendMoveData({
   playerMoveData, // force formatting
 }: {
   playerMoveData: PlayerMove;
-}): SendMoveMessageEvent {
+}): SendMoveMessageEvent<{
+  playerOneUsername?: string;
+  playerTwoUsername?: string;
+}> {
   const { gameSessionID, playerID } = playerMoveData;
 
   const mockGameSession = findGameSessionMock({
@@ -149,7 +157,9 @@ function createSendMoveData({
       boardCells: emptyBoard,
       moves: [...mockGameSession.moves, playerMoveData],
       playerOneID: mockGameSession.playerOneID,
+      playerOneUsername: mockGameSession.playerOneUsername,
       playerTwoID: mockGameSession.playerTwoID,
+      playerTwoUsername: mockGameSession.playerTwoUsername,
       status: mockGameSession.status,
       // TODO: should assign winner for winning move
       winner: null,
