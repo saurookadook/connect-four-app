@@ -18,6 +18,7 @@ import {
   NullableGameSessionDocument,
 } from '@/game-engine/schemas';
 import { PlayersService } from '@/players/players.service';
+import { PlayerDocument } from '@/players/schemas/player.schema';
 
 @Injectable()
 export class GameSessionsService {
@@ -30,16 +31,23 @@ export class GameSessionsService {
   async createOne(
     gameSession: CreateGameSessionDTO,
   ): Promise<GameSessionDocument> {
-    await this._validatePlayers({
+    const { playerOne, playerTwo } = await this._validatePlayers({
       playerOneID: gameSession.playerOneID,
       playerTwoID: gameSession.playerTwoID,
     });
-    const createdGameSession = new this.gameSessionModel(gameSession);
+    const createdGameSession = new this.gameSessionModel({
+      ...gameSession,
+      playerOne: playerOne._id,
+      playerTwo: playerTwo._id,
+    });
     return createdGameSession.save();
   }
 
   async findOneById(id: string): Promise<NullableGameSessionDocument> {
-    const foundGameSession = await this.gameSessionModel.findById(id).exec();
+    const foundGameSession = await this.gameSessionModel
+      .findById(id)
+      .populate(['playerOne', 'playerTwo'], 'playerID username')
+      .exec();
 
     return foundGameSession;
   }
@@ -47,6 +55,15 @@ export class GameSessionsService {
   async findAll(): Promise<GameSessionDocument[]> {
     const foundGameSessions = await this.gameSessionModel
       .find({})
+      .sort({ updatedAt: -1 });
+
+    return foundGameSessions;
+  }
+
+  async findAllPopulated(): Promise<GameSessionDocument[]> {
+    const foundGameSessions = await this.gameSessionModel
+      .find({})
+      .populate(['playerOne', 'playerTwo'], 'playerID username')
       .sort({ updatedAt: -1 });
 
     return foundGameSessions;
@@ -65,6 +82,7 @@ export class GameSessionsService {
       .find({
         $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
       })
+      .populate(['playerOne', 'playerTwo'], 'playerID username')
       .exec();
   }
 
@@ -84,6 +102,7 @@ export class GameSessionsService {
         },
         { new: true },
       )
+      .populate(['playerOne', 'playerTwo'], 'playerID username')
       .exec();
 
     return updatedGameSession;
@@ -103,29 +122,32 @@ export class GameSessionsService {
   }: {
     playerOneID: PlayerID;
     playerTwoID: PlayerID;
-  }): Promise<void> {
+  }): Promise<{ playerOne: PlayerDocument; playerTwo: PlayerDocument }> {
     if (playerOneID === playerTwoID) {
       throw new BadRequestException(
         '[GameSessionsService._validatePlayers] : Player IDs must be different.',
       );
     }
 
-    const playerOneExists =
-      await this.playersService.findOneByPlayerID(playerOneID);
+    const playerOne = await this.playersService.findOneByPlayerID(playerOneID);
 
-    if (!playerOneExists) {
+    if (!playerOne) {
       throw new UnauthorizedException(
         `[GameSessionsService._validatePlayers] : Player One with ID '${playerOneID}' does not exist.`,
       );
     }
 
-    const playerTwoExists =
-      await this.playersService.findOneByPlayerID(playerTwoID);
+    const playerTwo = await this.playersService.findOneByPlayerID(playerTwoID);
 
-    if (!playerTwoExists) {
+    if (!playerTwo) {
       throw new UnauthorizedException(
         `[GameSessionsService._validatePlayers] : Player Two with ID '${playerTwoID}' does not exist.`,
       );
     }
+
+    return {
+      playerOne,
+      playerTwo,
+    };
   }
 }

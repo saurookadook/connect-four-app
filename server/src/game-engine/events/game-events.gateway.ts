@@ -20,6 +20,8 @@ import {
   sharedLog,
   type PlayerID,
   type PlayerMove,
+  type SendGameSessionMessageEvent,
+  type SendMoveMessageEvent,
 } from '@connect-four-app/shared';
 import { GameEngineService } from '../game-engine.service';
 
@@ -99,21 +101,23 @@ export class GameEventsGateway implements OnGatewayConnection {
       gameSession.id,
     ) as GameSessionMap;
 
+    const sendGameSessionMessageEvent: SendGameSessionMessageEvent = {
+      event: SEND_GAME_SESSION,
+      data: {
+        id: gameSession.id,
+        boardCells: boardState.cells,
+        moves: gameSession.moves,
+        playerOneID: gameSession.playerOne.playerID,
+        playerOneUsername: gameSession.playerOne.username,
+        playerTwoID: gameSession.playerTwo.playerID,
+        playerTwoUsername: gameSession.playerTwo.username,
+        status: gameSession.status,
+        winner: gameSession.winner,
+      },
+    };
+
     activeGame.forEach((client) => {
-      client.send(
-        JSON.stringify({
-          event: SEND_GAME_SESSION,
-          data: {
-            id: gameSession.id,
-            boardCells: boardState.cells,
-            moves: gameSession.moves,
-            playerOneID: gameSession.playerOneID,
-            playerTwoID: gameSession.playerTwoID,
-            status: gameSession.status,
-            winner: gameSession.winner,
-          },
-        }),
-      );
+      client.send(JSON.stringify(sendGameSessionMessageEvent));
     });
   }
 
@@ -137,22 +141,23 @@ export class GameEventsGateway implements OnGatewayConnection {
     const activeGame = this.#activeGamesMap.get(
       gameSession.id,
     ) as GameSessionMap;
+    const sendMoveMessageEvent: SendMoveMessageEvent = {
+      event: SEND_MOVE,
+      data: {
+        id: gameSession.id,
+        boardCells: boardState.cells,
+        moves: gameSession.moves,
+        playerOneID: gameSession.playerOne.playerID,
+        playerOneUsername: gameSession.playerOne.username,
+        playerTwoID: gameSession.playerTwo.playerID,
+        playerTwoUsername: gameSession.playerTwo.username,
+        status: gameSession.status,
+        winner: gameSession.winner,
+      },
+    };
 
     activeGame.forEach((client) => {
-      client.send(
-        JSON.stringify({
-          event: SEND_MOVE,
-          data: {
-            id: gameSession.id,
-            boardCells: boardState.cells,
-            moves: gameSession.moves,
-            playerOneID: gameSession.playerOneID,
-            playerTwoID: gameSession.playerTwoID,
-            status: gameSession.status,
-            winner: gameSession.winner,
-          },
-        }),
-      );
+      client.send(JSON.stringify(sendMoveMessageEvent));
     });
   }
 

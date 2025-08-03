@@ -5,6 +5,7 @@ import { Connection, Model } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
+import { type PlayerID } from '@connect-four-app/shared';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
@@ -27,6 +28,13 @@ import { GameSessionsService } from './game-sessions.service';
 
 describe('GameSessionsController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
+  const playerDetailsMap = mockPlayers.reduce(
+    (acc, cur) => {
+      acc[cur.playerID] = { playerID: cur.playerID, username: cur.username };
+      return acc;
+    },
+    {} as Record<PlayerID, { playerID: PlayerID; username: string }>,
+  );
 
   let app: INestApplication<App>;
   let mongoConnection: Connection;
@@ -96,7 +104,9 @@ describe('GameSessionsController', () => {
             resultBody.session,
             createNewGameSessionMock({
               playerOneID: mockFirstPlayer.playerID,
+              playerOneUsername: mockFirstPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
           expect(result.status).toBe(201);
@@ -194,14 +204,22 @@ describe('GameSessionsController', () => {
           expect(resultBody.sessions).toHaveLength(3);
 
           resultBody.sessions.forEach((foundGameSession, index) => {
-            const gameSessionAtInverseIndex = gameSessions.at(index);
+            const gameSessionAtInverseIndex = gameSessions.at(
+              index,
+            ) as GameSessionDocument;
+            const playerOneDetails =
+              playerDetailsMap[gameSessionAtInverseIndex.playerOneID];
+            const playerTwoDetails =
+              playerDetailsMap[gameSessionAtInverseIndex.playerTwoID];
 
             expectSerializedDocumentToMatch(
               foundGameSession,
               createNewGameSessionMock({
-                id: gameSessionAtInverseIndex!._id.toString(),
-                playerOneID: gameSessionAtInverseIndex!.playerOneID,
-                playerTwoID: gameSessionAtInverseIndex!.playerTwoID,
+                id: gameSessionAtInverseIndex._id.toString(),
+                playerOneID: playerOneDetails.playerID,
+                playerOneUsername: playerOneDetails.username,
+                playerTwoID: playerTwoDetails.playerID,
+                playerTwoUsername: playerTwoDetails.username,
               }),
             );
           });
@@ -227,7 +245,9 @@ describe('GameSessionsController', () => {
             session,
             createNewGameSessionMock({
               playerOneID: mockFirstPlayer.playerID,
+              playerOneUsername: mockFirstPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
 
@@ -287,14 +307,18 @@ describe('GameSessionsController', () => {
             firstSession,
             createNewGameSessionMock({
               playerOneID: mockFirstPlayer.playerID,
+              playerOneUsername: mockFirstPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
           expectSerializedDocumentToMatch<GameSession>(
             secondSession,
             createNewGameSessionMock({
               playerOneID: mockSecondPlayer.playerID,
+              playerOneUsername: mockSecondPlayer.username,
               playerTwoID: mockFirstPlayer.playerID,
+              playerTwoUsername: mockFirstPlayer.username,
             }),
           );
 
@@ -316,21 +340,27 @@ describe('GameSessionsController', () => {
             firstSession,
             createNewGameSessionMock({
               playerOneID: mockFirstPlayer.playerID,
+              playerOneUsername: mockFirstPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
           expectSerializedDocumentToMatch<GameSession>(
             secondSession,
             createNewGameSessionMock({
               playerOneID: mockSecondPlayer.playerID,
+              playerOneUsername: mockSecondPlayer.username,
               playerTwoID: mockFirstPlayer.playerID,
+              playerTwoUsername: mockFirstPlayer.username,
             }),
           );
           expectSerializedDocumentToMatch<GameSession>(
             thirdSession,
             createNewGameSessionMock({
               playerOneID: mockThirdPlayer.playerID,
+              playerOneUsername: mockThirdPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
 
@@ -349,7 +379,9 @@ describe('GameSessionsController', () => {
             resultBody.sessions[0],
             createNewGameSessionMock({
               playerOneID: mockThirdPlayer.playerID,
+              playerOneUsername: mockThirdPlayer.username,
               playerTwoID: mockSecondPlayer.playerID,
+              playerTwoUsername: mockSecondPlayer.username,
             }),
           );
 

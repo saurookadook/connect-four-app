@@ -40,12 +40,16 @@ export async function expectGameDetailsToBeVisibleAndCorrect({
   containerRef,
   activePlayerID,
   playerOneID,
+  playerOneUsername,
   playerTwoID,
+  playerTwoUsername,
 }: {
   containerRef: HTMLElement;
   activePlayerID: PlayerID;
   playerOneID: PlayerID;
+  playerOneUsername: string;
   playerTwoID: PlayerID;
+  playerTwoUsername: string;
 }) {
   let gameDetailsEl: HTMLElement;
 
@@ -66,14 +70,22 @@ export async function expectGameDetailsToBeVisibleAndCorrect({
   });
 
   [playerOneID, playerTwoID].forEach((playerID, index) => {
-    const suffix =
-      index === 0 ? `One (${PlayerColor.RED})` : `Two (${PlayerColor.BLACK})`;
+    const details =
+      index === 0
+        ? {
+            suffix: `One (${PlayerColor.RED})`,
+            username: playerOneUsername,
+          }
+        : {
+            suffix: `Two (${PlayerColor.BLACK})`,
+            username: playerTwoUsername,
+          };
 
     expect(gameDetailsEl.querySelector(`dl dt.data-item-${index}`)).toHaveTextContent(
-      `Player ${suffix}`,
+      `Player ${details.suffix}`,
     );
     expect(gameDetailsEl.querySelector(`dl dd.data-item-${index}`)).toHaveTextContent(
-      playerID,
+      details.username,
     );
   });
 }

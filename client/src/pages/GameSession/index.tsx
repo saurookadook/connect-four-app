@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -31,11 +31,21 @@ export function GameSession() {
       gameSessionID,
       activePlayer,
       playerOneID,
+      playerOneUsername,
       playerTwoID,
+      playerTwoUsername,
       winner,
     },
     player: { playerID },
   } = appState;
+
+  const winnerUsername = useMemo(() => {
+    if (winner == null) {
+      return null;
+    }
+
+    return winner === playerOneID ? playerOneUsername : playerTwoUsername;
+  }, [playerOneID, playerOneUsername, playerTwoUsername, winner]);
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
@@ -103,7 +113,7 @@ export function GameSession() {
     <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four: Current Game 🔴 ⚫`}</h2>
 
-      {winner != null && <h3>{`🏆🏆🏆 Winner: '${winner}' 🏆🏆🏆`}</h3>}
+      {winnerUsername != null && <h3>{`🏆🏆🏆 Winner: '${winnerUsername}' 🏆🏆🏆`}</h3>}
 
       <DebuggingPanel // force formatting
         gameSessionID={gameSessionID}
@@ -120,14 +130,24 @@ export function GameSession() {
               <b>Players</b>
             </span>
             {[playerOneID, playerTwoID].map((playerID, index) => {
-              const suffix =
-                index === 0 ? `One (${PlayerColor.RED})` : `Two (${PlayerColor.BLACK})`;
+              const details =
+                playerID === playerOneID
+                  ? {
+                      suffix: `One (${PlayerColor.RED})`,
+                      username: playerOneUsername,
+                    }
+                  : {
+                      suffix: `Two (${PlayerColor.BLACK})`,
+                      username: playerTwoUsername,
+                    };
 
               return (
                 playerID != null && (
                   <Fragment key={playerID}>
-                    <dt className={`data-item-${index}`}>{`Player ${suffix}`}</dt>
-                    <dd className={`data-item-${index}`}>{playerID}</dd>
+                    <dt
+                      className={`data-item-${index}`}
+                    >{`Player ${details.suffix}`}</dt>
+                    <dd className={`data-item-${index}`}>{details.username}</dd>
                   </Fragment>
                 )
               );

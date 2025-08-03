@@ -42,12 +42,9 @@ import {
   WithMemoryRouter,
 } from '@/utils/testing';
 
-const testPlayerOneID = mockFirstPlayer.playerID;
-const testPlayerTwoID = mockSecondPlayer.playerID;
-
 const mockGameSession = findGameSessionMockForPlayers({
-  playerOneID: testPlayerOneID,
-  playerTwoID: testPlayerTwoID,
+  playerOneID: mockFirstPlayer.playerID,
+  playerTwoID: mockSecondPlayer.playerID,
 }) as GameSessionMock;
 const emptyBoard = createEmptyBoard();
 
@@ -100,14 +97,16 @@ describe('GameSession', () => {
       containerRef: container,
       activePlayerID: mockGameSession.playerOneID,
       playerOneID: mockGameSession.playerOneID,
+      playerOneUsername: mockGameSession.playerOneUsername,
       playerTwoID: mockGameSession.playerTwoID,
+      playerTwoUsername: mockGameSession.playerTwoUsername,
     });
 
     await expectGameBoardToBeVisibleAndCorrect({
       containerRef: container,
       boardCells: emptyBoard,
-      playerOneID: testPlayerOneID,
-      playerTwoID: testPlayerTwoID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
   });
 
@@ -134,8 +133,8 @@ describe('GameSession', () => {
       };
     });
     let logicSession = new GameLogicEngine().startGame({
-      playerOneID: testPlayerOneID,
-      playerTwoID: testPlayerTwoID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
     logicSession = populateBoardWithMoves({
       logicSessionRef: logicSession,
@@ -154,13 +153,15 @@ describe('GameSession', () => {
             gameSessionID: mockGameSession.id,
             boardCells: testBoardCells,
             moves: testMoves,
-            playerOneID: testPlayerOneID,
-            playerTwoID: testPlayerTwoID,
+            playerOneID: mockFirstPlayer.playerID,
+            playerOneUsername: mockFirstPlayer.username,
+            playerTwoID: mockSecondPlayer.playerID,
+            playerTwoUsername: mockSecondPlayer.username,
             status: GameSessionStatus.ACTIVE,
             winner: null,
           },
           player: {
-            playerID: testPlayerTwoID,
+            playerID: mockSecondPlayer.playerID,
           },
         },
       },
@@ -174,11 +175,20 @@ describe('GameSession', () => {
 
     await expectGameSessionDetailsToBeVisibleAndCorrect({ containerRef: container });
 
+    await expectGameDetailsToBeVisibleAndCorrect({
+      containerRef: container,
+      activePlayerID: mockFirstPlayer.playerID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerOneUsername: mockFirstPlayer.username,
+      playerTwoID: mockSecondPlayer.playerID,
+      playerTwoUsername: mockSecondPlayer.username,
+    });
+
     await expectGameBoardToBeVisibleAndCorrect({
       containerRef: container,
       boardCells: testBoardCells,
-      playerOneID: testPlayerOneID,
-      playerTwoID: testPlayerTwoID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
 
     const firstCellFromFirstColumn = container.querySelector(
@@ -208,15 +218,15 @@ describe('GameSession', () => {
       };
     });
     let logicSession = new GameLogicEngine().startGame({
-      playerOneID: testPlayerOneID,
-      playerTwoID: testPlayerTwoID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
     logicSession = populateBoardWithMoves({
       logicSessionRef: logicSession,
       moves: moveTuples,
     });
 
-    const { gameBoardState: testBoardCells } = logicSession.board;
+    const { gameBoardState: testBoardCells, lastUpdatedCell } = logicSession.board;
     /* END TEST SETUP */
 
     const { container, user } = renderWithContext(
@@ -228,13 +238,15 @@ describe('GameSession', () => {
             gameSessionID: mockGameSession.id,
             boardCells: testBoardCells,
             moves: testMoves,
-            playerOneID: testPlayerOneID,
-            playerTwoID: testPlayerTwoID,
+            playerOneID: mockFirstPlayer.playerID,
+            playerOneUsername: mockFirstPlayer.username,
+            playerTwoID: mockSecondPlayer.playerID,
+            playerTwoUsername: mockSecondPlayer.username,
             status: GameSessionStatus.COMPLETED,
-            winner: testPlayerOneID,
+            winner: mockFirstPlayer.playerID,
           },
           player: {
-            playerID: testPlayerTwoID,
+            playerID: mockSecondPlayer.playerID,
           },
         },
       },
@@ -249,16 +261,23 @@ describe('GameSession', () => {
     await expectHeadingToBeVisible({
       screenRef: screen,
       level: 3,
-      name: new RegExp(`Winner: '${testPlayerOneID}'`),
+      name: new RegExp(`Winner: '${mockFirstPlayer.username}'`),
     });
 
-    await expectGameSessionDetailsToBeVisibleAndCorrect({ containerRef: container });
+    await expectGameDetailsToBeVisibleAndCorrect({
+      containerRef: container,
+      activePlayerID: mockFirstPlayer.playerID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerOneUsername: mockFirstPlayer.username,
+      playerTwoID: mockSecondPlayer.playerID,
+      playerTwoUsername: mockSecondPlayer.username,
+    });
 
     await expectGameBoardToBeVisibleAndCorrect({
       containerRef: container,
       boardCells: testBoardCells,
-      playerOneID: testPlayerOneID,
-      playerTwoID: testPlayerTwoID,
+      playerOneID: mockFirstPlayer.playerID,
+      playerTwoID: mockSecondPlayer.playerID,
     });
 
     const firstCellFromFirstColumn = container.querySelector(
@@ -268,7 +287,7 @@ describe('GameSession', () => {
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledExactlyOnceWith(
-        `Can't carry out move; the game has been won by '${testPlayerOneID}'.`,
+        `Can't carry out move; the game has been won by '${mockFirstPlayer.username}'.`,
       );
     });
   });

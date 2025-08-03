@@ -13,12 +13,26 @@ export type GameSessionMock = {
   id: string;
   moves: PlayerMove[];
   playerOneID: PlayerID;
+  playerOneUsername: string;
   playerTwoID: PlayerID;
+  playerTwoUsername: string;
   status: GameSessionStatus;
   winner: Nullable<PlayerID>;
 };
 
-const playerCombinations = [
+const playerDetailsByPlayerID = mockPlayers.reduce(
+  (acc, cur) => {
+    acc[cur.playerID] = {
+      playerID: cur.playerID,
+      username: cur.username,
+    };
+
+    return acc;
+  },
+  {} as Record<PlayerID, { playerID: PlayerID; username: string }>,
+);
+
+const playerCombinations: [PlayerID, PlayerID][] = [
   [mockPlayers[0].playerID, mockPlayers[1].playerID],
   [mockPlayers[0].playerID, mockPlayers[2].playerID],
   [mockPlayers[1].playerID, mockPlayers[0].playerID],
@@ -46,12 +60,23 @@ export function createMockGameSession({
     }
   })();
 
+  if (playerOneID == null || playerTwoID == null) {
+    throw new Error(
+      `[${createMockGameSession.name}] Cannot create mock game session without player IDs. (playerOneID: '${playerOneID}', playerTwoID: '${playerTwoID}')`,
+    );
+  }
+
+  const playerOneDetails = playerDetailsByPlayerID[playerOneID as PlayerID];
+  const playerTwoDetails = playerDetailsByPlayerID[playerTwoID as PlayerID];
+
   return {
     /** @todo This should be a MongoDB `ObjectId` */
     id: id ?? randomUUID(),
     moves: [],
-    playerOneID,
-    playerTwoID,
+    playerOneID: playerOneDetails.playerID,
+    playerOneUsername: playerOneDetails.username,
+    playerTwoID: playerTwoDetails.playerID,
+    playerTwoUsername: playerTwoDetails.username,
     status: GameSessionStatus.ACTIVE,
     ...args,
   };
@@ -59,11 +84,16 @@ export function createMockGameSession({
 
 export const unstartedGameSessionsMock: GameSessionMock[] = playerCombinations.map(
   ([playerOneID, playerTwoID]) => {
+    const playerOneDetails = playerDetailsByPlayerID[playerOneID as PlayerID];
+    const playerTwoDetails = playerDetailsByPlayerID[playerTwoID as PlayerID];
+
     return {
       id: randomUUID(), // TODO: should be Mongo `ObjectId`
       moves: [],
-      playerOneID,
-      playerTwoID,
+      playerOneID: playerOneDetails.playerID,
+      playerOneUsername: playerOneDetails.username,
+      playerTwoID: playerTwoDetails.playerID,
+      playerTwoUsername: playerTwoDetails.username,
       status: GameSessionStatus.ACTIVE,
       winner: null,
     };

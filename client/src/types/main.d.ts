@@ -13,7 +13,9 @@ export type GameSessionsItem = {
   id: string;
   status: GameSessionStatus;
   playerOneID: PlayerID;
+  playerOneUsername: string;
   playerTwoID: PlayerID;
+  playerTwoUsername: string;
 };
 
 export type AppParams = {

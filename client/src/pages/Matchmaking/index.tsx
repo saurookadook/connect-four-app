@@ -37,7 +37,7 @@ export function Matchmaking() {
     logger.debug(
       `[${Matchmaking.name}.${handleOnStartGameClick.name}] playerTwoID: '${playerTwoID}' \n`,
     );
-    console.dir(event);
+    logger.debug(event);
 
     return makeStartGameRequest({
       dispatch: appDispatch,

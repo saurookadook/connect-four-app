@@ -142,7 +142,7 @@ describe('GameEventsGateway', () => {
         mockGameSessionID,
       )) as GameSessionDocument;
       const testGameSessionID = testGameSessionDocument._id.toJSON();
-      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+      const { playerOne: testPlayerOne, playerTwo: testPlayerTwo } =
         testGameSessionDocument;
 
       const testBoardStateDocument =
@@ -153,7 +153,7 @@ describe('GameEventsGateway', () => {
       const firstMakeMoveEvent = {
         columnIndex: 1,
         gameSessionID: testGameSessionID,
-        playerID: testPlayerOneID,
+        playerID: testPlayerOne.playerID,
         timestamp: firstTimestamp,
       };
 
@@ -161,7 +161,7 @@ describe('GameEventsGateway', () => {
 
       let targetRowIndex = BOARD_ROWS - 1;
       let updatedCells = testBoardStateDocument.cells;
-      updatedCells[1][targetRowIndex].cellState = testPlayerOneID;
+      updatedCells[1][targetRowIndex].cellState = testPlayerOne.playerID;
 
       const firstSendMoveEvent = {
         event: SEND_MOVE,
@@ -172,8 +172,10 @@ describe('GameEventsGateway', () => {
             ...testGameSessionDocument.moves, // force formatting
             firstMakeMoveEvent,
           ],
-          playerOneID: testGameSessionDocument.playerOneID,
-          playerTwoID: testGameSessionDocument.playerTwoID,
+          playerOneID: testPlayerOne.playerID,
+          playerOneUsername: testPlayerOne.username,
+          playerTwoID: testPlayerTwo.playerID,
+          playerTwoUsername: testPlayerTwo.username,
           status: testGameSessionDocument.status,
           winner: null,
         },
@@ -190,7 +192,7 @@ describe('GameEventsGateway', () => {
 
       const secondMakeMoveEvent = {
         ...firstMakeMoveEvent,
-        playerID: testPlayerTwoID,
+        playerID: testPlayerTwo.playerID,
         timestamp: secondTimestamp,
       };
 
@@ -198,7 +200,7 @@ describe('GameEventsGateway', () => {
 
       targetRowIndex -= 1;
       updatedCells = testBoardStateDocument.cells;
-      updatedCells[1][targetRowIndex].cellState = testPlayerTwoID;
+      updatedCells[1][targetRowIndex].cellState = testPlayerTwo.playerID;
 
       const secondSendMoveEvent = {
         event: SEND_MOVE,
@@ -225,7 +227,6 @@ describe('GameEventsGateway', () => {
 
     it('should handle a winning move and broadcast results of updated data to appropriate clients', async () => {
       /* START TEST SETUP */
-      // TODO: populate board with winning state minus one move
       const moveTuples =
         moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
       const playerMovesFromTuples: PlayerMove[] = moveTuples.map(
@@ -247,12 +248,12 @@ describe('GameEventsGateway', () => {
         },
       )) as GameSessionDocument;
       const testGameSessionID = testGameSessionDocument._id.toJSON();
-      const { playerOneID: testPlayerOneID, playerTwoID: testPlayerTwoID } =
+      const { playerOne: testPlayerOne, playerTwo: testPlayerTwo } =
         testGameSessionDocument;
 
       let logicSession: LogicSession = new GameLogicEngine().startGame({
-        playerOneID: testPlayerOneID,
-        playerTwoID: testPlayerTwoID,
+        playerOneID: testPlayerOne.playerID,
+        playerTwoID: testPlayerTwo.playerID,
       });
       logicSession = populateBoardWithMoves({
         logicSessionRef: logicSession,
@@ -275,10 +276,10 @@ describe('GameEventsGateway', () => {
       const winningMove = {
         columnIndex: 0,
         gameSessionID: testGameSessionID,
-        playerID: testPlayerOneID,
+        playerID: testPlayerOne.playerID,
         timestamp: new Date(),
       };
-      expectedCells[colIndex][rowIndex].cellState = testPlayerOneID;
+      expectedCells[colIndex][rowIndex].cellState = testPlayerOne.playerID;
       const expectedMoves = [...testGameSessionDocument.moves, winningMove];
       /* END TEST SETUP */
 
@@ -290,20 +291,22 @@ describe('GameEventsGateway', () => {
           id: testGameSessionID,
           boardCells: expectedCells,
           moves: expectedMoves,
-          playerOneID: testPlayerOneID,
-          playerTwoID: testPlayerTwoID,
+          playerOneID: testPlayerOne.playerID,
+          playerOneUsername: testPlayerOne.username,
+          playerTwoID: testPlayerTwo.playerID,
+          playerTwoUsername: testPlayerTwo.username,
           status: GameSessionStatus.COMPLETED,
-          winner: testPlayerOneID,
+          winner: testPlayerOne.playerID,
         },
       };
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerOneID).send,
+        activeGameSession?.get(testPlayerOne.playerID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwo.playerID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(winningSendMoveEvent));
     });
   });

@@ -12,24 +12,27 @@ import './styles.css';
 
 const columnHelper = createColumnHelper<PlayerMove>();
 
-const columns = [
-  columnHelper.accessor('playerID', {
-    cell: (info) => info.getValue(),
-    header: 'Player ID',
-  }),
-  columnHelper.accessor('columnIndex', {
-    cell: (info) => info.getValue() + 1,
-    header: 'Column',
-  }),
-];
-
 export function PlayerMoveLog({ ...props }) {
   const { appState } = useAppStore();
-  const { moves } = appState.gameSession;
+  const { moves, playerOneID, playerOneUsername, playerTwoUsername } =
+    appState.gameSession;
 
   const movesTable = useReactTable({
     data: moves,
-    columns,
+    columns: [
+      columnHelper.accessor('playerID', {
+        cell: (info) => {
+          return info.getValue() === playerOneID
+            ? playerOneUsername
+            : playerTwoUsername;
+        },
+        header: 'Player Username',
+      }),
+      columnHelper.accessor('columnIndex', {
+        cell: (info) => info.getValue() + 1,
+        header: 'Column',
+      }),
+    ],
     getCoreRowModel: getCoreRowModel(),
   });
 

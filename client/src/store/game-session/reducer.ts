@@ -28,7 +28,9 @@ export const initialGameSessionStateSlice = {
   boardCells: createEmptyBoard(),
   moves: [],
   playerOneID: null,
+  playerOneUsername: null,
   playerTwoID: null,
+  playerTwoUsername: null,
   status: GameSessionStatus.ACTIVE,
   winner: null,
 };
@@ -158,6 +160,21 @@ const playerOneID: CombinedGameSessionStateSlice['playerOneID'] = [
   initialGameSessionStateSlice.playerOneID,
 ];
 
+const playerOneUsername: CombinedGameSessionStateSlice['playerOneUsername'] = [
+  (stateSlice, action) => {
+    switch (action.type) {
+      case RESET_GAME:
+        return initialGameSessionStateSlice.playerOneUsername;
+      case SET_GAME_SESSION:
+      case START_GAME:
+        return action.payload.gameSession.playerOneUsername;
+      default:
+        return stateSlice;
+    }
+  },
+  initialGameSessionStateSlice.playerOneUsername,
+];
+
 const playerTwoID: CombinedGameSessionStateSlice['playerTwoID'] = [
   (stateSlice, action) => {
     switch (action.type) {
@@ -171,6 +188,21 @@ const playerTwoID: CombinedGameSessionStateSlice['playerTwoID'] = [
     }
   },
   initialGameSessionStateSlice.playerTwoID,
+];
+
+const playerTwoUsername: CombinedGameSessionStateSlice['playerTwoUsername'] = [
+  (stateSlice, action) => {
+    switch (action.type) {
+      case RESET_GAME:
+        return initialGameSessionStateSlice.playerTwoUsername;
+      case SET_GAME_SESSION:
+      case START_GAME:
+        return action.payload.gameSession.playerTwoUsername;
+      default:
+        return stateSlice;
+    }
+  },
+  initialGameSessionStateSlice.playerTwoUsername,
 ];
 
 const status: CombinedGameSessionStateSlice['status'] = [
@@ -214,7 +246,9 @@ export default combineReducers({
   boardCells,
   moves,
   playerOneID,
+  playerOneUsername,
   playerTwoID,
+  playerTwoUsername,
   status,
   winner,
 });

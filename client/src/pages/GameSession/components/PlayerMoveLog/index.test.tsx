@@ -41,7 +41,9 @@ const createTestInitialState = () => ({
     boardCells: emptyBoard,
     moves: [],
     playerOneID: mockGameSession.playerOneID,
+    playerOneUsername: mockGameSession.playerOneUsername,
     playerTwoID: mockGameSession.playerTwoID,
+    playerTwoUsername: mockGameSession.playerTwoUsername,
     status: GameSessionStatus.ACTIVE,
     winner: null,
   },
@@ -86,7 +88,9 @@ function TriggerUpdateGameStateButton() {
         boardCells: logicBoardRef.current.gameBoardState,
         moves: [...gameSession.moves, nextPlayerMove],
         playerOneID: gameSession.playerOneID,
+        playerOneUsername: gameSession.playerOneUsername,
         playerTwoID: gameSession.playerTwoID,
+        playerTwoUsername: gameSession.playerTwoUsername,
         status: gameSession.status,
         winner: null,
       },
@@ -137,7 +141,7 @@ describe('PlayerMoveLog', () => {
     // @ts-expect-error: This should go away once the test config is loaded correctly
     const theadEl = playerMoveLogEl.querySelector('thead') as HTMLTableSectionElement;
 
-    expect(within(theadEl).getByText('Player ID')).toBeVisible();
+    expect(within(theadEl).getByText('Player Username')).toBeVisible();
     expect(within(theadEl).getByText('Column')).toBeVisible();
 
     // @ts-expect-error: This should go away once the test config is loaded correctly
@@ -163,7 +167,7 @@ describe('PlayerMoveLog', () => {
     // @ts-expect-error: This should go away once the test config is loaded correctly
     const theadEl = playerMoveLogEl.querySelector('thead') as HTMLTableSectionElement;
 
-    expect(within(theadEl).getByText('Player ID')).toBeVisible();
+    expect(within(theadEl).getByText('Player Username')).toBeVisible();
     expect(within(theadEl).getByText('Column')).toBeVisible();
 
     // @ts-expect-error: This should go away once the test config is loaded correctly
@@ -177,10 +181,12 @@ describe('PlayerMoveLog', () => {
     expect(trEls.length).toBeGreaterThan(0);
 
     trEls.forEach((trEl, index) => {
-      const playerID =
-        index % 2 === 0 ? mockGameSession.playerOneID : mockGameSession.playerTwoID;
+      const playerUsername =
+        index % 2 === 0
+          ? mockGameSession.playerOneUsername
+          : mockGameSession.playerTwoUsername;
 
-      expect(within(trEl).getByText(playerID)).toBeVisible();
+      expect(within(trEl).getByText(playerUsername)).toBeVisible();
     });
   });
 });

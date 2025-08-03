@@ -17,7 +17,9 @@ export type GameSessionStateSlice = {
   boardCells: GameBoard;
   moves: PlayerMove[];
   playerOneID: Nullable<PlayerID>;
+  playerOneUsername: Nullable<string>;
   playerTwoID: Nullable<PlayerID>;
+  playerTwoUsername: Nullable<string>;
   status: GameSessionStatus;
   winner: Nullable<PlayerID>;
 };
@@ -32,7 +34,9 @@ export type GameSessionGameSessionAction = CombineReducers.ReducerAction<{
   moves?: GameSessionStateSlice['moves'];
   player?: PlayerColor;
   playerOneID?: GameSessionStateSlice['playerOneID'];
+  playerOneUsername?: GameSessionStateSlice['playerOneUsername'];
   playerTwoID?: GameSessionStateSlice['playerTwoID'];
+  playerTwoUsername?: GameSessionStateSlice['playerTwoUsername'];
   status?: GameSessionStateSlice['status'];
   winner?: GameSessionStateSlice['winner'];
 }>;
@@ -62,8 +66,16 @@ export type CombinedGameSessionStateSlice = {
     GameSessionStateSlice['playerOneID'],
     GameSessionGameSessionAction
   >;
+  playerOneUsername: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['playerOneUsername'],
+    GameSessionGameSessionAction
+  >;
   playerTwoID: CombineReducers.ArgsTuple<
     GameSessionStateSlice['playerTwoID'],
+    GameSessionGameSessionAction
+  >;
+  playerTwoUsername: CombineReducers.ArgsTuple<
+    GameSessionStateSlice['playerTwoUsername'],
     GameSessionGameSessionAction
   >;
   status: CombineReducers.ArgsTuple<

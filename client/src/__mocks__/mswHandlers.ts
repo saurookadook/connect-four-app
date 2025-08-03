@@ -1,4 +1,4 @@
-import { inspect } from 'node:util';
+// import { inspect } from 'node:util';
 import { ws } from 'msw';
 
 import {
@@ -116,7 +116,9 @@ function createSendGameSessionData({
       boardCells: emptyBoard,
       moves: mockGameSession.moves,
       playerOneID: mockGameSession.playerOneID,
+      playerOneUsername: mockGameSession.playerOneUsername,
       playerTwoID: mockGameSession.playerTwoID,
+      playerTwoUsername: mockGameSession.playerTwoUsername,
       status: mockGameSession.status,
       winner: null,
     },
@@ -149,7 +151,9 @@ function createSendMoveData({
       boardCells: emptyBoard,
       moves: [...mockGameSession.moves, playerMoveData],
       playerOneID: mockGameSession.playerOneID,
+      playerOneUsername: mockGameSession.playerOneUsername,
       playerTwoID: mockGameSession.playerTwoID,
+      playerTwoUsername: mockGameSession.playerTwoUsername,
       status: mockGameSession.status,
       // TODO: should assign winner for winning move
       winner: null,

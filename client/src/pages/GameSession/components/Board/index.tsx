@@ -22,8 +22,12 @@ export function Board() {
 
   function handleCellClick(cell: BoardCell) {
     if (gameSession.winner != null) {
+      const winnerUsername =
+        gameSession.winner === gameSession.playerOneID
+          ? gameSession.playerOneUsername
+          : gameSession.playerTwoUsername;
       window.alert(
-        `Can't carry out move; the game has been won by '${gameSession.winner}'.`,
+        `Can't carry out move; the game has been won by '${winnerUsername}'.`,
       );
       return;
     } else if (
