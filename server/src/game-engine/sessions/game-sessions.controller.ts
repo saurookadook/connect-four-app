@@ -27,9 +27,13 @@ export class GameSessionsController {
     const dataAsDTO = plainToInstance(CreateGameSessionDTO, requestData);
     const createdGameSession =
       await this.gameSessionsService.createOne(dataAsDTO);
+    await createdGameSession.populate(['playerOne', 'playerTwo']);
+
+    const sessionData =
+      await this.createSessionDataForResponse(createdGameSession);
 
     return {
-      session: plainToInstance(GameSessionDTO, createdGameSession.toJSON()),
+      session: plainToInstance(GameSessionDTO, sessionData),
     };
   }
 
@@ -37,9 +41,11 @@ export class GameSessionsController {
   @Get('all')
   async getAllGameSessions(): Promise<{ sessions: GameSessionDTO[] }> {
     const gameSessions = await this.gameSessionsService.findAll();
+    const transformedSessions =
+      await this.createTransformedSessions(gameSessions);
 
     return {
-      sessions: this.createTransformedSessions(gameSessions),
+      sessions: transformedSessions,
     };
   }
 
@@ -50,20 +56,40 @@ export class GameSessionsController {
   ): Promise<{ sessions: GameSessionDTO[] }> {
     const playerSessions =
       await this.gameSessionsService.findAllForPlayer(playerID);
+    const transformedSessions =
+      await this.createTransformedSessions(playerSessions);
 
     return {
-      sessions: this.createTransformedSessions(playerSessions),
+      sessions: transformedSessions,
     };
   }
 
-  createTransformedSessions(
+  async createTransformedSessions(
     gameSessions: GameSessionDocument[],
-  ): GameSessionDTO[] {
-    const transformedSessions = gameSessions.map((session) =>
-      plainToInstance(GameSessionDTO, session.toJSON()),
-    );
+  ): Promise<GameSessionDTO[]> {
+    const transformedSessions: GameSessionDTO[] = [];
+
+    for (const session of gameSessions) {
+      const sessionData = await this.createSessionDataForResponse(session);
+
+      transformedSessions.push(plainToInstance(GameSessionDTO, sessionData));
+    }
 
     return transformedSessions;
+  }
+
+  async createSessionDataForResponse(gameSession: GameSessionDocument) {
+    const populatedSession = await gameSession.populate([
+      'playerOne',
+      'playerTwo',
+    ]);
+    const { playerOne, playerTwo, ...rest } = populatedSession.toJSON();
+
+    return {
+      ...rest,
+      playerOneUsername: playerOne.username,
+      playerTwoUsername: playerTwo.username,
+    };
   }
 
   @Public()
@@ -80,8 +106,11 @@ export class GameSessionsController {
       );
     }
 
+    const sessionData =
+      await this.createSessionDataForResponse(foundGameSession);
+
     return {
-      session: plainToInstance(GameSessionDTO, foundGameSession.toJSON()),
+      session: plainToInstance(GameSessionDTO, sessionData),
     };
   }
 }

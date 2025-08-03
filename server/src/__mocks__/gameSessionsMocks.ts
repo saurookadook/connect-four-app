@@ -59,7 +59,9 @@ export type GameSessionMock =
   Pick<
     GameSessionDTO,
     | 'playerOneID' // force formatting
+    | 'playerOneUsername'
     | 'playerTwoID'
+    | 'playerTwoUsername'
     | 'moves'
     | 'status'
     | 'createdAt'
@@ -67,7 +69,16 @@ export type GameSessionMock =
   >;
 
 export type OptionalMockArgs = Partial<
-  Pick<GameSessionDTO, 'id' | 'createdAt' | 'moves' | 'status' | 'updatedAt'>
+  Pick<
+    GameSessionDTO,
+    | 'id'
+    | 'createdAt'
+    | 'moves'
+    | 'playerOneUsername'
+    | 'playerTwoUsername'
+    | 'status'
+    | 'updatedAt'
+  >
 >;
 
 export type RequiredMockArgs = Pick<
@@ -81,5 +92,7 @@ export function createNewGameSessionMock(
   return {
     ...commonDefaults,
     ...args,
+    playerOneUsername: args.playerOneUsername ?? 'playerOneUsername',
+    playerTwoUsername: args.playerTwoUsername ?? 'playerTwoUsername',
   };
 }

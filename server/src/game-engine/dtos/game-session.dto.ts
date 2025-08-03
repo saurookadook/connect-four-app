@@ -12,16 +12,16 @@ import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
 @Exclude()
 export class GameSessionDTO extends BaseDTO {
   @Expose()
-  playerOneObjectID: Types.ObjectId;
-
-  @Expose()
   playerOneID: PlayerID;
 
   @Expose()
-  playerTwoObjectID: Types.ObjectId;
+  playerOneUsername: string;
 
   @Expose()
   playerTwoID: PlayerID;
+
+  @Expose()
+  playerTwoUsername: string;
 
   @Expose()
   moves: PlayerMove[];
@@ -40,13 +40,13 @@ export class GameSessionDTO extends BaseDTO {
 @Exclude()
 export class CreateGameSessionDTO {
   @Expose()
-  playerOneObjectID?: GameSessionDTO['playerOneObjectID'];
+  playerOneObjectID?: Types.ObjectId;
 
   @Expose()
   playerOneID: GameSessionDTO['playerOneID'];
 
   @Expose()
-  playerTwoObjectID?: GameSessionDTO['playerTwoObjectID'];
+  playerTwoObjectID?: Types.ObjectId;
 
   @Expose()
   playerTwoID: GameSessionDTO['playerTwoID'];
@@ -61,13 +61,13 @@ export class CreateGameSessionDTO {
 @Exclude()
 export class UpdateGameSessionDTO extends PartialBaseDTO {
   @Expose()
-  playerOneObjectID?: GameSessionDTO['playerOneObjectID'];
+  playerOneObjectID?: CreateGameSessionDTO['playerOneObjectID'];
 
   @Expose()
   playerOneID?: GameSessionDTO['playerOneID'];
 
   @Expose()
-  playerTwoObjectID?: GameSessionDTO['playerTwoObjectID'];
+  playerTwoObjectID?: CreateGameSessionDTO['playerTwoObjectID'];
 
   @Expose()
   playerTwoID?: GameSessionDTO['playerTwoID'];
