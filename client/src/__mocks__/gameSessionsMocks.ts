@@ -13,11 +13,9 @@ export type GameSessionMock = {
   id: string;
   moves: PlayerMove[];
   playerOneID: PlayerID;
-  // TODO: make required after finishing refactoring
-  playerOneUsername?: string;
+  playerOneUsername: string;
   playerTwoID: PlayerID;
-  // TODO: make required after finishing refactoring
-  playerTwoUsername?: string;
+  playerTwoUsername: string;
   status: GameSessionStatus;
   winner: Nullable<PlayerID>;
 };
