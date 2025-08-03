@@ -38,7 +38,9 @@ export interface ActiveGameMessageEvent {
   boardCells: GameBoard;
   moves: PlayerMove[];
   playerOneID: PlayerID;
+  playerOneUsername: string;
   playerTwoID: PlayerID;
+  playerTwoUsername: string;
   status: GameSessionStatus;
   winner: Nullable<PlayerID>;
 }

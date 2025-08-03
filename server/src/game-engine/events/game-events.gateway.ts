@@ -101,10 +101,7 @@ export class GameEventsGateway implements OnGatewayConnection {
       gameSession.id,
     ) as GameSessionMap;
 
-    const sendGameSessionMessageEvent: SendGameSessionMessageEvent<{
-      playerOneUsername: string;
-      playerTwoUsername: string;
-    }> = {
+    const sendGameSessionMessageEvent: SendGameSessionMessageEvent = {
       event: SEND_GAME_SESSION,
       data: {
         id: gameSession.id,
@@ -144,10 +141,7 @@ export class GameEventsGateway implements OnGatewayConnection {
     const activeGame = this.#activeGamesMap.get(
       gameSession.id,
     ) as GameSessionMap;
-    const sendMoveMessageEvent: SendMoveMessageEvent<{
-      playerOneUsername: string;
-      playerTwoUsername: string;
-    }> = {
+    const sendMoveMessageEvent: SendMoveMessageEvent = {
       event: SEND_MOVE,
       data: {
         id: gameSession.id,

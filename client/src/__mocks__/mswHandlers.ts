@@ -1,4 +1,4 @@
-import { inspect } from 'node:util';
+// import { inspect } from 'node:util';
 import { ws } from 'msw';
 
 import {
@@ -93,10 +93,7 @@ function createSendGameSessionData({
   startGameData, // force formatting
 }: {
   startGameData: StartGameEventData;
-}): SendGameSessionMessageEvent<{
-  playerOneUsername?: string;
-  playerTwoUsername?: string;
-}> {
+}): SendGameSessionMessageEvent {
   const { gameSessionID, playerOneID, playerTwoID } = startGameData;
 
   const mockGameSession = findGameSessionMockForPlayers({
@@ -132,10 +129,7 @@ function createSendMoveData({
   playerMoveData, // force formatting
 }: {
   playerMoveData: PlayerMove;
-}): SendMoveMessageEvent<{
-  playerOneUsername?: string;
-  playerTwoUsername?: string;
-}> {
+}): SendMoveMessageEvent {
   const { gameSessionID, playerID } = playerMoveData;
 
   const mockGameSession = findGameSessionMock({

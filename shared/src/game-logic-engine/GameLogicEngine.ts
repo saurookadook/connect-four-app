@@ -1,5 +1,3 @@
-import { inspect } from 'node:util';
-
 import {
   GameSessionStatus, // force formatting
   PlayerColor,
@@ -98,15 +96,12 @@ export class GameLogicEngine {
 
   endGame(sessionRef: LogicSession) {
     sessionRef.status = GameSessionStatus.COMPLETED;
-    logger.debug(
-      `[${this.endGame.name} method] ${'-'.repeat(120)}\n`,
-      inspect({
-        activePlayer: sessionRef.activePlayer,
-        boardCells: sessionRef.board.gameBoardState,
-        playerOneID: sessionRef.playerOneID,
-        playerTwoID: sessionRef.playerTwoID,
-      }),
-    );
+    logger.debug(`[${this.endGame.name} method] ${'-'.repeat(120)}\n`, {
+      activePlayer: sessionRef.activePlayer,
+      boardCells: sessionRef.board.gameBoardState,
+      playerOneID: sessionRef.playerOneID,
+      playerTwoID: sessionRef.playerTwoID,
+    });
 
     return sessionRef;
   }
