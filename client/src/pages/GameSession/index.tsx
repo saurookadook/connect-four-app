@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -38,6 +38,14 @@ export function GameSession() {
     },
     player: { playerID },
   } = appState;
+
+  const winnerUsername = useMemo(() => {
+    if (winner == null) {
+      return null;
+    }
+
+    return winner === playerOneID ? playerOneUsername : playerTwoUsername;
+  }, [playerOneID, playerOneUsername, playerTwoUsername, winner]);
 
   const wsMessageHandler = useCallback(
     (event: MessageEvent) => {
@@ -105,7 +113,7 @@ export function GameSession() {
     <section id="game-session">
       <h2>{`🔴 ⚫ Connect Four: Current Game 🔴 ⚫`}</h2>
 
-      {winner != null && <h3>{`🏆🏆🏆 Winner: '${winner}' 🏆🏆🏆`}</h3>}
+      {winnerUsername != null && <h3>{`🏆🏆🏆 Winner: '${winnerUsername}' 🏆🏆🏆`}</h3>}
 
       <DebuggingPanel // force formatting
         gameSessionID={gameSessionID}

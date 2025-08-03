@@ -261,7 +261,7 @@ describe('GameSession', () => {
     await expectHeadingToBeVisible({
       screenRef: screen,
       level: 3,
-      name: new RegExp(`Winner: '${mockFirstPlayer.playerID}'`),
+      name: new RegExp(`Winner: '${mockFirstPlayer.username}'`),
     });
 
     await expectGameDetailsToBeVisibleAndCorrect({
@@ -287,7 +287,7 @@ describe('GameSession', () => {
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledExactlyOnceWith(
-        `Can't carry out move; the game has been won by '${mockFirstPlayer.playerID}'.`,
+        `Can't carry out move; the game has been won by '${mockFirstPlayer.username}'.`,
       );
     });
   });
