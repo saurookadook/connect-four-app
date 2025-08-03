@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn } from '@/layouts';
-import { fetchAllGameSessions } from '@/store/game-sessions/actions';
+import { fetchAllGameSessions } from '@/store/actions';
 import { useAppStore } from '@/store';
 import { LoadedResultsState } from '..';
+
+const logger = sharedLog.getLogger(AllGameSessions.name);
 
 export function AllGameSessions({
   containerID = 'all-game-sessions',
@@ -22,6 +25,10 @@ export function AllGameSessions({
       fetchAllGameSessions({ dispatch: appDispatch });
     }
   }, [appDispatch, gameSessions.allPaginated]);
+
+  logger.debug('allPaginated\n', {
+    allPaginated: gameSessions.allPaginated,
+  });
 
   return (
     <FlexColumn id={containerID}>

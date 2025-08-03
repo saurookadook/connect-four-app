@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { LoadingState } from '@/components';
 import { FlexColumn } from '@/layouts';
-import { fetchGameSessionsHistory } from '@/store/game-sessions/actions';
+import { fetchGameSessionsHistory } from '@/store/actions';
 import { useAppStore } from '@/store';
 import { LoadedResultsState } from '..';
+
+const logger = sharedLog.getLogger(PlayerGameSessions.name);
 
 export function PlayerGameSessions({
   containerID = 'player-game-sessions',
@@ -25,6 +28,10 @@ export function PlayerGameSessions({
       });
     }
   }, [appDispatch, gameSessions.playerHistory, player.playerID]);
+
+  logger.debug('playerHistory\n', {
+    playerHistory: gameSessions.playerHistory,
+  });
 
   return (
     <FlexColumn id={containerID}>

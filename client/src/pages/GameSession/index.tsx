@@ -31,7 +31,9 @@ export function GameSession() {
       gameSessionID,
       activePlayer,
       playerOneID,
+      playerOneUsername,
       playerTwoID,
+      playerTwoUsername,
       winner,
     },
     player: { playerID },
@@ -120,14 +122,24 @@ export function GameSession() {
               <b>Players</b>
             </span>
             {[playerOneID, playerTwoID].map((playerID, index) => {
-              const suffix =
-                index === 0 ? `One (${PlayerColor.RED})` : `Two (${PlayerColor.BLACK})`;
+              const details =
+                playerID === playerOneID
+                  ? {
+                      suffix: `One (${PlayerColor.RED})`,
+                      username: playerOneUsername,
+                    }
+                  : {
+                      suffix: `Two (${PlayerColor.BLACK})`,
+                      username: playerTwoUsername,
+                    };
 
               return (
                 playerID != null && (
                   <Fragment key={playerID}>
-                    <dt className={`data-item-${index}`}>{`Player ${suffix}`}</dt>
-                    <dd className={`data-item-${index}`}>{playerID}</dd>
+                    <dt
+                      className={`data-item-${index}`}
+                    >{`Player ${details.suffix}`}</dt>
+                    <dd className={`data-item-${index}`}>{details.username}</dd>
                   </Fragment>
                 )
               );
