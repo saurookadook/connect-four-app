@@ -72,8 +72,18 @@ export class GameSessionsService {
     id: string,
     gameSession: UpdateGameSessionDTO,
   ): Promise<NullableGameSessionDocument> {
+    const { playerOneObjectID, playerTwoObjectID, ...rest } = gameSession;
+
     const updatedGameSession = await this.gameSessionModel
-      .findByIdAndUpdate(id, gameSession, { new: true })
+      .findByIdAndUpdate(
+        id,
+        {
+          ...rest,
+          playerOne: playerOneObjectID,
+          playerTwo: playerTwoObjectID,
+        },
+        { new: true },
+      )
       .exec();
 
     return updatedGameSession;

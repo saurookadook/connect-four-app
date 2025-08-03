@@ -7,6 +7,7 @@ import {
   type PlayerID,
   type PlayerMove,
 } from '@connect-four-app/shared';
+import { Player } from '@/players/schemas/player.schema';
 
 @Schema({
   // @ts-expect-error: This is the documented way to add an enum validator [https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum()]
@@ -17,10 +18,22 @@ class Game_Session {
   // collection as `game_sessions` instead of `gamesessions`
 
   @Prop({
+    ref: Player.name,
+    type: Types.ObjectId,
+  })
+  playerOne: Player;
+
+  @Prop({
     required: true,
     type: Types.UUID,
   })
   playerOneID: PlayerID;
+
+  @Prop({
+    ref: Player.name,
+    type: Types.ObjectId,
+  })
+  playerTwo: Player;
 
   @Prop({
     required: true,
@@ -53,7 +66,16 @@ class Game_Session {
 
 export { Game_Session as GameSession };
 
-export type GameSessionDocument = HydratedDocument<Game_Session>;
+type GameSessionDocumentOverride = {
+  playerOne: Types.Subdocument<Types.ObjectId> & Player;
+  playerTwo: Types.Subdocument<Types.ObjectId> & Player;
+};
+
+export type GameSessionDocument = HydratedDocument<
+  Game_Session,
+  GameSessionDocumentOverride
+>;
+// export type GameSessionDocument = HydratedDocument<Game_Session>;
 export type NullableGameSessionDocument = GameSessionDocument | null;
 
 export const GameSessionSchema = SchemaFactory.createForClass(Game_Session);
