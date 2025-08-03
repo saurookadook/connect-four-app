@@ -1,3 +1,6 @@
+import renderWithContext from '#saurookkadookk/react-utils-render-with-context';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   afterAll, // force formatting
   beforeEach,
@@ -6,11 +9,10 @@ import {
   it,
   vi,
 } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 import { sharedLog } from '@connect-four-app/shared';
 import { mockFirstPlayer } from '@/__mocks__/playerMocks';
+import { AppStateProvider } from '@/store';
 import {
   createFetchMock,
   expectHeadingToBeVisible,
@@ -46,7 +48,10 @@ describe('Register Page', () => {
   });
 
   it('renders correctly', async () => {
-    render(<RegisterWithRouter />);
+    renderWithContext(
+      <RegisterWithRouter />, // force formatting
+      AppStateProvider,
+    );
 
     await expectHeadingToBeVisible({
       screenRef: screen,
@@ -65,8 +70,10 @@ describe('Register Page', () => {
     });
 
     it('handles valid form submissions', async () => {
-      const user = userEvent.setup();
-      const { container } = render(<RegisterWithRouter />);
+      const { container, user } = renderWithContext(
+        <RegisterWithRouter />,
+        AppStateProvider,
+      );
 
       await expectHeadingToBeVisible({
         screenRef: screen,
@@ -105,8 +112,10 @@ describe('Register Page', () => {
     });
 
     it("handles username that's too short", async () => {
-      const user = userEvent.setup();
-      render(<RegisterWithRouter />);
+      const { user } = renderWithContext(
+        <RegisterWithRouter />, // force formatting
+        AppStateProvider,
+      );
 
       await expectHeadingToBeVisible({
         screenRef: screen,
@@ -134,8 +143,10 @@ describe('Register Page', () => {
     });
 
     it("handles password that's too short", async () => {
-      const user = userEvent.setup();
-      render(<RegisterWithRouter />);
+      const { user } = renderWithContext(
+        <RegisterWithRouter />, // force formatting
+        AppStateProvider,
+      );
 
       await expectHeadingToBeVisible({
         screenRef: screen,
@@ -163,8 +174,10 @@ describe('Register Page', () => {
     });
 
     it.skip("handles password that doesn't meet character requirements", async () => {
-      const user = userEvent.setup();
-      render(<RegisterWithRouter />);
+      const { user } = renderWithContext(
+        <RegisterWithRouter />, // force formatting
+        AppStateProvider,
+      );
 
       await expectHeadingToBeVisible({
         screenRef: screen,
@@ -192,8 +205,10 @@ describe('Register Page', () => {
     });
 
     it('handles password mismatched with confirm password', async () => {
-      const user = userEvent.setup();
-      render(<RegisterWithRouter />);
+      const { user } = renderWithContext(
+        <RegisterWithRouter />, // force formatting
+        AppStateProvider,
+      );
 
       await expectHeadingToBeVisible({
         screenRef: screen,

@@ -86,6 +86,13 @@ export const routerConfig: RouteObject[] = [
         element: <AccountPortal />,
         // TODO: this whole loader situation feels... messy?
         loader: async ({ params }) => {
+          if (
+            typeof params['subPage'] === 'string' &&
+            ['details', 'login', 'register'].includes(params['subPage'])
+          ) {
+            return;
+          }
+
           const playerDetailsFromLocalStorage =
             window.localStorage.getItem(PLAYER_DETAILS_LS_KEY);
           const parsedPlayerData = safeParseJSON(playerDetailsFromLocalStorage);

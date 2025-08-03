@@ -72,11 +72,12 @@ function NewPlayerForm() {
 
 export function AccountPortal() {
   const navigate = useNavigate();
+  const params = useParams<AppParams>();
   const { appState } = useAppStore();
   const { playerID } = appState.player;
 
   useEffect(() => {
-    if (playerID == null) {
+    if (playerID == null && params['subPage'] === 'details') {
       navigate('/account/login');
     }
   }, [playerID]);
