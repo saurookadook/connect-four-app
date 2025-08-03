@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { Types } from 'mongoose';
 
 import {
   GameSessionStatus,
@@ -11,7 +12,13 @@ import { BaseDTO, PartialBaseDTO } from '@/dtos/base.dto';
 @Exclude()
 export class GameSessionDTO extends BaseDTO {
   @Expose()
+  playerOneObjectID: Types.ObjectId;
+
+  @Expose()
   playerOneID: PlayerID;
+
+  @Expose()
+  playerTwoObjectID: Types.ObjectId;
 
   @Expose()
   playerTwoID: PlayerID;
@@ -33,7 +40,13 @@ export class GameSessionDTO extends BaseDTO {
 @Exclude()
 export class CreateGameSessionDTO {
   @Expose()
+  playerOneObjectID?: GameSessionDTO['playerOneObjectID'];
+
+  @Expose()
   playerOneID: GameSessionDTO['playerOneID'];
+
+  @Expose()
+  playerTwoObjectID?: GameSessionDTO['playerTwoObjectID'];
 
   @Expose()
   playerTwoID: GameSessionDTO['playerTwoID'];
@@ -48,7 +61,13 @@ export class CreateGameSessionDTO {
 @Exclude()
 export class UpdateGameSessionDTO extends PartialBaseDTO {
   @Expose()
+  playerOneObjectID?: GameSessionDTO['playerOneObjectID'];
+
+  @Expose()
   playerOneID?: GameSessionDTO['playerOneID'];
+
+  @Expose()
+  playerTwoObjectID?: GameSessionDTO['playerTwoObjectID'];
 
   @Expose()
   playerTwoID?: GameSessionDTO['playerTwoID'];

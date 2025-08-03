@@ -11,7 +11,7 @@ import { GameSessionsService } from './game-sessions.service';
   controllers: [GameSessionsController],
   imports: [
     MongooseModule.forFeature([
-      { name: GameSession.name, schema: GameSessionSchema },
+      { name: GameSession.name, schema: GameSessionSchema }, // force formatting
     ]),
     AuthModule,
     PlayersModule,

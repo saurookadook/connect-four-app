@@ -27,6 +27,7 @@
     "client:base": "yarn workspace @connect-four-app/client",
     "client:test": "yarn client:base test",
     "server:base": "yarn workspace @connect-four-app/server",
+    "server:run": "yarn dcr server",
     "server:test": "yarn dcr server-test test",
     "shared:base": "yarn workspace @connect-four-app/shared",
     "shared:test": "yarn shared:base test"
