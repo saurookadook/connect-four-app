@@ -167,10 +167,8 @@ describe('GameSessionsService', () => {
         foundGameSession, // force formatting
         {
           ...mockGameSession,
-          // @ts-expect-error: Need to fix the type for this util :']
-          playerOne: testFirstPlayerDocument._id,
-          // @ts-expect-error: Need to fix the type for this util :']
-          playerTwo: testSecondPlayerDocument._id,
+          playerOne: testFirstPlayerDocument,
+          playerTwo: testSecondPlayerDocument,
         },
       );
     });
@@ -362,10 +360,8 @@ describe('GameSessionsService', () => {
         {
           ...mockGameSession,
           moves: [...mockGameSession.moves, ...updatedMoves],
-          // @ts-expect-error: Need to fix the type for this util :']
-          playerOne: testFirstPlayerDocument._id,
-          // @ts-expect-error: Need to fix the type for this util :']
-          playerTwo: testSecondPlayerDocument._id,
+          playerOne: testFirstPlayerDocument,
+          playerTwo: testSecondPlayerDocument,
         },
       );
     });
