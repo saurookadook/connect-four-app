@@ -57,6 +57,15 @@ export class GameSessionsService {
     return foundGameSessions;
   }
 
+  async findAllPopulated(): Promise<GameSessionDocument[]> {
+    const foundGameSessions = await this.gameSessionModel
+      .find({})
+      .populate(['playerOne', 'playerTwo'])
+      .sort({ updatedAt: -1 });
+
+    return foundGameSessions;
+  }
+
   async findAllForPlayer(playerID: PlayerID): Promise<GameSessionDocument[]> {
     const foundPlayer = await this.playersService.findOneByPlayerID(playerID);
 
@@ -70,6 +79,7 @@ export class GameSessionsService {
       .find({
         $or: [{ playerOneID: playerID }, { playerTwoID: playerID }],
       })
+      .populate(['playerOne', 'playerTwo'])
       .exec();
   }
 

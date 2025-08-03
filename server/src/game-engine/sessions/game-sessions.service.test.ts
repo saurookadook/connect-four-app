@@ -279,10 +279,8 @@ describe('GameSessionsService', () => {
           playerOneID: gameSessionOne.playerOneID,
           playerTwoID: gameSessionOne.playerTwoID,
         }),
-        // @ts-expect-error: Need to fix the type for this util :']
-        playerOne: playerDocumentByPlayerID[gameSessionOne.playerOneID]._id,
-        // @ts-expect-error: Need to fix the type for this util :']
-        playerTwo: playerDocumentByPlayerID[gameSessionOne.playerTwoID]._id,
+        playerOne: playerDocumentByPlayerID[gameSessionOne.playerOneID],
+        playerTwo: playerDocumentByPlayerID[gameSessionOne.playerTwoID],
       });
       expectHydratedDocumentToMatch<GameSession>(foundGameSessionTwo, {
         ...createNewGameSessionDocumentMock({
@@ -291,10 +289,8 @@ describe('GameSessionsService', () => {
           playerOneID: gameSessionTwo.playerOneID,
           playerTwoID: gameSessionTwo.playerTwoID,
         }),
-        // @ts-expect-error: Need to fix the type for this util :']
-        playerOne: playerDocumentByPlayerID[gameSessionTwo.playerOneID]._id,
-        // @ts-expect-error: Need to fix the type for this util :']
-        playerTwo: playerDocumentByPlayerID[gameSessionTwo.playerTwoID]._id,
+        playerOne: playerDocumentByPlayerID[gameSessionTwo.playerOneID],
+        playerTwo: playerDocumentByPlayerID[gameSessionTwo.playerTwoID],
       });
     });
   });

@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 
 // TODO: would be great to generate this somehow based on a schema?
 export const dateFields = new Set(['createdAt', 'updatedAt']);
@@ -16,6 +16,10 @@ export function expectHydratedDocumentToMatch<T>(
       expect(documentUnderTest).toHaveProperty(key, expect.any(Date));
     } else if (key === '__v') {
       expect(documentUnderTest).toHaveProperty(key, expect.any(Number));
+    } else if (value instanceof Document) {
+      // TODO: this should probably somehow call `expectHydratedDocumentToMatch`
+      // with the correct type
+      expect(documentUnderTest).toHaveProperty(key, expect.any(Document));
     } else {
       expect(documentUnderTest).toHaveProperty(key, value);
     }
