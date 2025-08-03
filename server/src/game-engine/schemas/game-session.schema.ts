@@ -66,7 +66,7 @@ class Game_Session {
 
 export { Game_Session as GameSession };
 
-type GameSessionDocumentOverride = {
+export type GameSessionDocumentOverride = {
   playerOne: Types.Subdocument<Types.ObjectId> & Player;
   playerTwo: Types.Subdocument<Types.ObjectId> & Player;
 };
