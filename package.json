@@ -20,7 +20,7 @@
     "//build:all": "yarn nx run-many -t build",
     "//dep-graph": "yarn nx graph",
     "dcr": "docker compose run --rm --remove-orphans",
-    "all:base": "yarn workspaces foreach --from \"@connect-four-app/{client,server}\" -R -pt",
+    "all:base": "yarn workspaces foreach --from \"@connect-four-app/{client,server,shared}\" -R -pt",
     "all:install": "yarn all:base install",
     "all:build": "yarn all:base run build",
     "all:start:dev": "yarn all:base run start:dev",
@@ -28,6 +28,7 @@
     "client:test": "yarn client:base test",
     "server:base": "yarn workspace @connect-four-app/server",
     "server:run": "yarn dcr server",
+    "server:ncs": "yarn server:run ncs",
     "server:test": "yarn dcr server-test test",
     "shared:base": "yarn workspace @connect-four-app/shared",
     "shared:test": "yarn shared:base test"
