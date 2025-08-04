@@ -9,7 +9,7 @@ A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built usi
 - [MongoDB](https://www.mongodb.com/)
 - [NGINX](https://nginx.org/en/docs/)
 
-<img src="/assets/connect-four-app-demo_2025-07-22.gif" alt="Demo of Connect Four application with side-by-side browsers">
+<img src="/assets/connect-four-app-demo_2025-08-04.gif" alt="Demo of Connect Four application with side-by-side browsers">
 
 ## Getting Started
 
