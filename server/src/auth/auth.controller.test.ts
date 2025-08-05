@@ -40,6 +40,7 @@ describe('AuthController', () => {
   afterAll(async () => {
     await model.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 
