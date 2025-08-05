@@ -38,7 +38,6 @@ const email: CombinedPlayerStateSlice['email'] = [
     switch (action.type) {
       case REGISTER_NEW_PLAYER:
       case LOG_IN_PLAYER:
-      case SET_PLAYER_ID:
       case SET_PLAYER_INFO:
         return action.payload.player.email ?? null;
       case UNSET_PLAYER_INFO:
