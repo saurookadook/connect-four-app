@@ -81,16 +81,6 @@ export class GameEventsGateway implements OnGatewayConnection {
       playerTwoID: PlayerID;
     },
   ) {
-    logger.debug(
-      '='.repeat(160),
-      '\n',
-      `    [GameEventsGateway.onStartGame] : 'data' received:`,
-      '\n',
-      { data },
-      '\n',
-      '='.repeat(160),
-    );
-
     const { boardState, gameSession } = await this.gameEngineService.startGame({
       gameSessionID: data.gameSessionID,
       playerOneID: data.playerOneID,
@@ -125,16 +115,6 @@ export class GameEventsGateway implements OnGatewayConnection {
   async onMakeMove(
     @MessageBody() data: PlayerMove, // force formatting
   ): Promise<void> {
-    logger.debug(
-      '='.repeat(160),
-      '\n',
-      `    [GameEventsGateway.onEvent] 'data' received:`,
-      '\n',
-      { ...data },
-      '\n',
-      '='.repeat(160),
-    );
-
     const { boardState, gameSession } =
       await this.gameEngineService.handlePlayerMove(data);
 
@@ -168,35 +148,62 @@ export class GameEventsGateway implements OnGatewayConnection {
   // TODO: just temp for testing with frontend
   @SubscribeMessage('broadcast-test')
   onBroadcastTestEvent(@MessageBody('message') message: string) {
-    logger.debug(
-      '='.repeat(160),
-      '\n',
-      `    [GameEventsGateway.onTestEvent] Message received: '${message}'`,
-      '\n',
+    this._logDebug(
+      {
+        headerMessage: `[${this.onBroadcastTestEvent.name}] Message received: '${message}'`,
+      },
       inspect(
         { clients: this.server.clients },
         { colors: true, compact: false, depth: 1, showHidden: true },
       ),
-      '\n',
-      '='.repeat(160),
     );
 
     this.server.clients.forEach((client, socket, wsSet) => {
-      logger.debug(
-        '?'.repeat(160),
-        '\n',
-        `    [GameEventsGateway.onTestEvent] 'clients.forEach' callback`,
-        '\n',
+      this._logDebug(
+        {
+          delimiter: '?',
+          headerMessage: `[${this.onBroadcastTestEvent.name}] 'clients.forEach' callback`,
+        },
         inspect(
           { client, socket, wsSet },
           { colors: true, compact: false, depth: 1, showHidden: true },
         ),
-        '\n',
-        '?'.repeat(160),
       );
+
       if (client.readyState === WebSocket.OPEN) {
         client.send('[server] Hello, world!');
       }
     });
+  }
+
+  /**
+   * @description Purely to clean up some of the `logger.debug` calls
+   */
+  _logDebug(
+    {
+      delimiter = '=',
+      headerMessage,
+    }: { delimiter?: string; headerMessage: string },
+    ...args: any[]
+  ) {
+    const argsWithSpacers = args.reduce((acc, cur, index) => {
+      if (index === 0) {
+        acc.push(cur);
+      } else {
+        acc.push('\n', cur);
+      }
+
+      return acc;
+    }, []);
+
+    logger.debug(
+      delimiter.repeat(160),
+      '\n',
+      `    ${headerMessage}`,
+      '\n',
+      ...argsWithSpacers,
+      '\n',
+      delimiter.repeat(160),
+    );
   }
 }

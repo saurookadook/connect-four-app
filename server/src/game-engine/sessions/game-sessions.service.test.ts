@@ -194,7 +194,8 @@ describe('GameSessionsService', () => {
       ]);
     });
 
-    afterEach(() => {
+    afterEach(async () => {
+      await gameSessionModel.deleteMany({}).exec();
       jest.clearAllTimers();
     });
 
