@@ -1,9 +1,12 @@
 import { RouterProvider } from 'react-router-dom';
 
-import browserRouter from '@/app//browserRouter';
-import '@/app/App.css';
+import { useLoadPlayer } from '@/store';
+import browserRouter from './browserRouter';
+import './App.css';
 
 function App() {
+  useLoadPlayer();
+
   return (
     <main>
       <RouterProvider router={browserRouter} />
