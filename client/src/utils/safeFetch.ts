@@ -1,10 +1,18 @@
-import { safeParseJSON, sharedLog } from '@connect-four-app/shared';
+import { Nullable, safeParseJSON, sharedLog } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL } from '@/constants';
 import { type BoundThis } from '@/types/main';
 
 const logger = sharedLog.getLogger(safeFetch.name);
 
-async function resolveResponseData(response: Response) {
+export type OnErrorCallback = ({
+  error,
+  response,
+}: {
+  error: Error;
+  response: Nullable<any>;
+}) => any;
+
+export async function resolveResponseData(response: Response) {
   if (response.status === 202) {
     const dataAsText = await response.text();
     return safeParseJSON(dataAsText) || dataAsText;
@@ -22,7 +30,7 @@ export async function safeFetch(
   }: {
     requestPathname: string;
     fetchOpts: RequestInit;
-    onErrorCallback?: () => void;
+    onErrorCallback?: OnErrorCallback | Promise<OnErrorCallback>;
   },
 ) {
   const funcName = this.name
@@ -30,10 +38,11 @@ export async function safeFetch(
     : `safeFetch: ${fetchOpts.method} '${requestPathname}'`;
 
   let responseData = null;
+  let response;
 
   try {
     const requestURL = new URL(requestPathname, BASE_API_SERVER_URL);
-    const response = await fetch(requestURL, fetchOpts);
+    response = await fetch(requestURL, fetchOpts);
 
     if (!response.ok || response.status >= 400) {
       // other pattern: /(?:\S\+)?([A-Z])/g
@@ -51,6 +60,14 @@ export async function safeFetch(
     responseData = await resolveResponseData(response);
   } catch (error) {
     const _error: Error = error instanceof Error ? error : new Error();
+
+    if (onErrorCallback != null && typeof onErrorCallback === 'function') {
+      return onErrorCallback({
+        error: _error,
+        response: response,
+      });
+    }
+
     logger.error(_error);
     throw new Error(`[${funcName}] ${_error.message}`, { cause: error });
   }

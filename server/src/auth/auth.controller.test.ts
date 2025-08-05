@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { WsAdapter } from '@nestjs/platform-ws';
 import { Connection, Model } from 'mongoose';
 import request from 'supertest';
 import type { App } from 'supertest/types';
@@ -8,9 +9,8 @@ import type { App } from 'supertest/types';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
-import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
 import { Player } from '@/players/schemas/player.schema';
-import { AuthModule } from './auth.module';
+import { AppModule } from '@/app.module';
 import { AuthenticationService } from './authentication.service';
 
 describe('AuthController', () => {
@@ -23,12 +23,12 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         DatabaseModule, // force formatting
-        AuthModule,
+        AppModule,
       ],
     }).compile();
 
     app = module.createNestApplication();
-    applyGlobalSessionMiddleware(app);
+    app.useWebSocketAdapter(new WsAdapter(app));
 
     await app.init();
 
@@ -40,6 +40,7 @@ describe('AuthController', () => {
   afterAll(async () => {
     await model.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 

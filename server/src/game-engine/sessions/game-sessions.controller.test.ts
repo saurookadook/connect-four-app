@@ -15,7 +15,6 @@ import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
 import { PlayersModule } from '@/players/players.module';
 import { Player } from '@/players/schemas/player.schema';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
@@ -53,7 +52,6 @@ describe('GameSessionsController', () => {
     }).compile();
 
     app = module.createNestApplication();
-    applyGlobalSessionMiddleware(app);
 
     await app.init();
 

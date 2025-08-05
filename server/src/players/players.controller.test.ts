@@ -8,13 +8,14 @@ import { App } from 'supertest/types';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
+import { AuthModule } from '@/auth/auth.module';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-import { applyGlobalSessionMiddleware } from '@/middleware/session.middleware';
+
 import { Player } from '@/players/schemas/player.schema';
 import { PlayersModule } from '@/players/players.module';
 import { PlayersService } from '@/players/players.service';
@@ -31,13 +32,13 @@ describe('PlayersController', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         DatabaseModule, // force formatting
+        AuthModule,
         PlayersModule,
       ],
       providers: [CatchAllFilterProvider, HttpExceptionFilterProvider],
     }).compile();
 
     app = module.createNestApplication();
-    applyGlobalSessionMiddleware(app);
 
     await app.init();
 

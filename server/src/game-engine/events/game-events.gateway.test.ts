@@ -183,11 +183,11 @@ describe('GameEventsGateway', () => {
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerOneID).send,
+        activeGameSession?.get(testPlayerOne.playerID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwo.playerID).send,
       ).toHaveBeenNthCalledWith(1, JSON.stringify(firstSendMoveEvent));
 
       const secondMakeMoveEvent = {
@@ -217,11 +217,11 @@ describe('GameEventsGateway', () => {
 
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerOneID).send,
+        activeGameSession?.get(testPlayerOne.playerID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
       expect(
         // @ts-expect-error: Until I can figure out a better way to mock the client
-        activeGameSession?.get(testPlayerTwoID).send,
+        activeGameSession?.get(testPlayerTwo.playerID).send,
       ).toHaveBeenNthCalledWith(2, JSON.stringify(secondSendMoveEvent));
     });
 

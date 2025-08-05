@@ -1,12 +1,13 @@
 import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL, PLAYER_DETAILS_LS_KEY } from '@/constants';
-import { BoundThis, type BaseAction } from '@/types/main';
-import { safeFetch } from '@/utils';
+import { type BaseAction } from '@/types/main';
+import { resolveResponseData, safeFetch } from '@/utils';
 import {
   REGISTER_NEW_PLAYER,
   LOG_IN_PLAYER,
   SET_PLAYER_ID,
   UNSET_PLAYER_INFO,
+  SET_PLAYER_INFO,
 } from '../actionTypes';
 
 const logger = sharedLog.getLogger('playerActions');
@@ -35,6 +36,55 @@ function updateBrowserSession(responseData: AuthResponseData) {
     });
     window.localStorage.setItem(PLAYER_DETAILS_LS_KEY, stringifiedDetails);
   }
+}
+
+export async function refreshPlayerData({
+  dispatch, // force formatting
+}: BaseAction) {
+  const funcName = refreshPlayerData.name;
+
+  const responseData = await safeFetch.call(
+    {
+      name: funcName,
+    },
+    {
+      requestPathname: `/api/auth/refresh`,
+      fetchOpts: {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          credentials: 'include',
+        },
+      },
+      onErrorCallback: async ({ error, response }) => {
+        const errorResponseData = await resolveResponseData(response);
+        const { timestamp, ...rest } = errorResponseData;
+        return {
+          ...rest,
+          timestamp: timestamp == null ? new Date() : new Date(timestamp),
+        };
+      },
+    },
+  );
+
+  logger.debug(`[${funcName}] responseData:\n`, {
+    responseData,
+  });
+
+  if (responseData.statusCode === 403) {
+    return unsetPlayerInfo({ dispatch });
+  }
+
+  updateBrowserSession(responseData);
+
+  return setPlayerInfo({
+    dispatch,
+    playerDetails: {
+      playerID: responseData.playerID,
+      playerObjectID: responseData.playerObjectID,
+      username: responseData.username,
+    },
+  });
 }
 
 async function handleAuthRequest({
@@ -99,7 +149,12 @@ async function handleAuthRequest({
   dispatch({
     type: actionType,
     payload: {
-      ...responseData,
+      player: {
+        email: responseData.email,
+        playerID: responseData.playerID,
+        playerObjectID: responseData.playerObjectID,
+        username: responseData.username,
+      },
     },
   });
 
@@ -164,9 +219,7 @@ export async function logOutPlayer({
     // TODO: throw error?
   }
 
-  window.localStorage.removeItem(PLAYER_DETAILS_LS_KEY);
-
-  return unsetPlayer({
+  return unsetPlayerInfo({
     dispatch,
   });
 }
@@ -183,9 +236,25 @@ export function setPlayerID({
   });
 }
 
-export function unsetPlayer({
+export function setPlayerInfo({
+  dispatch,
+  playerDetails,
+}: BaseAction & {
+  playerDetails: { playerID: PlayerID; playerObjectID: string; username: string };
+}) {
+  return dispatch({
+    type: SET_PLAYER_INFO,
+    payload: {
+      player: playerDetails,
+    },
+  });
+}
+
+export function unsetPlayerInfo({
   dispatch, // force formatting
 }: BaseAction) {
+  window.localStorage.removeItem(PLAYER_DETAILS_LS_KEY);
+
   return dispatch({
     type: UNSET_PLAYER_INFO,
   });

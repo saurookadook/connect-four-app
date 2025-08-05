@@ -14,14 +14,16 @@ import {
 } from 'vitest';
 
 import {
+  LogicBoard,
   LogicSession,
   GameLogicEngine,
+  GameSessionStatus,
+  PlayerColor,
   moveTuplesByGenerator,
   populateBoardWithDescendingSlopeDiagonalWinOne,
   populateBoardWithOneMoveTilWin,
   populateBoardWithMoves,
   type PlayerMove,
-  GameSessionStatus,
 } from '@connect-four-app/shared';
 import {
   findGameSessionMockForPlayers,
@@ -30,7 +32,8 @@ import {
 import { server } from '@/__mocks__/mswServers';
 import { mockFirstPlayer, mockSecondPlayer } from '@/__mocks__/playerMocks';
 import { DEBUG_LS_KEY, GAME_SESSION_LS_KEY, PLAYER_DETAILS_LS_KEY } from '@/constants';
-import { createEmptyBoard } from '@/pages/GameSession/utils';
+import { GameSessionStateSlice } from '@/store/game-session/reducer.types';
+import { PlayerStateSlice } from '@/store/player/reducer.types';
 import { AppStateProvider } from '@/store';
 import {
   createFetchMock,
@@ -46,7 +49,36 @@ const mockGameSession = findGameSessionMockForPlayers({
   playerOneID: mockFirstPlayer.playerID,
   playerTwoID: mockSecondPlayer.playerID,
 }) as GameSessionMock;
-const emptyBoard = createEmptyBoard();
+const emptyBoard = LogicBoard.createEmptyBoardState();
+
+function createInitialState({
+  gameSession,
+  player,
+}: {
+  gameSession?: Partial<GameSessionStateSlice>;
+  player?: Partial<PlayerStateSlice>;
+} = {}) {
+  return {
+    gameSession: {
+      gameSessionID: mockGameSession.id,
+      activePlayer: PlayerColor.RED,
+      boardCells: emptyBoard,
+      moves: [],
+      playerOneID: mockFirstPlayer.playerID,
+      playerOneUsername: mockFirstPlayer.username,
+      playerTwoID: mockSecondPlayer.playerID,
+      playerTwoUsername: mockSecondPlayer.username,
+      status: GameSessionStatus.ACTIVE,
+      winner: null,
+      ...gameSession,
+    },
+    player: {
+      playerID: mockFirstPlayer.playerID,
+      username: mockFirstPlayer.username,
+      ...player,
+    },
+  };
+}
 
 function GameSessionWithRouter({ gameSessionID }: { gameSessionID: string }) {
   return <WithMemoryRouter initialEntries={[`/game-session/${gameSessionID}`]} />;
@@ -56,13 +88,6 @@ describe('GameSession', () => {
   // @ts-expect-error: I know the type doesn't match exactly but that's ok :]
   const fetchMock = vi.spyOn(window, 'fetch').mockImplementation(createFetchMock());
   window.localStorage.setItem(DEBUG_LS_KEY, JSON.stringify(true));
-  window.localStorage.setItem(
-    PLAYER_DETAILS_LS_KEY,
-    JSON.stringify({
-      playerID: mockFirstPlayer.playerID,
-      username: mockFirstPlayer.username,
-    }),
-  );
 
   beforeAll(() => {
     server.listen();
@@ -83,6 +108,9 @@ describe('GameSession', () => {
     const { container } = renderWithContext(
       <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
       AppStateProvider,
+      {
+        state: createInitialState(),
+      },
     );
 
     await expectHeadingToBeVisible({
@@ -113,13 +141,6 @@ describe('GameSession', () => {
   test("alert is thrown when trying to move during other player's turn", async () => {
     /* START TEST SETUP */
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(vi.fn());
-    window.localStorage.setItem(
-      PLAYER_DETAILS_LS_KEY,
-      JSON.stringify({
-        playerID: mockSecondPlayer.playerID,
-        username: mockSecondPlayer.username,
-      }),
-    );
 
     const moveTuples = moveTuplesByGenerator[populateBoardWithOneMoveTilWin.name];
 
@@ -148,22 +169,16 @@ describe('GameSession', () => {
       <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
       AppStateProvider,
       {
-        state: {
+        state: createInitialState({
           gameSession: {
-            gameSessionID: mockGameSession.id,
             boardCells: testBoardCells,
             moves: testMoves,
-            playerOneID: mockFirstPlayer.playerID,
-            playerOneUsername: mockFirstPlayer.username,
-            playerTwoID: mockSecondPlayer.playerID,
-            playerTwoUsername: mockSecondPlayer.username,
-            status: GameSessionStatus.ACTIVE,
-            winner: null,
           },
           player: {
             playerID: mockSecondPlayer.playerID,
+            username: mockSecondPlayer.username,
           },
-        },
+        }),
       },
     );
 
@@ -233,22 +248,18 @@ describe('GameSession', () => {
       <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
       AppStateProvider,
       {
-        state: {
+        state: createInitialState({
           gameSession: {
-            gameSessionID: mockGameSession.id,
             boardCells: testBoardCells,
             moves: testMoves,
-            playerOneID: mockFirstPlayer.playerID,
-            playerOneUsername: mockFirstPlayer.username,
-            playerTwoID: mockSecondPlayer.playerID,
-            playerTwoUsername: mockSecondPlayer.username,
             status: GameSessionStatus.COMPLETED,
             winner: mockFirstPlayer.playerID,
           },
           player: {
             playerID: mockSecondPlayer.playerID,
+            username: mockSecondPlayer.username,
           },
-        },
+        }),
       },
     );
 

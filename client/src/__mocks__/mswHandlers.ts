@@ -6,24 +6,26 @@ import {
   SEND_GAME_SESSION,
   SEND_MOVE,
   START_GAME,
+  LogicBoard,
   safeParseJSON,
+  sharedLog,
   type BaseWebSocketMessageEvent,
   type PlayerID,
   type PlayerMove,
   type SendGameSessionMessageEvent,
   type SendMoveMessageEvent,
 } from '@connect-four-app/shared';
-import { createEmptyBoard } from '@/pages/GameSession/utils';
 import {
   findGameSessionMock,
   findGameSessionMockForPlayers,
 } from './gameSessionsMocks';
 
+const logger = sharedLog.getLogger('mswHandlers');
+
 const WS_CONN_URL = 'ws://localhost:8090/connect-ws';
-
-const emptyBoard = createEmptyBoard();
-
 const wsApi = ws.link(WS_CONN_URL);
+
+const emptyBoard = LogicBoard.createEmptyBoardState();
 
 export const handlers = [
   wsApi.addEventListener('connection', ({ client, server }) => {

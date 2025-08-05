@@ -8,9 +8,10 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
 import { sharedLog } from '@connect-four-app/shared';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '@/auth/decorators';
 
 const logger = sharedLog.getLogger('LocalAuthGuard');
+logger.setLevel('ERROR');
 
 @Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
@@ -18,17 +19,29 @@ export class LocalAuthGuard extends AuthGuard('local') {
     super();
   }
 
-  canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
+    logger.debug(
+      `[${this.canActivate.name} method] - is public? ${isPublic}\n`,
+    );
 
     if (isPublic) {
       return true;
     }
 
-    return super.canActivate(context);
+    const result = (await super.canActivate(context)) as boolean;
+    logger.debug(`[${this.canActivate.name} method] - result\n`, {
+      result,
+    });
+    const logInResult = await super.logIn(context.switchToHttp().getRequest());
+    logger.debug(`[${this.canActivate.name} method] - logInResult\n`, {
+      logInResult,
+    });
+
+    return result;
   }
 
   handleRequest(err, user, info) {
