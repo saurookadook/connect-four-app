@@ -40,7 +40,9 @@ const email: CombinedPlayerStateSlice['email'] = [
       case LOG_IN_PLAYER:
       case SET_PLAYER_ID:
       case SET_PLAYER_INFO:
-        return action.payload.email;
+        return action.payload.player.email ?? null;
+      case UNSET_PLAYER_INFO:
+        return null;
       default:
         return stateSlice;
     }
@@ -54,7 +56,6 @@ const playerID: CombinedPlayerStateSlice['playerID'] = [
       case REGISTER_NEW_PLAYER:
       case LOG_IN_PLAYER:
       case SET_PLAYER_ID:
-        return action.payload.playerID;
       case SET_PLAYER_INFO:
         return action.payload.player.playerID;
       case UNSET_PLAYER_INFO:
@@ -71,9 +72,8 @@ const playerObjectID: CombinedPlayerStateSlice['playerObjectID'] = [
     switch (action.type) {
       case REGISTER_NEW_PLAYER:
       case LOG_IN_PLAYER:
-        return action.payload.playerObjectID ?? null;
       case SET_PLAYER_INFO:
-        return action.payload.player.playerObjectID;
+        return action.payload.player.playerObjectID ?? null;
       case UNSET_PLAYER_INFO:
         return null;
       default:
@@ -89,7 +89,7 @@ const username: CombinedPlayerStateSlice['username'] = [
       case REGISTER_NEW_PLAYER:
       case LOG_IN_PLAYER:
       case SET_PLAYER_INFO:
-        return action.payload.username;
+        return action.payload.player.username;
       case UNSET_PLAYER_INFO:
         return null;
       default:

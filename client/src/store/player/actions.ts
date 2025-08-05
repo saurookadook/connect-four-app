@@ -1,7 +1,7 @@
 import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { BASE_API_SERVER_URL, PLAYER_DETAILS_LS_KEY } from '@/constants';
 import { type BaseAction } from '@/types/main';
-import { safeFetch } from '@/utils';
+import { resolveResponseData, safeFetch } from '@/utils';
 import {
   REGISTER_NEW_PLAYER,
   LOG_IN_PLAYER,
@@ -56,12 +56,24 @@ export async function refreshPlayerData({
           credentials: 'include',
         },
       },
+      onErrorCallback: async ({ error, response }) => {
+        const errorResponseData = await resolveResponseData(response);
+        const { timestamp, ...rest } = errorResponseData;
+        return {
+          ...rest,
+          timestamp: timestamp == null ? new Date() : new Date(timestamp),
+        };
+      },
     },
   );
 
   logger.debug(`[${funcName}] responseData:\n`, {
     responseData,
   });
+
+  if (responseData.statusCode === 403) {
+    return unsetPlayerInfo({ dispatch });
+  }
 
   updateBrowserSession(responseData);
 
@@ -137,7 +149,12 @@ async function handleAuthRequest({
   dispatch({
     type: actionType,
     payload: {
-      ...responseData,
+      player: {
+        email: responseData.email,
+        playerID: responseData.playerID,
+        playerObjectID: responseData.playerObjectID,
+        username: responseData.username,
+      },
     },
   });
 
