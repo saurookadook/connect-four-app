@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Query,
@@ -14,20 +15,58 @@ import { plainToInstance } from 'class-transformer';
 import { type Request, type Response } from 'express';
 
 import { sharedLog, type PlayerID } from '@connect-four-app/shared';
-import { PlayerDetails } from '@/types/main';
-import {
-  AuthenticationRequestDTO,
-  RegisterDTO,
-  LoginDTO,
-} from './dtos/auth.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { AuthenticationService } from './authentication.service';
+import { LocalAuthGuard, LoggedInGuard } from '@/auth/guards';
+import { AuthenticationRequestDTO, RegisterDTO, LoginDTO } from '@/auth/dtos';
+import { AuthenticationService } from '@/auth/authentication.service';
+import type { PlayerDetails } from '@/types/main';
 
 const logger = sharedLog.getLogger('AuthController');
+logger.setLevel('DEBUG');
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authenticationService: AuthenticationService) {}
+
+  /**
+   * @description Self-heal route for player data using `sessionID` from cookie.
+   */
+  @UseGuards(LoggedInGuard)
+  @Get('refresh')
+  refresh(
+    @Req() req: Request, // force formatting
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    logger.debug(
+      `in '${this.refresh.name}' method\n`,
+      inspect(
+        {
+          // req,
+          reqHeaders: req.headers,
+          reqCookies: req.cookies,
+          reqUrl: req.url,
+          reqSignedCookies: req.signedCookies,
+          reqSession: req.session,
+          reqUser: req.user,
+          // res,
+        },
+        {
+          colors: true,
+          compact: false,
+          depth: 2,
+          showHidden: true,
+          sorted: true,
+        },
+      ),
+    );
+
+    return {
+      message: 'Player data refresh successful!',
+      playerID: req.user.playerID,
+      playerObjectID: req.user.playerObjectID,
+      statusCode: 200,
+      username: req.user.username,
+    };
+  }
 
   @Post('register')
   async register(
@@ -78,6 +117,7 @@ export class AuthController {
     return playerDetails;
   }
 
+  @UseGuards(LoggedInGuard)
   @Delete('logout/:playerID')
   async logout(
     // TODO: maybe don't need to pass this? or could use it to delete the other session record?
