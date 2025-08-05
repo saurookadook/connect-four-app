@@ -7,6 +7,7 @@ import { sharedLog } from '@connect-four-app/shared';
 import { AuthenticationService } from '@/auth/authentication.service';
 
 const logger = sharedLog.getLogger('LocalStrategy');
+logger.setLevel('ERROR');
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
