@@ -97,8 +97,6 @@ export function GameSession() {
   useLoadGame({
     dispatch: appDispatch,
     params,
-    gameSession: appState.gameSession,
-    playerID,
     wsMessageHandler,
   });
 
