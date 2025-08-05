@@ -104,7 +104,7 @@ describe('GameSession', () => {
     vi.clearAllMocks();
   });
 
-  it.only('renders correctly', async () => {
+  it('renders correctly', async () => {
     const { container } = renderWithContext(
       <GameSessionWithRouter gameSessionID={mockGameSession.id} />, // force formatting
       AppStateProvider,
