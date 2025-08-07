@@ -25,7 +25,7 @@ import { GameSessionsService } from '@/game-engine/sessions/game-sessions.servic
 export class GameSessionsController {
   constructor(private readonly gameSessionsService: GameSessionsService) {}
 
-  // @UseGuards(LoggedInGuard)
+  @UseGuards(LoggedInGuard)
   @Post('start')
   async createNewGameSession(
     @Body() requestData: CreateGameSessionDTO, // force formatting

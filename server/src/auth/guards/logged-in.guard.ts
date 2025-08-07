@@ -43,12 +43,16 @@ export class LoggedInGuard implements CanActivate {
           reqHeaders: request.headers,
           reqUser: request.user,
           sessionID: request.sessionID,
-          isAuthenticated: request.isAuthenticated(),
+          isAuthenticated:
+            typeof request.isAuthenticated === 'function' &&
+            request.isAuthenticated(),
         },
         { colors: true, compact: false, depth: 1 },
       ),
     );
 
-    return request.isAuthenticated();
+    return (
+      typeof request.isAuthenticated === 'function' && request.isAuthenticated()
+    );
   }
 }
