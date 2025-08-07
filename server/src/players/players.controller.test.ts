@@ -5,6 +5,7 @@ import { Connection, Model } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
+import { sharedLog } from '@connect-four-app/shared';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
@@ -15,11 +16,12 @@ import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-
 import { Player } from '@/players/schemas/player.schema';
 import { PlayersModule } from '@/players/players.module';
 import { PlayersService } from '@/players/players.service';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
+
+const logger = sharedLog.getLogger('PlayersController__tests');
 
 describe('PlayersController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
@@ -93,6 +95,21 @@ describe('PlayersController', () => {
             `Could not find 'player' with ID '${randomUUID}'.`,
           );
           expect(resultBody.statusCode).toBe(404);
+        });
+    });
+
+    it("should respond with validation error if 'playerID' path param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/players/${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
         });
     });
   });
@@ -174,6 +191,21 @@ describe('PlayersController', () => {
 
           expect(resultBody.playersData).not.toBeNull();
           expect(resultBody.playersData).toHaveLength(0);
+        });
+    });
+
+    it("should respond with validation error if 'currentPlayerID' query param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/players/all?currentPlayerID=${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
         });
     });
   });
