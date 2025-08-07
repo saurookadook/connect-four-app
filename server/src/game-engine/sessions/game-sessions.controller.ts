@@ -4,22 +4,28 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { plainToInstance } from 'class-transformer';
 
 import { type PlayerID } from '@connect-four-app/shared';
 import { Public } from '@/auth/decorators/public.decorator';
-import { CreateGameSessionDTO, GameSessionDTO } from '../dtos/game-session.dto';
-import { GameSessionDocument } from '../schemas/game-session.schema';
-import { GameSessionsService } from '../sessions/game-sessions.service';
+import { LoggedInGuard } from '@/auth/guards';
+import {
+  CreateGameSessionDTO,
+  GameSessionDTO,
+} from '@/game-engine/dtos/game-session.dto';
+import { GameSessionDocument } from '@/game-engine/schemas/game-session.schema';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 
 @Controller('game-sessions')
 export class GameSessionsController {
   constructor(private readonly gameSessionsService: GameSessionsService) {}
 
-  // TODO: add decorator for the session cookie
+  // @UseGuards(LoggedInGuard)
   @Post('start')
   async createNewGameSession(
     @Body() requestData: CreateGameSessionDTO, // force formatting
@@ -52,7 +58,7 @@ export class GameSessionsController {
   @Public()
   @Get('history/:playerID')
   async getGameSessionsHistoryForPlayerID(
-    @Param('playerID') playerID: PlayerID,
+    @Param('playerID', ParseUUIDPipe) playerID: PlayerID,
   ): Promise<{ sessions: GameSessionDTO[] }> {
     const playerSessions =
       await this.gameSessionsService.findAllForPlayer(playerID);
@@ -95,7 +101,7 @@ export class GameSessionsController {
   @Public()
   @Get(':sessionID')
   async getGameSession(
-    @Param('sessionID') sessionID: string,
+    @Param('sessionID', ParseObjectIdPipe) sessionID: string,
   ): Promise<{ session: GameSessionDTO }> {
     const foundGameSession =
       await this.gameSessionsService.findOneById(sessionID);

@@ -269,9 +269,24 @@ describe('GameSessionsController', () => {
         })
         .expect(404);
     });
+
+    it("should respond with validation error if 'sessionID' path param is not a valid MongoDB ObjectId", async () => {
+      const invalidSessionID = 'hooplah';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${invalidSessionID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            `Invalid ObjectId: '${invalidSessionID}' is not a valid MongoDB ObjectId`,
+          );
+          expect(resultBody.statusCode).toBe(400);
+        });
+    });
   });
 
-  describe('/game-sessions/history (GET)', () => {
+  describe('/game-sessions/history/:playerID (GET)', () => {
     beforeEach(async () => {
       await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
@@ -384,6 +399,21 @@ describe('GameSessionsController', () => {
           );
 
           expect(result.status).toBe(200);
+        });
+    });
+
+    it("should respond with validation error if 'playerID' path param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/history/${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
         });
     });
   });
