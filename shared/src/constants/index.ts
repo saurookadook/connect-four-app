@@ -12,4 +12,5 @@ export enum PlayerColor {
   BLACK = 'BLACK',
 }
 
+export * from './validation-patterns';
 export * from './ws-events';
