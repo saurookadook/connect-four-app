@@ -20,6 +20,7 @@ import {
 } from '@/game-engine/dtos/game-session.dto';
 import { GameSessionDocument } from '@/game-engine/schemas/game-session.schema';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
+import { DTOValidationPipe } from '@/pipes/dto-validation.pipe';
 
 @Controller('game-sessions')
 export class GameSessionsController {
@@ -28,11 +29,10 @@ export class GameSessionsController {
   @UseGuards(LoggedInGuard)
   @Post('start')
   async createNewGameSession(
-    @Body() requestData: CreateGameSessionDTO, // force formatting
+    @Body(DTOValidationPipe) createGameSessionDTO: CreateGameSessionDTO, // force formatting
   ): Promise<{ session: GameSessionDTO }> {
-    const dataAsDTO = plainToInstance(CreateGameSessionDTO, requestData);
     const createdGameSession =
-      await this.gameSessionsService.createOne(dataAsDTO);
+      await this.gameSessionsService.createOne(createGameSessionDTO);
     await createdGameSession.populate(['playerOne', 'playerTwo']);
 
     const sessionData =
