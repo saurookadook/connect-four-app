@@ -83,7 +83,6 @@ describe('GameSessionsController', () => {
 
     app = module.createNestApplication();
     app.useWebSocketAdapter(new WsAdapter(app));
-
     await app.init();
 
     mongoConnection = await app.resolve(getConnectionToken());
@@ -112,6 +111,7 @@ describe('GameSessionsController', () => {
     await playerModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 

@@ -51,6 +51,7 @@ describe('PlayersController', () => {
   afterAll(async () => {
     await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 
