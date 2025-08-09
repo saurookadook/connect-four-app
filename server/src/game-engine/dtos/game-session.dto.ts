@@ -1,10 +1,14 @@
 import { Exclude, Expose } from 'class-transformer';
 import {
+  IsDateString,
   IsEnum,
+  IsMongoId,
   IsOptional,
   IsString,
+  IsStrongPassword,
   IsUUID,
   ValidateIf,
+  type IsStrongPasswordOptions,
 } from 'class-validator';
 import { Types } from 'mongoose';
 
@@ -55,6 +59,7 @@ export class GameSessionDTO extends BaseDTO {
 export class CreateGameSessionDTO {
   @Expose()
   @IsOptional()
+  @IsMongoId()
   playerOneObjectID?: Types.ObjectId;
 
   @Expose()
@@ -63,6 +68,7 @@ export class CreateGameSessionDTO {
 
   @Expose()
   @IsOptional()
+  @IsMongoId()
   playerTwoObjectID?: Types.ObjectId;
 
   @Expose()
@@ -75,6 +81,7 @@ export class CreateGameSessionDTO {
 
   @Expose()
   @IsOptional()
+  @IsEnum(GameSessionStatus)
   status?: GameSessionDTO['status'];
 }
 
@@ -82,18 +89,22 @@ export class CreateGameSessionDTO {
 export class UpdateGameSessionDTO extends PartialBaseDTO {
   @Expose()
   @IsOptional()
+  @IsMongoId()
   playerOneObjectID?: CreateGameSessionDTO['playerOneObjectID'];
 
   @Expose()
   @IsOptional()
+  @IsUUID()
   playerOneID?: GameSessionDTO['playerOneID'];
 
   @Expose()
   @IsOptional()
+  @IsMongoId()
   playerTwoObjectID?: CreateGameSessionDTO['playerTwoObjectID'];
 
   @Expose()
   @IsOptional()
+  @IsUUID()
   playerTwoID?: GameSessionDTO['playerTwoID'];
 
   @Expose()
@@ -102,5 +113,6 @@ export class UpdateGameSessionDTO extends PartialBaseDTO {
 
   @Expose()
   @IsOptional()
+  @IsEnum(GameSessionStatus)
   status?: GameSessionDTO['status'];
 }
