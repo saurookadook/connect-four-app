@@ -1,16 +1,8 @@
 import * as React from 'react';
 import classNames from 'classnames';
 
+import { usernamePattern, passwordPattern } from '@connect-four-app/shared';
 import './styles.css';
-
-export const usernamePattern = {
-  asRegExp: /^[a-zA-Z0-9_]{5,24}$/,
-  asString: '^[a-zA-Z0-9_]{5,24}$',
-};
-export const passwordPattern = {
-  asRegExp: /^[A-Za-z0-9!@#$%^&*\-_]{8,30}$/,
-  asString: '^[A-Za-z0-9!@#$%^&*\\-_]{8,30}$',
-};
 
 export enum InputType {
   USERNAME = 'username',

@@ -9,7 +9,7 @@ import {
   type MoveTuple,
 } from '@/utils/testing/winConditionGenerators';
 
-const logger = sharedLog.getLogger('GameLogicEngine__Tests');
+const logger = sharedLog.getLogger('GameLogicEngine__tests');
 
 describe('GameLogicEngine', () => {
   let gameEngine: GameLogicEngine;
