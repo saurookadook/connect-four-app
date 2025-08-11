@@ -166,7 +166,7 @@ describe('GameEngineService', () => {
       const initialGameSessionResult = (await gameSessionModel
         .findById(initialGameSessionDocument.id)
         .exec()) as GameSessionDocument;
-      expect(initialGameSessionResult).not.toBeNull();
+      expect(initialGameSessionResult).not.toBeNullish();
       expectHydratedDocumentToMatch<GameSession>(
         initialGameSessionResult, // force formatting
         {
@@ -227,7 +227,7 @@ describe('GameEngineService', () => {
           playerTwoID: mockPlayerTwoID,
         })
         .exec()) as GameSessionDocument;
-      expect(initialGameSessionResult).not.toBeNull();
+      expect(initialGameSessionResult).not.toBeNullish();
       expectHydratedDocumentToMatch<GameSession>(
         initialGameSessionResult, // force formatting
         {
@@ -238,7 +238,7 @@ describe('GameEngineService', () => {
       const initialBoardStateResult = (await boardStateModel
         .findById(initialBoardStateDocument.id)
         .exec()) as BoardStateDocument;
-      expect(initialBoardStateResult).not.toBeNull();
+      expect(initialBoardStateResult).not.toBeNullish();
       expectHydratedDocumentToMatch<BoardState>(
         initialBoardStateResult, // force formatting
         {

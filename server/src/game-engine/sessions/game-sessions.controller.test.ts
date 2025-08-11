@@ -137,7 +137,7 @@ describe('GameSessionsController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.session).not.toBeNull();
+          expect(resultBody.session).not.toBeNullish();
           expectSerializedDocumentToMatch<GameSession>(
             resultBody.session,
             createNewGameSessionMock({

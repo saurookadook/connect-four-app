@@ -13,7 +13,7 @@ export function expectHydratedDocumentToMatch<T>(
   documentUnderTest: HydratedDocument<T>,
   expected: { _id?: Types.ObjectId; __v?: number } & Partial<T>,
 ): void {
-  expect(documentUnderTest).not.toBeNull();
+  expect(documentUnderTest).not.toBeNullish();
   expect(documentUnderTest).toHaveProperty('_id', expect.any(Types.ObjectId));
 
   for (const [key, value] of Object.entries(expected)) {
@@ -35,7 +35,7 @@ export function expectSerializedDocumentToMatch<T>(
   documentUnderTest: Partial<T>,
   expected: Partial<T> & { id?: string },
 ): void {
-  expect(documentUnderTest).not.toBeNull();
+  expect(documentUnderTest).not.toBeNullish();
   expect(documentUnderTest).toHaveProperty('id', expect.any(String));
 
   for (const [key, value] of Object.entries(expected)) {

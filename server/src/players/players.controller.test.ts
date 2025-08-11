@@ -74,7 +74,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.player).not.toBeNull();
+          expect(resultBody.player).not.toBeNullish();
           expectSerializedDocumentToMatch<Player>(
             resultBody.player, // force formatting
             {
@@ -134,7 +134,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(3);
 
           mockPlayers.forEach((expectedPlayer, index) => {
@@ -152,7 +152,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(2);
 
           [mockFirstPlayer, mockThirdPlayer].forEach(
@@ -178,7 +178,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(0);
         });
     });
@@ -190,7 +190,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(0);
         });
     });
