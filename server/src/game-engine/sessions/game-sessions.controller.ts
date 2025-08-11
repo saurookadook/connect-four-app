@@ -84,6 +84,7 @@ export class GameSessionsController {
     return transformedSessions;
   }
 
+  // TODO: this should probably be a util function instead of a method
   async createSessionDataForResponse(gameSession: GameSessionDocument) {
     const populatedSession = await gameSession.populate([
       'playerOne',
