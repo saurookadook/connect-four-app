@@ -21,6 +21,7 @@ import {
 import { GameSessionDocument } from '@/game-engine/schemas/game-session.schema';
 import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
 import { DTOValidationPipe } from '@/pipes/dto-validation.pipe';
+import { createTransformedSessionDataForResponse } from '@/utils/transforms';
 
 @Controller('game-sessions')
 export class GameSessionsController {
@@ -70,35 +71,6 @@ export class GameSessionsController {
     };
   }
 
-  async createTransformedSessions(
-    gameSessions: GameSessionDocument[],
-  ): Promise<GameSessionDTO[]> {
-    const transformedSessions: GameSessionDTO[] = [];
-
-    for (const session of gameSessions) {
-      const sessionData = await this.createSessionDataForResponse(session);
-
-      transformedSessions.push(plainToInstance(GameSessionDTO, sessionData));
-    }
-
-    return transformedSessions;
-  }
-
-  // TODO: this should probably be a util function instead of a method
-  async createSessionDataForResponse(gameSession: GameSessionDocument) {
-    const populatedSession = await gameSession.populate([
-      'playerOne',
-      'playerTwo',
-    ]);
-    const { playerOne, playerTwo, ...rest } = populatedSession.toJSON();
-
-    return {
-      ...rest,
-      playerOneUsername: playerOne.username,
-      playerTwoUsername: playerTwo.username,
-    };
-  }
-
   @Public()
   @Get(':sessionID')
   async getGameSession(
@@ -119,5 +91,23 @@ export class GameSessionsController {
     return {
       session: plainToInstance(GameSessionDTO, sessionData),
     };
+  }
+
+  async createTransformedSessions(
+    gameSessions: GameSessionDocument[],
+  ): Promise<GameSessionDTO[]> {
+    const transformedSessions: GameSessionDTO[] = [];
+
+    for (const session of gameSessions) {
+      const sessionData = await this.createSessionDataForResponse(session);
+
+      transformedSessions.push(plainToInstance(GameSessionDTO, sessionData));
+    }
+
+    return transformedSessions;
+  }
+
+  async createSessionDataForResponse(gameSessionDocument: GameSessionDocument) {
+    return createTransformedSessionDataForResponse(gameSessionDocument);
   }
 }
