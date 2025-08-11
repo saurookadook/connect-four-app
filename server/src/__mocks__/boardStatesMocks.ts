@@ -12,7 +12,7 @@ export type BoardStateDocumentMock = {
 };
 
 export function createBoardStateDocumentMock(
-  gameSessionID: string,
+  gameSessionID?: string,
 ): BoardStateDocumentMock {
   return {
     gameSessionID: new Types.ObjectId(gameSessionID),
