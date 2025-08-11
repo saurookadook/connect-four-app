@@ -1,8 +1,24 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { inspect } from 'node:util';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 
-import { CreateGameSessionDTO } from './dtos/game-session.dto';
-import { GameSessionsService } from './sessions/game-sessions.service';
+import { sharedLog } from '@connect-four-app/shared';
+import { LoggedInGuard } from '@/auth/guards';
+import { GameSessionsService } from '@/game-engine/sessions/game-sessions.service';
+import {
+  BoardStateDTO,
+  CreateGameSessionDTO,
+  GameSessionDTO,
+} from '@/game-engine/dtos';
+import { BoardStateDocument, GameSessionDocument } from '@/game-engine/schemas';
+import { DTOValidationPipe } from '@/pipes/dto-validation.pipe';
+import {
+  createTransformedBoardStateDataForResponse,
+  createTransformedSessionDataForResponse,
+} from '@/utils/transforms';
 import { GameEngineService } from './game-engine.service';
+
+const logger = sharedLog.getLogger('GameEngineController');
 
 @Controller('game-engine')
 export class GameEngineController {
@@ -11,14 +27,28 @@ export class GameEngineController {
     private readonly gameSessionsService: GameSessionsService,
   ) {}
 
-  // TODO: I'm not sure this is necessary?
+  @UseGuards(LoggedInGuard)
   @Post('start')
   async startGame(
-    @Body() createGameSessionDTO: CreateGameSessionDTO, // force formatting
-  ) {
-    return await this.gameEngineService.startGame({
-      playerOneID: createGameSessionDTO.playerOneID,
-      playerTwoID: createGameSessionDTO.playerTwoID,
-    });
+    @Body(DTOValidationPipe) createGameSessionDTO: CreateGameSessionDTO, // force formatting
+  ): Promise<{ boardState: BoardStateDTO; gameSession: GameSessionDTO }> {
+    const { boardState: boardStateDocument, gameSession: gameSessionDocument } =
+      await this.gameEngineService.startGame({
+        playerOneID: createGameSessionDTO.playerOneID,
+        playerTwoID: createGameSessionDTO.playerTwoID,
+      });
+
+    return {
+      boardState: this.createBoardStateDataForResponse(boardStateDocument),
+      gameSession: await this.createSessionDataForResponse(gameSessionDocument),
+    };
+  }
+
+  createBoardStateDataForResponse(boardStateDocument: BoardStateDocument) {
+    return createTransformedBoardStateDataForResponse(boardStateDocument);
+  }
+
+  async createSessionDataForResponse(gameSessionDocument: GameSessionDocument) {
+    return createTransformedSessionDataForResponse(gameSessionDocument);
   }
 }
