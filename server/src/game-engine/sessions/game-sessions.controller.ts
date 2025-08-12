@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { plainToInstance } from 'class-transformer';
 
 import { type PlayerID } from '@connect-four-app/shared';
 import { Public } from '@/auth/decorators/public.decorator';
@@ -40,7 +39,7 @@ export class GameSessionsController {
       await this.createSessionDataForResponse(createdGameSession);
 
     return {
-      session: plainToInstance(GameSessionDTO, sessionData),
+      session: sessionData,
     };
   }
 
@@ -89,7 +88,7 @@ export class GameSessionsController {
       await this.createSessionDataForResponse(foundGameSession);
 
     return {
-      session: plainToInstance(GameSessionDTO, sessionData),
+      session: sessionData,
     };
   }
 
@@ -101,7 +100,7 @@ export class GameSessionsController {
     for (const session of gameSessions) {
       const sessionData = await this.createSessionDataForResponse(session);
 
-      transformedSessions.push(plainToInstance(GameSessionDTO, sessionData));
+      transformedSessions.push(sessionData);
     }
 
     return transformedSessions;

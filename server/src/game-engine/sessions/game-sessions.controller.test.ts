@@ -108,8 +108,8 @@ describe('GameSessionsController', () => {
   });
 
   afterAll(async () => {
-    await playerModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
+    await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
     await app.close();
     jest.useRealTimers();
