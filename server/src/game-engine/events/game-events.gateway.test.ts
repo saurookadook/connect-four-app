@@ -23,12 +23,13 @@ import {
   mockPlayerOneID,
   mockPlayerTwoID,
 } from '@/__mocks__/playerMocks';
+import { RootConfigModule } from '@/config';
 import {
   BOARD_STATE_MODEL_TOKEN,
   GAME_SESSION_MODEL_TOKEN,
   PLAYER_MODEL_TOKEN,
 } from '@/constants';
-import { databaseProviders } from '@/database/database.providers';
+import { DatabaseModule } from '@/database/database.module';
 import { BoardStatesService } from '@/game-engine/board-states/board-states.service';
 import {
   BoardState,
@@ -67,7 +68,8 @@ describe('GameEventsGateway', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        ...databaseProviders, // force formatting
+        RootConfigModule, // force formatting
+        DatabaseModule,
         GameEngineModule,
       ],
       providers: [GameEventsGateway],

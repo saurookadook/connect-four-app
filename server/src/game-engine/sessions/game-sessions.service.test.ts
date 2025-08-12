@@ -11,18 +11,16 @@ import {
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionDocumentMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
-import { Player, PlayerDocument } from '@/players/schemas/player.schema';
-import { PlayersModule } from '@/players/players.module';
+import { RootConfigModule } from '@/config';
 import {
   GAME_SESSION_MODEL_TOKEN, // force formatting
   PLAYER_MODEL_TOKEN,
 } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
+import { Player, PlayerDocument } from '@/players/schemas/player.schema';
+import { PlayersModule } from '@/players/players.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
-import {
-  GameSession,
-  GameSessionDocument,
-} from '../schemas/game-session.schema';
+import { GameSession, GameSessionDocument } from '@/game-engine/schemas';
 import { GameSessionsModule } from './game-sessions.module';
 import { GameSessionsService } from './game-sessions.service';
 
@@ -53,6 +51,7 @@ describe('GameSessionsService', () => {
     });
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         GameSessionsModule,
         PlayersModule,

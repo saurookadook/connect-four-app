@@ -27,6 +27,7 @@ import {
   mockPlayerOneID,
   mockPlayerTwoID,
 } from '@/__mocks__/playerMocks';
+import { RootConfigModule } from '@/config';
 import {
   BOARD_STATE_MODEL_TOKEN,
   GAME_SESSION_MODEL_TOKEN,
@@ -68,6 +69,7 @@ describe('GameEngineService', () => {
     });
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         GameEngineModule,
         PlayersModule,

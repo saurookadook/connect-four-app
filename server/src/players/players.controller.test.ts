@@ -8,6 +8,7 @@ import { App } from 'supertest/types';
 import { sharedLog } from '@connect-four-app/shared';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { AuthModule } from '@/auth/auth.module';
+import { RootConfigModule } from '@/config';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import {
@@ -32,6 +33,7 @@ describe('PlayersController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         AuthModule,
         PlayersModule,

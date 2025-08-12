@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import connectMongoDBSession from 'connect-mongodb-session';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -12,6 +13,7 @@ import { HttpExceptionFilterProvider } from '@/filters/filters.providers';
 import { GameEngineModule } from '@/game-engine/game-engine.module';
 import { GameEventsModule } from '@/game-engine/events/game-events.module';
 import { SecurityMiddleware } from '@/middleware/security.middleware';
+import { isProdEnv } from '@/utils/predicates';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 
@@ -36,6 +38,11 @@ function createSessionStore() {
 @Module({
   controllers: [AppController],
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      isGlobal: true,
+      load: [baseConfig],
+    }),
     AuthModule,
     DatabaseModule,
     GameEngineModule, // force formatting
@@ -55,7 +62,7 @@ export class AppModule {
     logger.setLevel('debug');
     const { NODE_ENV, SESSION_SECRET } = process.env;
 
-    const isProd = NODE_ENV === 'prod';
+    const isProd = isProdEnv(NODE_ENV);
     const sessionStore = createSessionStore();
 
     consumer

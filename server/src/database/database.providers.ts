@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Collection, Connection } from 'mongoose';
 
 import { sharedLog } from '@connect-four-app/shared';
-import baseConfig, { buildConnectionURI } from '@/config';
+import { buildConnectionURI } from '@/config';
 import { BOARD_STATES_TTL_SECONDS } from '@/game-engine/schemas/board-states.schema';
 
 const logger = sharedLog.getLogger('databaseProviders');
@@ -42,11 +42,6 @@ async function initSpecialCollections(mongoConn: Connection) {
 }
 
 export const databaseProviders = [
-  ConfigModule.forRoot({
-    envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
-    isGlobal: true,
-    load: [baseConfig],
-  }),
   MongooseModule.forRootAsync({
     imports: [ConfigModule],
     useFactory: (configService: ConfigService) => ({
