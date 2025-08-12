@@ -3,13 +3,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document, Model, RootFilterQuery, SortOrder, Types } from 'mongoose';
 
-import { type PlayerID } from '@connect-four-app/shared';
+import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { CreatePlayerDTO, UpdatePlayerDTO } from './dtos/player.dto';
 import {
   NullablePlayerDocument,
   Player,
   PlayerDocument,
 } from './schemas/player.schema';
+
+const logger = sharedLog.getLogger('PlayersService');
 
 export type PlayerFilterOptions = RootFilterQuery<
   Document<unknown, {}, Player, {}> &

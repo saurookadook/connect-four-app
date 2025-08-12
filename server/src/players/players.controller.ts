@@ -2,9 +2,11 @@ import { inspect } from 'node:util';
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
@@ -33,7 +35,8 @@ export class PlayersController {
 
   @Get('all')
   async getAllPlayers(
-    @Query('currentPlayerID') currentPlayerID?: string, // force formatting
+    @Query('currentPlayerID', new ParseUUIDPipe({ optional: true }))
+    currentPlayerID?: string, // force formatting
   ): Promise<{ playersData: Pick<PlayerDTO, 'playerID' | 'username'>[] }> {
     const methodName = this.getAllPlayers.name;
     logger.trace(
@@ -57,7 +60,7 @@ export class PlayersController {
 
   @Get(':playerID')
   async getPlayerByPlayerID(
-    @Param('playerID') playerID: PlayerID, // force formatting
+    @Param('playerID', ParseUUIDPipe) playerID: PlayerID, // force formatting
   ): Promise<{ player: PlayerDTO }> {
     const methodName = this.getPlayerByPlayerID.name;
     logger.trace(

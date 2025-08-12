@@ -1,29 +1,60 @@
 import { INestApplication } from '@nestjs/common';
 import { getConnectionToken } from '@nestjs/mongoose';
+import { WsAdapter } from '@nestjs/platform-ws';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Connection, Model } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
-import { type PlayerID } from '@connect-four-app/shared';
+import { sharedLog, type PlayerID } from '@connect-four-app/shared';
 import { mockNow } from '@/__mocks__/commonMocks';
 import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
-import { mockPlayers } from '@/__mocks__/playerMocks';
+import {
+  mockFirstPlayer as mockFirstPlayerRawPassword,
+  mockPlayers,
+  type MockPlayer,
+} from '@/__mocks__/playerMocks';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
-import { DatabaseModule } from '@/database/database.module';
 import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-import { PlayersModule } from '@/players/players.module';
-import { Player } from '@/players/schemas/player.schema';
-import { expectSerializedDocumentToMatch } from '@/utils/testing';
 import {
   GameSession,
   GameSessionDocument,
-} from '../schemas/game-session.schema';
-import { GameSessionsModule } from './game-sessions.module';
+} from '@/game-engine/schemas/game-session.schema';
+import { Player } from '@/players/schemas/player.schema';
+import { expectSerializedDocumentToMatch } from '@/utils/testing';
+import { AppModule } from '@/app.module';
 import { GameSessionsService } from './game-sessions.service';
+
+const logger = sharedLog.getLogger('GameSessionsController__tests');
+
+async function getSessionCookieForPlayer({
+  requestRef,
+  nestApp,
+  mockPlayer,
+}: {
+  requestRef: typeof request;
+  nestApp: INestApplication;
+  mockPlayer: MockPlayer;
+}) {
+  const response = await requestRef(nestApp.getHttpServer())
+    .post('/auth/login')
+    .send({
+      username: mockPlayer.username,
+      password: mockPlayer.unhashedPassword,
+    });
+
+  const setCookieHeader = new Headers(response.headers).get('set-cookie');
+  if (setCookieHeader == null || setCookieHeader == '') {
+    throw new Error(
+      `[${getSessionCookieForPlayer.name}] No cookie value found in response headers! :(`,
+    );
+  }
+
+  return setCookieHeader.match(/connect\.sid=\S+[^;]/im)![0];
+}
 
 describe('GameSessionsController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
@@ -37,6 +68,7 @@ describe('GameSessionsController', () => {
 
   let app: INestApplication<App>;
   let mongoConnection: Connection;
+  let cookieValue: string;
   let playerModel: Model<Player>;
   let gameSessionsService: GameSessionsService;
   let gameSessionModel: Model<GameSession>;
@@ -44,15 +76,13 @@ describe('GameSessionsController', () => {
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        DatabaseModule, // force formatting
-        GameSessionsModule,
-        PlayersModule,
+        AppModule, // force formatting
       ],
       providers: [CatchAllFilterProvider, HttpExceptionFilterProvider],
     }).compile();
 
     app = module.createNestApplication();
-
+    app.useWebSocketAdapter(new WsAdapter(app));
     await app.init();
 
     mongoConnection = await app.resolve(getConnectionToken());
@@ -65,6 +95,12 @@ describe('GameSessionsController', () => {
       mockSecondPlayer,
       mockThirdPlayer,
     ]);
+
+    cookieValue = await getSessionCookieForPlayer({
+      requestRef: request,
+      nestApp: app,
+      mockPlayer: mockFirstPlayerRawPassword,
+    });
   });
 
   afterEach(async () => {
@@ -72,9 +108,10 @@ describe('GameSessionsController', () => {
   });
 
   afterAll(async () => {
-    await playerModel.deleteMany({}).exec();
     await gameSessionModel.deleteMany({}).exec();
+    await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 
@@ -93,11 +130,14 @@ describe('GameSessionsController', () => {
           playerOneID: mockFirstPlayer.playerID,
           playerTwoID: mockSecondPlayer.playerID,
         })
-        .set('Accept', 'application/json')
+        .set({
+          Accept: 'application/json',
+          Cookie: cookieValue,
+        })
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.session).not.toBeNull();
+          expect(resultBody.session).not.toBeNullish();
           expectSerializedDocumentToMatch<GameSession>(
             resultBody.session,
             createNewGameSessionMock({
@@ -118,7 +158,10 @@ describe('GameSessionsController', () => {
           playerOneID: mockFirstPlayer.playerID,
           playerTwoID: mockFirstPlayer.playerID,
         })
-        .set('Accept', 'application/json')
+        .set({
+          Accept: 'application/json',
+          Cookie: cookieValue,
+        })
         .expect((result) => {
           const { message, statusCode } = JSON.parse(result.text);
 
@@ -135,7 +178,10 @@ describe('GameSessionsController', () => {
           playerOneID: unregisteredPlayerID,
           playerTwoID: mockFirstPlayer.playerID,
         })
-        .set('Accept', 'application/json')
+        .set({
+          Accept: 'application/json',
+          Cookie: cookieValue,
+        })
         .expect((result) => {
           const { message, statusCode } = JSON.parse(result.text);
 
@@ -154,7 +200,10 @@ describe('GameSessionsController', () => {
           playerOneID: mockSecondPlayer.playerID,
           playerTwoID: unregisteredPlayerID,
         })
-        .set('Accept', 'application/json')
+        .set({
+          Accept: 'application/json',
+          Cookie: cookieValue,
+        })
         .expect((result) => {
           const { message, statusCode } = JSON.parse(result.text);
 
@@ -269,9 +318,24 @@ describe('GameSessionsController', () => {
         })
         .expect(404);
     });
+
+    it("should respond with validation error if 'sessionID' path param is not a valid MongoDB ObjectId", async () => {
+      const invalidSessionID = 'hooplah';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/${invalidSessionID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            `Invalid ObjectId: '${invalidSessionID}' is not a valid MongoDB ObjectId`,
+          );
+          expect(resultBody.statusCode).toBe(400);
+        });
+    });
   });
 
-  describe('/game-sessions/history (GET)', () => {
+  describe('/game-sessions/history/:playerID (GET)', () => {
     beforeEach(async () => {
       await gameSessionsService.createOne({
         playerOneID: mockFirstPlayer.playerID,
@@ -384,6 +448,21 @@ describe('GameSessionsController', () => {
           );
 
           expect(result.status).toBe(200);
+        });
+    });
+
+    it("should respond with validation error if 'playerID' path param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/game-sessions/history/${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
         });
     });
   });

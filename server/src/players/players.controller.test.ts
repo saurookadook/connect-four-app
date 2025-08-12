@@ -5,8 +5,7 @@ import { Connection, Model } from 'mongoose';
 import request from 'supertest';
 import { App } from 'supertest/types';
 
-import { mockNow } from '@/__mocks__/commonMocks';
-import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
+import { sharedLog } from '@connect-four-app/shared';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { AuthModule } from '@/auth/auth.module';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
@@ -15,11 +14,12 @@ import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-
-import { Player } from '@/players/schemas/player.schema';
+import { Player, PlayerDocument } from '@/players/schemas/player.schema';
 import { PlayersModule } from '@/players/players.module';
 import { PlayersService } from '@/players/players.service';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
+
+const logger = sharedLog.getLogger('PlayersController__tests');
 
 describe('PlayersController', () => {
   const [mockFirstPlayer, mockSecondPlayer, mockThirdPlayer] = mockPlayers;
@@ -27,6 +27,7 @@ describe('PlayersController', () => {
   let app: INestApplication<App>;
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
+  let playersService: PlayersService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -44,11 +45,18 @@ describe('PlayersController', () => {
 
     mongoConnection = await app.resolve(getConnectionToken());
     playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
+    playersService = await app.resolve(PlayersService);
+  });
+
+  afterEach(async () => {
+    await playerModel.deleteMany({}).exec();
+    jest.clearAllTimers();
   });
 
   afterAll(async () => {
     await playerModel.deleteMany({}).exec();
     await mongoConnection.close();
+    await app.close();
     jest.useRealTimers();
   });
 
@@ -71,7 +79,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.player).not.toBeNull();
+          expect(resultBody.player).not.toBeNullish();
           expectSerializedDocumentToMatch<Player>(
             resultBody.player, // force formatting
             {
@@ -95,15 +103,38 @@ describe('PlayersController', () => {
           expect(resultBody.statusCode).toBe(404);
         });
     });
+
+    it("should respond with validation error if 'playerID' path param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/players/${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
+        });
+    });
   });
 
   describe('/players/all (GET)', () => {
+    let testPlayers: PlayerDocument[];
+
     beforeEach(async () => {
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
+      testPlayers = await Promise.all([
+        playersService.createOne(mockFirstPlayer),
+        playersService.createOne(mockSecondPlayer),
+        playersService.createOne(mockThirdPlayer),
+      ]).then((results) =>
+        results.sort(
+          (a, b) =>
+            Number(new Date(a.updatedAt) < new Date(b.updatedAt)) -
+            Number(new Date(a.updatedAt) > new Date(b.updatedAt)),
+        ),
+      );
     });
 
     afterEach(async () => {
@@ -116,10 +147,10 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(3);
 
-          mockPlayers.forEach((expectedPlayer, index) => {
+          testPlayers.forEach((expectedPlayer, index) => {
             const playerFromResult = resultBody.playersData[index];
 
             expect(playerFromResult.playerID).toEqual(expectedPlayer.playerID);
@@ -134,11 +165,12 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(2);
 
-          [mockFirstPlayer, mockThirdPlayer].forEach(
-            (expectedPlayer, index) => {
+          testPlayers
+            .filter((player) => player.playerID !== mockSecondPlayer.playerID)
+            .forEach((expectedPlayer, index) => {
               const playerFromResult = resultBody.playersData[index];
 
               expect(playerFromResult.playerID).toEqual(
@@ -147,8 +179,7 @@ describe('PlayersController', () => {
               expect(playerFromResult.username).toEqual(
                 expectedPlayer.username,
               );
-            },
-          );
+            });
         });
     });
 
@@ -160,7 +191,7 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(0);
         });
     });
@@ -172,8 +203,23 @@ describe('PlayersController', () => {
         .expect((result) => {
           const resultBody = JSON.parse(result.text);
 
-          expect(resultBody.playersData).not.toBeNull();
+          expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(0);
+        });
+    });
+
+    it("should respond with validation error if 'currentPlayerID' query param is not a valid UUID", async () => {
+      const invalidPlayerID = 'woops';
+
+      await request(app.getHttpServer())
+        .get(`/players/all?currentPlayerID=${invalidPlayerID}`)
+        .expect((result) => {
+          const resultBody = JSON.parse(result.text);
+
+          expect(resultBody.message).toBeStringIncluding(
+            'Validation failed (uuid is expected)',
+          );
+          expect(resultBody.statusCode).toBe(400);
         });
     });
   });

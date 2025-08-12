@@ -12,7 +12,7 @@ import { Player, PlayerDocument } from './schemas/player.schema';
 import { PlayersModule } from './players.module';
 import { PlayersService } from './players.service';
 
-const logger = sharedLog.getLogger('PlayersService__Tests');
+const logger = sharedLog.getLogger('PlayersService__tests');
 
 const mockPlayerID = randomUUID();
 const mockNow = new Date();

@@ -1,3 +1,4 @@
+import { inspect } from 'node:util';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
@@ -74,7 +75,7 @@ describe('GameSessionsService', () => {
     });
   });
 
-  beforeEach(async () => {
+  afterEach(async () => {
     await gameSessionModel.deleteMany({}).exec();
     jest.clearAllTimers();
   });
@@ -191,7 +192,13 @@ describe('GameSessionsService', () => {
           playerOneID: mockThirdPlayer.playerID,
           playerTwoID: mockSecondPlayer.playerID,
         }),
-      ]);
+      ]).then((results) =>
+        results.sort(
+          (a, b) =>
+            Number(new Date(a.updatedAt) < new Date(b.updatedAt)) -
+            Number(new Date(a.updatedAt) > new Date(b.updatedAt)),
+        ),
+      );
     });
 
     afterEach(async () => {
@@ -205,14 +212,13 @@ describe('GameSessionsService', () => {
       expect(foundGameSessions).toHaveLength(3);
 
       foundGameSessions.forEach((foundGameSession, index) => {
-        const gameSessionAtInverseIndex = gameSessions.at(-1 - index);
-        const { playerOneID, playerTwoID } =
-          gameSessionAtInverseIndex as GameSessionDocument;
+        const gameSessionAtInverseIndex = gameSessions[index];
+        const { playerOneID, playerTwoID } = gameSessionAtInverseIndex;
 
         expectHydratedDocumentToMatch<GameSession>(foundGameSession, {
           ...createNewGameSessionDocumentMock({
-            _id: gameSessionAtInverseIndex!._id,
-            __v: gameSessionAtInverseIndex!.__v,
+            _id: gameSessionAtInverseIndex._id,
+            __v: gameSessionAtInverseIndex.__v,
             playerOneID: playerOneID,
             playerTwoID: playerTwoID,
           }),

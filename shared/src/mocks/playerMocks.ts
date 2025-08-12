@@ -1,7 +1,12 @@
 import { type PlayerID } from '@/types/main';
 import { mockNow } from './commonMocks';
 
-type MockUnregisteredPlayer = {
+/**
+ * @note Players of this type may or may not be registered
+ *
+ * @todo This should be consolidated with the one in `server`.
+ */
+type MockPlayer = {
   playerID: PlayerID;
   username: string;
   unhashedPassword: string;
@@ -9,21 +14,21 @@ type MockUnregisteredPlayer = {
   updatedAt: Date;
 };
 
-export const mockFirstPlayer: MockUnregisteredPlayer = {
+export const mockFirstPlayer: MockPlayer = {
   playerID: '80ac649a-ab17-4726-805e-d9cdd82e7eeb',
   username: 'player_uno',
   unhashedPassword: 'superdupergoodpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
-export const mockSecondPlayer: MockUnregisteredPlayer = {
+export const mockSecondPlayer: MockPlayer = {
   playerID: '55993b33-add4-4a8f-9549-bd41fe32a62c',
   username: 'player_dos',
   unhashedPassword: 'anothersuperduperpassword',
   createdAt: mockNow,
   updatedAt: mockNow,
 };
-export const mockThirdPlayer: MockUnregisteredPlayer = {
+export const mockThirdPlayer: MockPlayer = {
   playerID: '5ba3e6b9-ff75-42b7-89e8-f362a4a3a4af',
   username: 'player_tres',
   unhashedPassword: 'eatmoarveggies',

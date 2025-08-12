@@ -1,5 +1,10 @@
+import { inspect } from 'node:util';
 import { Types } from 'mongoose';
 import { Document, HydratedDocument } from 'mongoose';
+
+import { sharedLog } from '@connect-four-app/shared';
+
+const logger = sharedLog.getLogger('mongo-helpers');
 
 // TODO: would be great to generate this somehow based on a schema?
 export const dateFields = new Set(['createdAt', 'updatedAt']);
@@ -8,7 +13,7 @@ export function expectHydratedDocumentToMatch<T>(
   documentUnderTest: HydratedDocument<T>,
   expected: { _id?: Types.ObjectId; __v?: number } & Partial<T>,
 ): void {
-  expect(documentUnderTest).not.toBeNull();
+  expect(documentUnderTest).not.toBeNullish();
   expect(documentUnderTest).toHaveProperty('_id', expect.any(Types.ObjectId));
 
   for (const [key, value] of Object.entries(expected)) {
@@ -30,7 +35,7 @@ export function expectSerializedDocumentToMatch<T>(
   documentUnderTest: Partial<T>,
   expected: Partial<T> & { id?: string },
 ): void {
-  expect(documentUnderTest).not.toBeNull();
+  expect(documentUnderTest).not.toBeNullish();
   expect(documentUnderTest).toHaveProperty('id', expect.any(String));
 
   for (const [key, value] of Object.entries(expected)) {
