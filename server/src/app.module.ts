@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import connectMongoDBSession from 'connect-mongodb-session';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -37,6 +38,11 @@ function createSessionStore() {
 @Module({
   controllers: [AppController],
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      isGlobal: true,
+      load: [baseConfig],
+    }),
     AuthModule,
     DatabaseModule,
     GameEngineModule, // force formatting
