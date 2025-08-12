@@ -30,7 +30,6 @@ export default () => {
     MONGO_PORT,
     NODE_ENV,
     SERVER_PORT,
-    WS_PROTOCOL,
     WS_PORT,
   } = process.env;
 
