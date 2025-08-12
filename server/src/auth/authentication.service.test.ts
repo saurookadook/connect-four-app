@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Connection, Model, Types } from 'mongoose';
 
+import { RootConfigModule } from '@/config';
 import { PLAYER_MODEL_TOKEN } from '@/constants';
 import { DatabaseModule } from '@/database/database.module';
 import { Player } from '@/players/schemas/player.schema';
@@ -31,6 +32,7 @@ describe('AuthenticationService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         AuthModule,
       ],

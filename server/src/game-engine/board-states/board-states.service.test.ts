@@ -17,6 +17,7 @@ import {
   type GameSessionMock,
 } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
+import { RootConfigModule } from '@/config';
 import {
   BOARD_STATE_MODEL_TOKEN,
   GAME_SESSION_MODEL_TOKEN,
@@ -53,6 +54,7 @@ describe('BoardStatesService', () => {
     });
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         BoardStatesModule,
         GameSessionsModule,

@@ -5,6 +5,7 @@ import { Connection, Model } from 'mongoose';
 
 import { sharedLog } from '@connect-four-app/shared';
 import { mockPlayers } from '@/__mocks__/playerMocks';
+import { RootConfigModule } from '@/config';
 import { PLAYER_MODEL_TOKEN } from '@/constants/db';
 import { DatabaseModule } from '@/database/database.module';
 import { expectHydratedDocumentToMatch } from '@/utils/testing';
@@ -37,6 +38,7 @@ describe('PlayersService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        RootConfigModule,
         DatabaseModule, // force formatting
         PlayersModule,
       ],
