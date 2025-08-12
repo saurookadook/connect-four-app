@@ -6,8 +6,6 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 
 import { sharedLog } from '@connect-four-app/shared';
-import { mockNow } from '@/__mocks__/commonMocks';
-import { createNewGameSessionMock } from '@/__mocks__/gameSessionsMocks';
 import { mockPlayers } from '@/__mocks__/playerMocks';
 import { AuthModule } from '@/auth/auth.module';
 import { GAME_SESSION_MODEL_TOKEN, PLAYER_MODEL_TOKEN } from '@/constants';
@@ -16,7 +14,7 @@ import {
   CatchAllFilterProvider,
   HttpExceptionFilterProvider,
 } from '@/filters/filters.providers';
-import { Player } from '@/players/schemas/player.schema';
+import { Player, PlayerDocument } from '@/players/schemas/player.schema';
 import { PlayersModule } from '@/players/players.module';
 import { PlayersService } from '@/players/players.service';
 import { expectSerializedDocumentToMatch } from '@/utils/testing';
@@ -29,6 +27,7 @@ describe('PlayersController', () => {
   let app: INestApplication<App>;
   let mongoConnection: Connection;
   let playerModel: Model<Player>;
+  let playersService: PlayersService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -46,6 +45,12 @@ describe('PlayersController', () => {
 
     mongoConnection = await app.resolve(getConnectionToken());
     playerModel = await app.resolve(PLAYER_MODEL_TOKEN);
+    playersService = await app.resolve(PlayersService);
+  });
+
+  afterEach(async () => {
+    await playerModel.deleteMany({}).exec();
+    jest.clearAllTimers();
   });
 
   afterAll(async () => {
@@ -116,12 +121,20 @@ describe('PlayersController', () => {
   });
 
   describe('/players/all (GET)', () => {
+    let testPlayers: PlayerDocument[];
+
     beforeEach(async () => {
-      await playerModel.insertMany([
-        mockFirstPlayer,
-        mockSecondPlayer,
-        mockThirdPlayer,
-      ]);
+      testPlayers = await Promise.all([
+        playersService.createOne(mockFirstPlayer),
+        playersService.createOne(mockSecondPlayer),
+        playersService.createOne(mockThirdPlayer),
+      ]).then((results) =>
+        results.sort(
+          (a, b) =>
+            Number(new Date(a.updatedAt) < new Date(b.updatedAt)) -
+            Number(new Date(a.updatedAt) > new Date(b.updatedAt)),
+        ),
+      );
     });
 
     afterEach(async () => {
@@ -137,7 +150,7 @@ describe('PlayersController', () => {
           expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(3);
 
-          mockPlayers.forEach((expectedPlayer, index) => {
+          testPlayers.forEach((expectedPlayer, index) => {
             const playerFromResult = resultBody.playersData[index];
 
             expect(playerFromResult.playerID).toEqual(expectedPlayer.playerID);
@@ -155,8 +168,9 @@ describe('PlayersController', () => {
           expect(resultBody.playersData).not.toBeNullish();
           expect(resultBody.playersData).toHaveLength(2);
 
-          [mockFirstPlayer, mockThirdPlayer].forEach(
-            (expectedPlayer, index) => {
+          testPlayers
+            .filter((player) => player.playerID !== mockSecondPlayer.playerID)
+            .forEach((expectedPlayer, index) => {
               const playerFromResult = resultBody.playersData[index];
 
               expect(playerFromResult.playerID).toEqual(
@@ -165,8 +179,7 @@ describe('PlayersController', () => {
               expect(playerFromResult.username).toEqual(
                 expectedPlayer.username,
               );
-            },
-          );
+            });
         });
     });
 
