@@ -1,6 +1,6 @@
 # connect-four-app
 
-A little [Conect Four](https://en.wikipedia.org/wiki/Connect_Four) app built using:
+A little [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) app built using:
 
 - [NestJS](https://nestjs.com/)
 - [React](https://react.dev/)
